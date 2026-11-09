@@ -23,6 +23,23 @@
     }
     .card:hover .card-icono svg { transform: scale(1.1); }
 
+    /* 🛑 BOTÓN FLOTANTE MODO CINE 🛑 */
+    .btn-modo-cine {
+      position: fixed; bottom: 210px; right: 20px; z-index: 9998;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 2px solid rgba(255,255,255,0.1); color: #e4e4e7; 
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 1.5rem;
+    }
+    .btn-modo-cine:hover { 
+      transform: translateY(-5px) scale(1.05); 
+      box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4); 
+      color: #a78bfa;
+    }
+    .btn-modo-cine svg { width: 24px; height: 24px; fill: currentColor; }
+
     /* 🛑 MODAL RECUERDO DEL DÍA 🛑 */
     .modal-recuerdo {
       position: fixed; inset: 0; background: rgba(15, 10, 25, 0.85);
@@ -176,7 +193,10 @@
   <footer class="footer"><p>Hecho con amor solo para ti</p></footer>
   <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
 
-  <!-- 🛑 BOTÓN FLOTANTE Y MODAL DEL RECUERDO DEL DÍA 🛑 -->
+  <!-- 🛑 BOTONES FLOTANTES 🛑 -->
+  <button class="btn-modo-cine" id="btnModoCine" title="Modo Cine" style="display: none;">
+    <svg viewBox="0 0 24 24"><path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
+  </button>
   <button class="btn-recuerdo-flotante" id="btnVerRecuerdo" title="Recuerdo del Día">📸</button>
   
   <div class="modal-recuerdo" id="modalRecuerdo">
@@ -256,25 +276,6 @@
       `;
     }
 
-    // 🛑 NUEVA FUNCIÓN PARA INICIAR EL MODO CINE CON LOS FONDOS DE SUPABASE 🛑
-    function iniciarModoCineConFondos(fondos) {
-      if (!fondos || fondos.length === 0) {
-        alert("Aún no has seleccionado fotos para el Modo Cine en el panel de administración.");
-        return;
-      }
-      
-      // Si tienes una función en js/script.js que abre el modo cine, la llamamos aquí.
-      // Si no, podemos crear un modal sencillo para mostrarlas.
-      if (window.abrirModoCine && typeof window.abrirModoCine === 'function') {
-        window.abrirModoCine(fondos);
-      } else {
-        // Fallback: Si no hay función, mostramos un mensaje.
-        alert(`Cargando ${fondos.length} fotos para el Modo Cine...`);
-        console.log("Fondos del modo cine listos:", fondos);
-        // Aquí podrías implementar la apertura de un modal si no existe en script.js
-      }
-    }
-
     async function initIndex() {
       document.documentElement.style.visibility = "hidden";
       
@@ -308,14 +309,23 @@
           }
         }
 
-        // 🛑 CARGAR FONDOS DE CINE 🛑
-        // Se los pasamos a la función que abre el modo cine
+        // 🛑 CARGAR BOTÓN DE MODO CINE 🛑
+        const btnModoCine = document.getElementById('btnModoCine');
         if (datos.couple && datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
-          // Escuchar el clic en el botón del modo cine (si existe)
-          const btnModoCine = document.getElementById('btnModoCine');
           if (btnModoCine) {
-            btnModoCine.onclick = () => iniciarModoCineConFondos(datos.couple.fondos_modo_cine);
+            btnModoCine.style.display = 'flex'; // Mostrar botón
+            btnModoCine.onclick = () => {
+              // Abrir el modo cine pasando los fondos
+              if (typeof window.abrirModoCine === 'function') {
+                window.abrirModoCine(datos.couple.fondos_modo_cine);
+              } else {
+                alert("El visor de cine no está configurado en js/script.js");
+                console.log("Fondos de cine:", datos.couple.fondos_modo_cine);
+              }
+            };
           }
+        } else {
+          if (btnModoCine) btnModoCine.style.display = 'none'; // Ocultar si no hay fondos
         }
 
         const musicCard = document.getElementById('musicCard');
@@ -372,10 +382,20 @@
               }
               // Actualizar fondos de cine en tiempo real
               if (e.detail.data.fondos_modo_cine) {
-                // Re-vincular el botón con los nuevos fondos
                 const btnModoCine = document.getElementById('btnModoCine');
                 if (btnModoCine) {
-                  btnModoCine.onclick = () => iniciarModoCineConFondos(e.detail.data.fondos_modo_cine);
+                  if (e.detail.data.fondos_modo_cine.length > 0) {
+                    btnModoCine.style.display = 'flex';
+                    btnModoCine.onclick = () => {
+                      if (typeof window.abrirModoCine === 'function') {
+                        window.abrirModoCine(e.detail.data.fondos_modo_cine);
+                      } else {
+                        alert("El visor de cine no está configurado en js/script.js");
+                      }
+                    };
+                  } else {
+                    btnModoCine.style.display = 'none';
+                  }
                 }
               }
               // Actualizar música
