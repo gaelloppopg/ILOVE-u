@@ -13,198 +13,244 @@
   <meta name="theme-color" content="#f28ca6" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>" />
 
+  <!-- 🛑 LIBRERÍA PARA EL MOVIMIENTO 3D 🛑 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+
   <style>
+    /* =========================================
+       VARIABLES Y ESTILOS BASE
+       ========================================= */
     :root {
-      --dorado-suave: #c9a050;
-      --rosa-profundo: #d96c88;
-      --texto-elegante: #2c1a24;
       --bg-claro: #fdfafb;
-      --bg-tarjeta: #ffffff;
-      --borde-sutil: rgba(242, 140, 166, 0.15);
+      --bg-tarjeta: rgba(255, 255, 255, 0.85);
+      --texto-principal: #2c1a24;
+      --texto-secundario: #7a5c8c;
+      --dorado: #c9a050;
+      --rosa: #d96c88;
+      --borde: rgba(242, 140, 166, 0.2);
+      --sombra: 0 15px 35px rgba(217, 108, 136, 0.1);
+      --nube-color: rgba(255, 255, 255, 0.9);
     }
 
-    /* 🛑 VARIABLES PARA EL MODO OSCURO 🛑 */
+    /* 🛑 MODO OSCURO (Noche) 🛑 */
     body.modo-noche {
-      --texto-elegante: #f0e6eb;
-      --bg-claro: #121015;
-      --bg-tarjeta: #1c1920;
-      --borde-sutil: rgba(255, 255, 255, 0.05);
-      --dorado-suave: #e0b96a;
-      background-color: var(--bg-claro) !important;
-      color: var(--texto-elegante) !important;
+      --bg-claro: #0b0e14;
+      --bg-tarjeta: rgba(26, 30, 42, 0.85);
+      --texto-principal: #e2e8f0;
+      --texto-secundario: #94a3b8;
+      --dorado: #fbbf24;
+      --rosa: #f472b6;
+      --borde: rgba(255, 255, 255, 0.08);
+      --sombra: 0 15px 35px rgba(0, 0, 0, 0.4);
+      --nube-color: rgba(255, 255, 255, 0.03);
     }
 
-    body { transition: background-color 0.5s ease, color 0.5s ease; background-color: var(--bg-claro); color: var(--texto-elegante); }
+    body { 
+      background-color: var(--bg-claro); 
+      color: var(--texto-principal); 
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 1s ease, color 1s ease;
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    /* 🛑 FONDO DE NUBES (Se mueven con CSS) 🛑 */
+    .fondo-nubes {
+      position: fixed; inset: 0; z-index: -1; overflow: hidden;
+      background: linear-gradient(180deg, #fdfafb 0%, #fceef2 100%);
+      transition: background 1s ease;
+    }
+    body.modo-noche .fondo-nubes {
+      background: linear-gradient(180deg, #0b0e14 0%, #1a1f2e 100%);
+    }
+    .nube {
+      position: absolute; background: var(--nube-color); border-radius: 50%;
+      filter: blur(40px); opacity: 0.8; animation: flotarNubes 20s linear infinite;
+      transition: background 1s ease;
+    }
+    .nube:nth-child(1) { width: 300px; height: 100px; top: 10%; left: -10%; animation-duration: 25s; }
+    .nube:nth-child(2) { width: 400px; height: 150px; top: 40%; left: -20%; animation-duration: 35s; animation-delay: -5s; }
+    .nube:nth-child(3) { width: 250px; height: 80px; top: 70%; left: -15%; animation-duration: 22s; animation-delay: -10s; }
+    .nube:nth-child(4) { width: 350px; height: 120px; top: 20%; right: -15%; animation-duration: 28s; animation-delay: -2s; animation-direction: reverse; }
+    .nube:nth-child(5) { width: 200px; height: 60px; top: 80%; right: -10%; animation-duration: 20s; animation-delay: -15s; animation-direction: reverse; }
     
+    @keyframes flotarNubes {
+      0% { transform: translateX(0) translateY(0); }
+      50% { transform: translateX(30vw) translateY(-20px); }
+      100% { transform: translateX(0) translateY(0); }
+    }
+
+    /* ESTILOS DE LA PÁGINA */
     #btnAdmin, #btnInvitarPareja { display: none !important; }
-    .spotify-iframe { border-radius: 16px; margin-top: 15px; border: none; width: 100%; height: 152px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    .hero { position: relative; padding: 120px 20px 80px; text-align: center; z-index: 2; }
+    .hero-title { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(2.5rem, 6vw, 4.5rem); margin: 10px 0 20px; }
+    .hero-subtitle { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic; max-width: 600px; margin: 0 auto; color: var(--texto-secundario); }
 
-    /* Portada más visible en modo claro */
-    .hero { position: relative; overflow: hidden; }
-    .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.6; filter: brightness(1.1); z-index: 1; transition: opacity 0.5s ease; }
-    body.modo-noche .hero-img { opacity: 0.2; filter: brightness(0.6); }
-    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,250,245,0.4), rgba(253,250,251,1)); z-index: 2; transition: background 0.5s ease; }
-    body.modo-noche .hero-overlay { background: linear-gradient(180deg, rgba(18,16,21,0.4), rgba(18,16,21,1)); }
-    .hero-content { position: relative; z-index: 3; }
-
-    /* 🛑 REDISEÑO DEL MENÚ (Lista elegante en lugar de botones) 🛑 */
-    .menu-lista { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
-    .menu-item {
-      display: flex; align-items: center; gap: 20px; padding: 20px 30px;
-      background: var(--bg-tarjeta); border: 1px solid var(--borde-sutil);
-      border-radius: 12px; text-decoration: none; color: var(--texto-elegante);
-      transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    /* 🛑 BENTO GRID (Tarjetas 3D) 🛑 */
+    .bento-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px; max-width: 1100px; margin: 0 auto; padding: 20px;
+      perspective: 1000px;
     }
-    .menu-item:hover { transform: translateX(10px); border-color: var(--rosa-profundo); box-shadow: 0 8px 25px rgba(217, 108, 136, 0.15); }
-    .menu-item svg { width: 32px; height: 32px; stroke: var(--rosa-profundo); fill: none; stroke-width: 1.5; flex-shrink: 0; }
-    body.modo-noche .menu-item svg { stroke: var(--dorado-suave); }
-    .menu-item-info h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin: 0 0 4px 0; font-weight: 600; }
-    .menu-item-info p { font-family: 'Cormorant Garamond', serif; font-size: 1rem; margin: 0; color: #7a5c8c; font-style: italic; }
-    body.modo-noche .menu-item-info p { color: #a8959e; }
-
-    /* Secciones generales */
-    .sobre-section, .music-section { padding: 80px 20px; text-align: center; background: transparent; }
-    .sobre-titulo, .music-section::before { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.4rem; color: var(--texto-elegante); margin-bottom: 15px; }
-    .sobre-sub { color: #7a5c8c; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-style: italic; margin-bottom: 40px; }
-    body.modo-noche .sobre-sub { color: #a8959e; }
-
-    /* Sobre interactivo */
-    .sobre-btn { width: 160px; height: 100px; background: var(--bg-tarjeta); border: 1px solid var(--borde-sutil); border-radius: 6px; position: relative; cursor: pointer; display: inline-block; transition: all 0.4s ease; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
-    .sobre-btn::before { content: ''; position: absolute; top: 0; left: 0; border-left: 78px solid transparent; border-right: 78px solid transparent; border-top: 50px solid var(--borde-sutil); border-radius: 6px 6px 0 0; transition: 0.4s; }
-    .sobre-btn::after { content: "❤"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; background: var(--dorado-suave); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
-    .sobre-btn:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(217, 108, 136, 0.2); }
+    .bento-item {
+      background: var(--bg-tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: 24px;
+      padding: 30px;
+      display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+      text-decoration: none; color: var(--texto-principal);
+      box-shadow: var(--sombra);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      transform-style: preserve-3d;
+    }
+    .bento-item:hover { border-color: var(--rosa); box-shadow: 0 25px 50px rgba(217, 108, 136, 0.25); }
+    .bento-item svg { width: 36px; height: 36px; stroke: var(--rosa); fill: none; stroke-width: 1.5; margin-bottom: 15px; transform: translateZ(30px); }
+    .bento-item h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0 0 8px 0; transform: translateZ(20px); }
+    .bento-item p { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-style: italic; color: var(--texto-secundario); margin: 0; transform: translateZ(10px); }
     
-    .mensaje-sobre { max-width: 600px; margin: 30px auto 0; padding: 30px 40px; background: var(--bg-tarjeta); border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.06); display: none; font-family: 'Caveat', cursive; font-size: 2rem; color: var(--texto-elegante); line-height: 1.5; border-left: 4px solid var(--rosa-profundo); }
-    .mensaje-sobre.visible { display: block; animation: fadeInUp 0.5s ease; }
+    /* Tarjetas destacadas (Bento Box) */
+    .bento-item.grande { grid-column: span 2; }
+    .bento-item.destacado { background: linear-gradient(135deg, rgba(217,108,136,0.1), rgba(201,160,80,0.1)); border-color: var(--dorado); }
 
-    /* Botones flotantes */
-    .btn-recuerdo-flotante, .btn-modo-cine { position: fixed; right: 20px; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.15); transition: all 0.3s ease; z-index: 9997; }
-    .btn-recuerdo-flotante { bottom: 20px; background: var(--bg-tarjeta); border: 1px solid var(--borde-sutil); color: var(--rosa-profundo); font-size: 1.3rem; }
+    @media (max-width: 768px) {
+      .bento-item.grande { grid-column: span 1; }
+    }
+
+    /* Resto de estilos (Sobre, Música, etc.) */
+    .sobre-section, .music-section { padding: 80px 20px; text-align: center; z-index: 2; position: relative; }
+    .sobre-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.4rem; margin-bottom: 15px; }
+    .sobre-btn { width: 160px; height: 100px; background: var(--bg-tarjeta); border: 1px solid var(--borde); border-radius: 6px; position: relative; cursor: pointer; display: inline-block; box-shadow: var(--sombra); margin: 20px 0; }
+    .sobre-btn::before { content: ''; position: absolute; top: 0; left: 0; border-left: 78px solid transparent; border-right: 78px solid transparent; border-top: 50px solid var(--borde); border-radius: 6px 6px 0 0; }
+    .sobre-btn::after { content: "❤"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; background: var(--dorado); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .mensaje-sobre { max-width: 600px; margin: 0 auto; padding: 30px; background: var(--bg-tarjeta); border-radius: 12px; display: none; font-family: 'Caveat', cursive; font-size: 2rem; border-left: 4px solid var(--rosa); box-shadow: var(--sombra); }
+    .mensaje-sobre.visible { display: block; animation: fadeInUp 0.5s ease; }
+    
+    .music-card { max-width: 600px; margin: 0 auto; background: var(--bg-tarjeta); border: 1px solid var(--borde); border-radius: 16px; padding: 30px; box-shadow: var(--sombra); }
+
+    /* Botones Flotantes */
+    .btn-recuerdo-flotante, .btn-modo-cine { position: fixed; right: 20px; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 9997; transition: transform 0.3s; }
+    .btn-recuerdo-flotante { bottom: 20px; background: var(--bg-tarjeta); border: 1px solid var(--borde); color: var(--rosa); font-size: 1.3rem; }
     .btn-modo-cine { bottom: 85px; background: #1a1a1a; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
     .btn-recuerdo-flotante:hover, .btn-modo-cine:hover { transform: translateY(-5px) scale(1.05); }
 
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
-<body data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti">
+<body>
+
+  <!-- 🛑 FONDO DE NUBES 🛑 -->
+  <div class="fondo-nubes">
+    <div class="nube"></div>
+    <div class="nube"></div>
+    <div class="nube"></div>
+    <div class="nube"></div>
+    <div class="nube"></div>
+  </div>
 
   <!-- 1. PORTADA (HERO) -->
-  <section class="hero" id="heroSection" style="padding: 120px 20px 80px;">
-    <div class="hero-overlay"></div>
-    <img src="assets/images/portada.jpg" alt="Portada" class="hero-img" id="portadaImg" onerror="this.style.display='none'">
+  <section class="hero" id="heroSection">
+    <img src="assets/images/portada.jpg" alt="Portada" id="portadaImg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; z-index: -1; border-radius: 0 0 50px 50px; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);">
+    
+    <p id="saludoTag" style="letter-spacing: 4px; text-transform: uppercase; font-size: 0.8rem; color: var(--dorado); font-weight: 600;">Un pequeño universo</p>
+    <h1 class="hero-title" id="tituloSaludo">Hola, Mi Amor</h1>
+    <p class="hero-subtitle">Cada rincón de esta página guarda algo nuestro.<br>Tómate tu tiempo... esto es <em>todo</em> para ti.</p>
 
-    <div class="hero-content">
-      <p class="hero-tag" id="saludoTag" style="letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; color: var(--dorado-suave);">Un pequeño universo hecho para ti</p>
-      <h1 class="hero-title" id="tituloSaludo" style="font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(2.5rem, 5vw, 4rem); margin: 10px 0 20px;">Hola, Mi Amor</h1>
-      <p class="hero-subtitle" style="font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic; max-width: 600px; margin: 0 auto; line-height: 1.6;">Cada rincón de esta página guarda algo nuestro.<br>Tómate tu tiempo... esto es <em>todo</em> para ti.</p>
-
-      <div class="contador-hero" id="contador" style="display: flex; gap: 20px; justify-content: center; margin: 40px 0;">
-        <div class="contador-item" style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--borde-sutil);"><span id="dias" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa-profundo);">0</span><small style="font-family: 'Poppins'; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #7a5c8c;">Días</small></div>
-        <div class="contador-item" style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--borde-sutil);"><span id="horas" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa-profundo);">0</span><small style="font-family: 'Poppins'; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #7a5c8c;">Horas</small></div>
-        <div class="contador-item" style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--borde-sutil);"><span id="minutos" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa-profundo);">0</span><small style="font-family: 'Poppins'; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #7a5c8c;">Min</small></div>
-        <div class="contador-item" style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--borde-sutil);"><span id="segundos" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa-profundo);">0</span><small style="font-family: 'Poppins'; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: #7a5c8c;">Seg</small></div>
-      </div>
-
-      <p class="contador-label" style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem;">Juntos desde el <strong id="fecha-inicio">Cargando fecha...</strong></p>
+    <div id="contador" style="display: flex; gap: 15px; justify-content: center; margin: 40px 0;">
+      <div style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra);"><span id="dias" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa);">0</span><small style="font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario);">Días</small></div>
+      <div style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra);"><span id="horas" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa);">0</span><small style="font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario);">Horas</small></div>
+      <div style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra);"><span id="minutos" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa);">0</span><small style="font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario);">Min</small></div>
+      <div style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra);"><span id="segundos" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa);">0</span><small style="font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario);">Seg</small></div>
     </div>
+    <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--texto-secundario);">Juntos desde el <strong id="fecha-inicio">Cargando fecha...</strong></p>
   </section>
 
   <!-- 2. EL SOBRE SECRETO -->
   <section class="sobre-section" id="seccionSobre">
     <h2 class="sobre-titulo">Un mensaje para ti</h2>
-    <p class="sobre-sub">Presiona el sobre para descubrir lo que guardé hoy.</p>
+    <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2rem; color: var(--texto-secundario); margin-bottom: 20px;">Presiona el sobre para descubrir lo que guardé hoy.</p>
     <div class="sobre-btn" id="btnAbrirSobre"></div>
     <div class="mensaje-sobre" id="mensajeSobre">
-      <p id="textoCartaSecreta" style="margin: 0;">"Eres mi persona favorita en el mundo entero."</p>
-      <small id="autorCartaSecreta" style="display:block; margin-top: 15px; font-family: 'Poppins'; font-size: 0.8rem; color: #888;"></small>
+      <p id="textoCartaSecreta" style="margin: 0;">"Eres mi persona favorita."</p>
+      <small id="autorCartaSecreta" style="display:block; margin-top: 15px; font-family: 'Poppins'; font-size: 0.8rem; color: var(--texto-secundario);"></small>
     </div>
   </section>
 
-  <!-- 3. MENÚ PRINCIPAL REDISEÑADO -->
-  <section class="menu" id="menu" style="max-width: 800px; margin: 0 auto; padding: 40px 20px 80px;">
-    <h2 class="section-title" style="font-family: 'Playfair Display', serif; font-style: italic; text-align: center; font-size: 2.4rem; margin-bottom: 10px;">Explora Nuestro Mundo</h2>
-    <p class="section-sub" style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2rem; text-align: center; color: #7a5c8c; margin-bottom: 40px;">Cada sección es un pedacito de nosotros</p>
-
-    <div class="menu-lista">
-      <a href="pages/historia.html" class="menu-item">
+  <!-- 3. MENÚ PRINCIPAL (BENTO GRID 3D) -->
+  <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
+    <h2 class="sobre-titulo" style="text-align: center; margin-bottom: 40px;">Explora Nuestro Mundo</h2>
+    
+    <div class="bento-grid">
+      
+      <!-- Tarjeta Destacada (Historia) -->
+      <a href="pages/historia.html" class="bento-item grande destacado" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
         <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-        <div class="menu-item-info"><h3>Nuestra Historia</h3><p>Cómo nos conocimos y todo lo que vino después.</p></div>
+        <h3 style="font-size: 1.8rem;">Nuestra Historia</h3>
+        <p>Cómo nos conocimos y todo lo que vino después. Un viaje por nuestros momentos más importantes.</p>
       </a>
-      <a href="pages/recuerdos.html" class="menu-item">
+
+      <!-- Tarjeta Normal (Recuerdos) -->
+      <a href="pages/recuerdos.html" class="bento-item" data-tilt>
         <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-        <div class="menu-item-info"><h3>Recuerdos</h3><p>Momentos, fotos y cosas que me recuerdan a ti.</p></div>
+        <h3>Recuerdos</h3>
+        <p>Momentos, fotos y cosas que me recuerdan a ti.</p>
       </a>
-      <a href="pages/cartas.html" class="menu-item">
+
+      <!-- Tarjeta Normal (Cartas) -->
+      <a href="pages/cartas.html" class="bento-item" data-tilt>
         <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-        <div class="menu-item-info"><h3>Cartas</h3><p>Se desbloquea una nueva cada 48 horas.</p></div>
+        <h3>Cartas</h3>
+        <p>Se desbloquea una nueva cada 48 horas.</p>
       </a>
-      <a href="pages/razones.html" class="menu-item">
+
+      <!-- Tarjeta Normal (Razones) -->
+      <a href="pages/razones.html" class="bento-item" data-tilt>
         <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-        <div class="menu-item-info"><h3>1000 Razones</h3><p>Todas las razones por las que me enamoré de ti.</p></div>
+        <h3>1000 Razones</h3>
+        <p>Todas las razones por las que me enamoré de ti.</p>
       </a>
-      <a href="pages/juego.html" class="menu-item">
+
+      <!-- Tarjeta Normal (Juego) -->
+      <a href="pages/juego.html" class="bento-item" data-tilt>
         <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        <div class="menu-item-info"><h3>El Juego</h3><p>Cuánto me conoces? Gana puntos amorosos.</p></div>
+        <h3>El Juego</h3>
+        <p>Cuánto me conoces? Gana puntos amorosos.</p>
       </a>
-      <a href="pages/cuponera.html" class="menu-item">
-        <svg viewBox="0 0 24 24"><path d="M20 12v10H4V12"></path><path d="M2 7h20v5H2z"></path><path d="M12 22V7"></path><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-        <div class="menu-item-info"><h3>Cuponera</h3><p>Canjea tus puntos por cupones especiales.</p></div>
-      </a>
-      <a href="pages/diario.html" class="menu-item">
-        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="11" x2="16" y2="11"></line></svg>
-        <div class="menu-item-info"><h3>Nuestro Diario</h3><p>Un mural de momentos, uno por uno.</p></div>
-      </a>
-      <a href="pages/arte.html" class="menu-item">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>
-        <div class="menu-item-info"><h3>Taller de Arte</h3><p>Dibuja, guarda y descarga tus obras.</p></div>
-      </a>
-      <a href="pages/audios.html" class="menu-item">
-        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-        <div class="menu-item-info"><h3>Notas de Voz</h3><p>Mensajes de voz para escuchar cuando quieras.</p></div>
-      </a>
-      <a href="pages/mapa.html" class="menu-item">
+
+      <!-- Tarjeta Normal (Mapa) -->
+      <a href="pages/mapa.html" class="bento-item" data-tilt>
         <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        <div class="menu-item-info"><h3>Mapa de Recuerdos</h3><p>Los lugares que marcan nuestra historia.</p></div>
+        <h3>Mapa de Recuerdos</h3>
+        <p>Los lugares que marcan nuestra historia.</p>
       </a>
-      <a href="pages/calendario.html" class="menu-item">
+
+      <!-- Tarjeta Normal (Calendario) -->
+      <a href="pages/calendario.html" class="bento-item" data-tilt>
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        <div class="menu-item-info"><h3>Calendario</h3><p>Fechas importantes que no queremos olvidar.</p></div>
+        <h3>Calendario</h3>
+        <p>Fechas importantes que no queremos olvidar.</p>
       </a>
-      <a href="pages/metas.html" class="menu-item">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-        <div class="menu-item-info"><h3>Nuestros Sueños</h3><p>Las metas y sueños que queremos cumplir juntos.</p></div>
+
+      <!-- Admin -->
+      <a href="admin.html" id="btnAdmin" class="bento-item" data-tilt style="border: 1px dashed var(--dorado);">
+        <svg viewBox="0 0 24 24" style="stroke: var(--dorado);"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <h3 style="color: var(--dorado);">Admin</h3>
+        <p>Configura la página.</p>
       </a>
-      <a href="admin.html" id="btnAdmin" class="menu-item" style="border: 1px dashed var(--dorado-suave); background: rgba(201, 160, 80, 0.05);">
-        <svg viewBox="0 0 24 24" style="stroke: var(--dorado-suave);"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        <div class="menu-item-info"><h3 style="color: var(--dorado-suave);">Panel de Admin</h3><p>Configura cartas, juego y cupones.</p></div>
-      </a>
+
     </div>
   </section>
 
   <!-- 4. LA MÚSICA -->
   <section class="music-section">
     <h2 class="sobre-titulo" style="font-size: 2rem; margin-bottom: 30px;">Nuestra Melodía</h2>
-    <div class="music-card" id="musicCard" style="max-width: 600px; margin: 0 auto; background: var(--bg-tarjeta); border: 1px solid var(--borde-sutil); border-radius: 12px; padding: 30px;"></div>
+    <div class="music-card" id="musicCard"></div>
   </section>
 
-  <!-- 5. INVITAR A LA PAREJA -->
-  <section id="btnInvitarPareja" style="text-align: center; padding: 60px 30px; background: var(--bg-tarjeta); margin: 40px auto; max-width: 800px; border-radius: 12px; border: 1px solid var(--borde-sutil);">
-    <h3 style="font-family: 'Playfair Display', serif; font-style: italic; color: var(--texto-elegante); margin-bottom: 12px; font-size: 2rem;">Un espacio para dos</h3>
-    <p style="color: #7a5c8c; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; margin-bottom: 30px; font-style: italic;">Genera un código único y su código QR para que tu pareja se una a este pequeño universo.</p>
-    <a href="invitar.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; background: var(--dorado-suave); color: #fff; padding: 12px 24px; text-decoration: none;">
-      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-      Generar Código / QR
-    </a>
-  </section>
-
-  <!-- BOTÓN PWA -->
-  <div style="text-align: center; padding-bottom: 40px;">
-    <button id="btnInstalarPWAUnico" style="display: none; padding: 16px 40px; background: linear-gradient(135deg, #d96c88, #c9a050); color: #fff; border: none; border-radius: 50px; font-family: 'Poppins'; font-weight: 600; cursor: pointer;">
-      Instalar Nuestra App
-    </button>
-  </div>
-
-  <footer class="footer" style="text-align: center; padding: 30px; border-top: 1px solid var(--borde-sutil); font-size: 0.9rem; color: #7a5c8c; font-style: italic;">Hecho con amor, solo para ti.</footer>
+  <!-- Footer -->
+  <footer style="text-align: center; padding: 40px; font-size: 0.9rem; color: var(--texto-secundario); font-style: italic;">Hecho con amor, solo para ti.</footer>
 
   <!-- 🛑 CONTENEDOR DEL MODO CINE 🛑 -->
   <div class="cine-container" id="cineContainer"></div>
@@ -215,10 +261,10 @@
     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
   </button>
 
-  <!-- Modal Recuerdo del Día -->
-  <div class="modal-recuerdo" id="modalRecuerdo" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: var(--bg-tarjeta); border-radius: 12px; padding: 20px; max-width: 450px; width: 100%; position: relative; text-align: center;">
-      <button id="btnCerrarRecuerdo" style="position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; border-radius: 50%; background: #fff; border: none; cursor: pointer; font-size: 1.2rem;">✕</button>
+  <!-- Modal Recuerdo -->
+  <div id="modalRecuerdo" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px;">
+    <div style="background: var(--bg-tarjeta); border-radius: 24px; padding: 20px; max-width: 450px; width: 100%; position: relative; text-align: center; box-shadow: var(--sombra); border: 1px solid var(--borde);">
+      <button id="btnCerrarRecuerdo" style="position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; border-radius: 50%; background: var(--bg-claro); border: 1px solid var(--borde); cursor: pointer; font-size: 1.2rem; color: var(--texto-principal);">✕</button>
       <div id="contenidoRecuerdoModal"></div>
     </div>
   </div>
@@ -231,6 +277,17 @@
     import { protegerRuta } from './js/proteger.js';
     import { supabase } from './js/supabase.js';
     import { iniciarRealtimeGlobal } from './js/realtime.js';
+
+    // 🛑 ACTIVAR EFECTO 3D EN LAS TARJETAS 🛑
+    if (window.VanillaTilt) {
+      VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+        max: 15,
+        speed: 400,
+        glare: true,
+        "max-glare": 0.2,
+        scale: 1.02
+      });
+    }
 
     function obtenerEmbedUrl(url) {
       if (!url) return null;
@@ -259,8 +316,6 @@
       // 🛑 ACTIVAR MODO OSCURO SI ES DE NOCHE 🛑
       if (obtenerMomentoDelDia() === 'noche') {
         document.body.classList.add('modo-noche');
-      } else {
-        document.body.classList.remove('modo-noche');
       }
 
       if (hora >= 6 && hora < 12) {
@@ -311,8 +366,8 @@
       const fechaObj = new Date(recuerdo.fecha);
       const fechaFormat = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
       container.innerHTML = `
-        <img src="${recuerdo.url}" style="width: 100%; height: 300px; object-fit: cover; border-radius: 8px; margin-bottom: 20px;">
-        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--dorado-suave); font-weight: 600;">${fechaFormat}</span>
+        <img src="${recuerdo.url}" style="width: 100%; height: 300px; object-fit: cover; border-radius: 12px; margin-bottom: 20px;">
+        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--dorado); font-weight: 600;">${fechaFormat}</span>
         <h3 style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.8rem; margin: 8px 0 12px;">${recuerdo.titulo || 'Un momento'}</h3>
         <p style="font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; line-height: 1.6; font-style: italic;">${recuerdo.descripcion || 'Un pedacito de nuestra historia.'}</p>
       `;
@@ -356,10 +411,10 @@
           const mp3Url = datos.couple?.cancion_mp3_url;
           if (spotifyUrl) {
             const embedUrl = obtenerEmbedUrl(spotifyUrl);
-            if (embedUrl) musicCard.innerHTML = `<iframe class="spotify-iframe" src="${embedUrl}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+            if (embedUrl) musicCard.innerHTML = `<iframe style="border-radius:12px; border:none; width:100%; height:152px;" src="${embedUrl}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
             else musicCard.innerHTML = `<p style="text-align:center;color:#888;">El enlace de Spotify no es válido.</p>`;
           } else if (mp3Url) {
-            musicCard.innerHTML = `<div class="vinyl" id="vinyl"></div><div class="music-info"><h3 style="font-family: 'Playfair Display', serif; font-style: italic;">Nuestra Melodía</h3><p style="font-family: 'Cormorant Garamond', serif; font-style: italic;">Presiona play y piensa en mí</p><button class="btn btn-primary" id="playBtn">▶ Reproducir</button></div>`;
+            musicCard.innerHTML = `<div class="vinyl" id="vinyl"></div><div class="music-info"><h3 style="font-family: 'Playfair Display', serif; font-style: italic;">Nuestra Melodía</h3><p style="font-family: 'Cormorant Garamond', serif; font-style: italic;">Presiona play y piensa en mí</p><button class="btn btn-primary" id="playBtn" style="margin-top: 15px; padding: 10px 20px; border-radius: 8px; border: none; background: var(--rosa); color: #fff; cursor: pointer;">▶ Reproducir</button></div>`;
           } else {
             musicCard.innerHTML = `<p style="text-align:center;color:#888;">Aún no hay música configurada.</p>`;
           }
@@ -413,7 +468,7 @@
               const musicCard = document.getElementById('musicCard');
               if (spotifyUrl) {
                 const embedUrl = obtenerEmbedUrl(spotifyUrl);
-                if (embedUrl) musicCard.innerHTML = `<iframe class="spotify-iframe" src="${embedUrl}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+                if (embedUrl) musicCard.innerHTML = `<iframe style="border-radius:12px; border:none; width:100%; height:152px;" src="${embedUrl}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
               } else if (mp3Url) {
                 musicCard.innerHTML = `<div class="vinyl" id="vinyl"></div><div class="music-info"><h3>🎵 Nuestra Canción</h3><p>Presiona play y piensa en mí</p><button class="btn btn-primary" id="playBtn">▶ Reproducir</button></div>`;
               } else {
