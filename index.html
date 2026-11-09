@@ -54,7 +54,7 @@
       margin: 0;
     }
 
-    /* 🛑 FONDO DE NUBES (Se mueven con CSS) 🛑 */
+    /* 🛑 FONDO DE NUBES 🛑 */
     .fondo-nubes {
       position: fixed; inset: 0; z-index: -1; overflow: hidden;
       background: linear-gradient(180deg, #fdfafb 0%, #fceef2 100%);
@@ -81,9 +81,9 @@
     }
 
     /* ESTILOS DE LA PÁGINA */
-    #btnAdmin, #btnInvitarPareja { display: none !important; }
+    #btnAdmin { display: none !important; }
 
-    /* 🛑 PORTADA ORIGINAL (Texto centrado y grande) 🛑 */
+    /* 🛑 PORTADA ORIGINAL 🛑 */
     .hero { position: relative; padding: 120px 20px 80px; text-align: center; z-index: 2; }
     .hero-title { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(2.5rem, 6vw, 4.5rem); margin: 10px 0 20px; color: var(--texto-principal); }
     .hero-subtitle { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic; max-width: 600px; margin: 0 auto; color: var(--texto-secundario); }
@@ -117,7 +117,6 @@
     .bento-item h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0 0 8px 0; transform: translateZ(20px); color: var(--texto-principal); }
     .bento-item p { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-style: italic; color: var(--texto-secundario); margin: 0; transform: translateZ(10px); }
     
-    /* Tarjetas destacadas (Bento Box) */
     .bento-item.grande { grid-column: span 2; }
     .bento-item.destacado { background: linear-gradient(135deg, rgba(217,108,136,0.1), rgba(201,160,80,0.1)); border-color: var(--dorado); }
 
@@ -158,6 +157,41 @@
       transition: transform 0.3s, background 0.5s; font-size: 1.3rem;
     }
     .btn-recuerdo-flotante:hover { transform: translateY(-5px) scale(1.05); background: var(--rosa); color: #fff; }
+
+    /* 🛑 DISEÑO ESPECIAL PARA EL BOTÓN DE ADMIN 🛑 */
+    .admin-seccion {
+      max-width: 800px;
+      margin: 0 auto 80px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+    .btn-admin-consola {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 20px 40px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+    .btn-admin-consola:hover {
+      background: #2a2a2a;
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      border-color: var(--dorado);
+    }
+    .btn-admin-consola svg { width: 24px; height: 24px; stroke: var(--dorado); }
+    .btn-admin-consola span { color: var(--dorado); }
 
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
@@ -206,7 +240,7 @@
     </div>
   </section>
 
-  <!-- 3. MENÚ PRINCIPAL (BENTO GRID 3D) -->
+  <!-- 3. MENÚ PRINCIPAL (BENTO GRID 3D CON TODOS LOS BOTONES) -->
   <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
     <h2 class="sobre-titulo" style="text-align: center; margin-bottom: 40px;">Explora Nuestro Mundo</h2>
     
@@ -247,6 +281,34 @@
         <p>Cuánto me conoces? Gana puntos amorosos.</p>
       </a>
 
+      <!-- Tarjeta Normal (Cuponera) -->
+      <a href="pages/cuponera.html" class="bento-item" data-tilt>
+        <svg viewBox="0 0 24 24"><path d="M20 12v10H4V12"></path><path d="M2 7h20v5H2z"></path><path d="M12 22V7"></path><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
+        <h3>Cuponera</h3>
+        <p>Canjea tus puntos por cupones especiales.</p>
+      </a>
+
+      <!-- Tarjeta Normal (Diario) -->
+      <a href="pages/diario.html" class="bento-item" data-tilt>
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="11" x2="16" y2="11"></line></svg>
+        <h3>Nuestro Diario</h3>
+        <p>Un mural de momentos, uno por uno.</p>
+      </a>
+
+      <!-- Tarjeta Normal (Arte) -->
+      <a href="pages/arte.html" class="bento-item" data-tilt>
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>
+        <h3>Taller de Arte</h3>
+        <p>Dibuja, guarda y descarga tus obras.</p>
+      </a>
+
+      <!-- Tarjeta Normal (Audios) -->
+      <a href="pages/audios.html" class="bento-item" data-tilt>
+        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        <h3>Notas de Voz</h3>
+        <p>Mensajes de voz para escuchar cuando quieras.</p>
+      </a>
+
       <!-- Tarjeta Normal (Mapa) -->
       <a href="pages/mapa.html" class="bento-item" data-tilt>
         <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -261,14 +323,22 @@
         <p>Fechas importantes que no queremos olvidar.</p>
       </a>
 
-      <!-- Admin -->
-      <a href="admin.html" id="btnAdmin" class="bento-item" data-tilt style="border: 1px dashed var(--dorado);">
-        <svg viewBox="0 0 24 24" style="stroke: var(--dorado);"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-        <h3 style="color: var(--dorado);">Admin</h3>
-        <p>Configura la página.</p>
+      <!-- Tarjeta Normal (Metas/Sueños) -->
+      <a href="pages/metas.html" class="bento-item" data-tilt>
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+        <h3>Nuestros Sueños</h3>
+        <p>Las metas y sueños que queremos cumplir juntos.</p>
       </a>
 
     </div>
+  </section>
+
+  <!-- 🛑 SECCIÓN EXCLUSIVA DE ADMIN (Solo dueño) 🛑 -->
+  <section class="admin-seccion">
+    <a href="admin.html" id="btnAdmin" class="btn-admin-consola">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      Acceder a la <span>Consola de Administración</span>
+    </a>
   </section>
 
   <!-- 4. LA MÚSICA -->
@@ -416,15 +486,12 @@
         }
 
         const btnAdmin = document.getElementById('btnAdmin');
-        const btnInvitar = document.getElementById('btnInvitarPareja');
         const esOwnerReal = datos.esOwner === true || (datos.couple && String(datos.couple.owner_id) === String(datos.user.id));
 
         if (esOwnerReal) {
           if (btnAdmin) btnAdmin.style.display = 'flex';
-          if (btnInvitar) btnInvitar.style.display = 'block';
         } else {
           if (btnAdmin) btnAdmin.remove();
-          if (btnInvitar) btnInvitar.remove();
         }
 
         // 🛑 CARGAR CARTA SECRETA (Y recargar si cambia en admin) 🛑
