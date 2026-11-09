@@ -281,6 +281,23 @@
           if (btnInvitar) btnInvitar.remove();
         }
 
+        // 🛑 NUEVO: CARGAR PORTADA PERSONALIZADA 🛑
+        if (datos.couple && datos.couple.portada_url) {
+          const heroImg = document.querySelector('.hero-img');
+          if (heroImg) {
+            heroImg.src = datos.couple.portada_url;
+          }
+        }
+
+        // 🛑 NUEVO: CARGAR FONDOS DE CINE 🛑
+        if (datos.couple && datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
+          // Aquí debes conectar los fondos con la lógica del "Modo Cine" que tengas en tu script.js
+          // Por ejemplo, si tienes una variable global para el carrusel:
+          if (window.iniciarModoCine) {
+            window.iniciarModoCine(datos.couple.fondos_modo_cine);
+          }
+        }
+
         const musicCard = document.getElementById('musicCard');
         if (musicCard) {
           const spotifyUrl = datos.couple?.cancion_spotify_url;
@@ -328,6 +345,12 @@
               cargarRecuerdoDelDia(datos.couple.id);
             }
             if (e.detail.tabla === 'couples') {
+              // Actualizar portada si cambia en tiempo real
+              if (e.detail.data.portada_url) {
+                const heroImg = document.querySelector('.hero-img');
+                if (heroImg) heroImg.src = e.detail.data.portada_url;
+              }
+              // Actualizar música
               const spotifyUrl = e.detail.data.cancion_spotify_url;
               const mp3Url = e.detail.data.cancion_mp3_url;
               const musicCard = document.getElementById('musicCard');

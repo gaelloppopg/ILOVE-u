@@ -989,10 +989,15 @@
         try {
           const ext = 'jpg';
           const path = `portadas/${coupleId}/${Date.now()}.${ext}`;
-          const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado);
+          // 🛑 CORRECCIÓN: Asegurarse de que se sube al bucket 'media'
+          const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado, { contentType: 'image/jpeg' });
           if (upErr) throw upErr;
           const { data: pub } = supabase.storage.from('media').getPublicUrl(path);
-          await supabase.from('couples').update({ portada_url: pub.publicUrl }).eq('id', coupleId);
+          
+          // 🛑 CORRECCIÓN: Actualizar la columna correcta en couples
+          const { error: dbErr } = await supabase.from('couples').update({ portada_url: pub.publicUrl }).eq('id', coupleId);
+          if (dbErr) throw dbErr;
+
           cargarPortada();
           alert("¡Portada actualizada!");
         } catch (err) { alert("Error: " + err.message); }
@@ -1107,9 +1112,10 @@
         try {
           const ext = 'jpg';
           const path = `fondos_cine/${coupleId}/${Date.now()}.${ext}`;
-          const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado);
+          const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado, { contentType: 'image/jpeg' });
           if (upErr) throw upErr;
-          await cargarFondosCine();
+          
+          await cargarFondosCine(); // Recargar la galería (lee los archivos del storage)
           alert("¡Foto subida! Haz clic en ella para añadirla al carrusel.");
         } catch (err) {
           alert("Error al subir: " + err.message);
