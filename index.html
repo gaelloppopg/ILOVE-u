@@ -151,6 +151,18 @@
         <div class="card-icono"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
         <h3>Calendario</h3><p>Fechas importantes que no queremos olvidar.</p>
       </a>
+      
+      <!-- 🛑 ÚNICO BOTÓN DEL MODO CINE (Diseñado como tarjeta) 🛑 -->
+      <a href="#" id="btnModoCineCard" class="card" style="display: none; border: 2px dashed #d4af37;">
+        <div class="card-icono">
+          <svg viewBox="0 0 24 24" style="stroke: #d4af37;">
+            <path d="M23 7l-7 5 7 5V7z"></path>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+          </svg>
+        </div>
+        <h3>Modo Cine</h3><p>Revive nuestros momentos en la pantalla grande.</p>
+      </a>
+
       <a href="admin.html" id="btnAdmin" class="card" style="border: 2px dashed var(--rosa);">
         <div class="card-icono"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
         <h3>Panel de Admin</h3><p>Configura cartas, juego y cupones.</p>
@@ -178,19 +190,17 @@
   <footer class="footer"><p>Hecho con amor solo para ti</p></footer>
   <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
 
-  <!-- 🛑 BOTÓN DE RECUERDO DEL DÍA (Se mantiene) 🛑 -->
+  <!-- 🛑 BOTÓN FLOTANTE RECUERDO DEL DÍA 🛑 -->
   <button class="btn-recuerdo-flotante" id="btnVerRecuerdo" title="Recuerdo del Día">📸</button>
   
   <div class="modal-recuerdo" id="modalRecuerdo">
     <div class="recuerdo-card-modal">
       <button class="btn-cerrar-modal" id="btnCerrarRecuerdo">✕</button>
-      <div id="contenidoRecuerdoModal">
-        <!-- El contenido se carga vía JS -->
-      </div>
+      <div id="contenidoRecuerdoModal"></div>
     </div>
   </div>
 
-  <!-- 🛑 CONTENEDOR DEL MODO CINE (Se llena dinámicamente) 🛑 -->
+  <!-- 🛑 CONTENEDOR DEL MODO CINE 🛑 -->
   <div class="cine-container" id="cineContainer"></div>
 
   <script src="js/script.js"></script>
@@ -268,15 +278,15 @@
 
       if (!fondos || fondos.length === 0) return;
 
-      // Para que no queden espacios en blanco, duplicamos las fotos varias veces.
-      // Si hay 3 fotos, las repetimos 4 veces (12 fotos en total) para llenar la pantalla.
+      // 1. Duplicar las fotos para que no haya huecos
+      // Hacemos suficientes copias para que la cinta sea muy larga
       let fotosRepetidas = [];
-      const repeticiones = Math.max(4, Math.ceil(10 / fondos.length)); 
+      const repeticiones = Math.max(6, Math.ceil(20 / fondos.length)); 
       for (let i = 0; i < repeticiones; i++) {
         fotosRepetidas = fotosRepetidas.concat(fondos);
       }
 
-      // 1. Inyectar el HTML de la cinta de cine
+      // 2. Inyectar el HTML de la cinta de cine
       container.innerHTML = `
         <div class="cine-sala-oscura"></div>
         <div class="cine-proyector-luz"></div>
@@ -288,7 +298,8 @@
 
         <div class="cine-cinta-wrapper">
           <div class="cine-cinta-agujeros"></div>
-          <div class="cine-carrusel" id="cineCarrusel" style="animation-duration: ${fotosRepetidas.length * 3}s;">
+          <!-- Ajustamos la duración según la cantidad de fotos para que vaya a la misma velocidad -->
+          <div class="cine-carrusel" id="cineCarrusel" style="animation-duration: ${fotosRepetidas.length * 2}s;">
             ${fotosRepetidas.map(foto => `
               <div class="cine-fotograma">
                 <img src="${foto}" alt="Recuerdo" loading="lazy">
@@ -304,29 +315,29 @@
         </div>
       `;
 
-      // 2. Aplicar la clase al body para activar el CSS
+      // 3. Activar el modo cine
       body.classList.add('modo-cine-activo');
 
-      // 3. Configurar cierre del modo cine al hacer clic en cualquier parte
+      // 4. Lógica de salida al hacer clic en cualquier parte
       const cerrarCine = () => {
         body.classList.remove('modo-cine-activo');
         setTimeout(() => {
-          container.innerHTML = ''; // Limpiar el DOM
-        }, 1000); // Esperar a que termine la animación de CSS
+          container.innerHTML = ''; 
+        }, 1000); 
         document.removeEventListener('keydown', escucharEsc);
       };
 
-      // Al hacer clic en CUALQUIER parte del contenedor del cine, se cierra
+      // El contenedor entero escucha el clic
       container.addEventListener('click', cerrarCine);
 
-      // 4. Escuchar tecla ESC
+      // Salir con ESC
       const escucharEsc = (e) => {
         if (e.key === 'Escape') cerrarCine();
       };
       document.addEventListener('keydown', escucharEsc);
     }
 
-    // Exponer la función globalmente
+    // Exponer la función para que la tarjeta la llame
     window.abrirModoCine = abrirModoCine;
 
     async function initIndex() {
@@ -362,12 +373,19 @@
           }
         }
 
-        // Cargar lógica para activar el cine (sin botón, quizás con un botón en el menú o por código)
-        // El botón de la cámara ha sido eliminado.
-        // Si quieres un botón en el menú, puedes añadirlo al grid de "cards".
-        
-        // (Opcional) Si quieres que el modo cine se abra con alguna tecla o acción específica, puedes configurarlo aquí.
-        // Por ejemplo, si tienes un botón oculto o quieres que se abra al hacer clic en algún elemento del menú.
+        // 🛑 CONTROL DEL ÚNICO BOTÓN DE MODO CINE 🛑
+        const btnModoCineCard = document.getElementById('btnModoCineCard');
+        if (datos.couple && datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
+          if (btnModoCineCard) {
+            btnModoCineCard.style.display = 'block'; // Mostramos la tarjeta
+            btnModoCineCard.onclick = (e) => {
+              e.preventDefault(); // Evitar que el enlace recargue
+              window.abrirModoCine(datos.couple.fondos_modo_cine);
+            };
+          }
+        } else {
+          if (btnModoCineCard) btnModoCineCard.style.display = 'none'; // Ocultar si no hay fotos
+        }
 
         const musicCard = document.getElementById('musicCard');
         if (musicCard) {
@@ -420,9 +438,20 @@
                 const heroImg = document.querySelector('.hero-img');
                 if (heroImg) heroImg.src = e.detail.data.portada_url;
               }
-              // Aquí podrías actualizar los fondos de cine si se abren dinámicamente
-              if (e.detail.data.fondos_modo_cine && e.detail.data.fondos_modo_cine.length > 0) {
-                // window.abrirModoCine(e.detail.data.fondos_modo_cine);
+              // Actualizar en tiempo real si se agregan fotos de cine
+              if (e.detail.data.fondos_modo_cine) {
+                const btnModoCineCard = document.getElementById('btnModoCineCard');
+                if (btnModoCineCard) {
+                  if (e.detail.data.fondos_modo_cine.length > 0) {
+                    btnModoCineCard.style.display = 'block';
+                    btnModoCineCard.onclick = (ev) => {
+                      ev.preventDefault();
+                      window.abrirModoCine(e.detail.data.fondos_modo_cine);
+                    };
+                  } else {
+                    btnModoCineCard.style.display = 'none';
+                  }
+                }
               }
               // Actualizar música
               const spotifyUrl = e.detail.data.cancion_spotify_url;
