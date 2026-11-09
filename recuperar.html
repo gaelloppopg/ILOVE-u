@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recuperar Contraseña</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="login-body">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-lock">🔑</div>
+      <h1>Recuperar Acceso</h1>
+      <p class="login-sub">Ingresa tu correo para enviarte un enlace de recuperación.</p>
+
+      <form id="formRecuperar">
+        <input type="email" id="emailRecuperar" placeholder="Tu correo electrónico" required style="width:100%; padding:16px; margin-bottom:15px; border-radius:14px; border:2px solid var(--rosa-suave); box-sizing: border-box;" />
+        <button type="submit" class="btn btn-primary" id="btnEnviar" style="width:100%;">Enviar enlace 🔗</button>
+      </form>
+
+      <p class="login-error" id="errorMsg" style="color:red; margin-top:10px; font-weight: bold; font-size: 0.85rem;"></p>
+      <p class="login-ok" id="okMsg" style="color:#2e7d32; margin-top:10px; font-weight: bold; font-size: 0.85rem;"></p>
+
+      <p style="margin-top: 20px; font-size: 0.9rem;">
+        <a href="login.html" style="color: #a874e8; text-decoration: none;">← Volver al inicio de sesión</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+
+    const form = document.getElementById('formRecuperar');
+    const btn = document.getElementById('btnEnviar');
+    const errorMsg = document.getElementById('errorMsg');
+    const okMsg = document.getElementById('okMsg');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('emailRecuperar').value.trim();
+      
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      errorMsg.textContent = '';
+      okMsg.textContent = '';
+
+      try {
+        // 🛑 ENVIAR CORREO DE RECUPERACIÓN
+        // El redirectTo debe apuntar a donde quieres que llegue el usuario después de hacer clic en el correo
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/actualizar-password.html',
+        });
+
+        if (error) throw error;
+
+        okMsg.textContent = "✅ Revisa tu bandeja de entrada (y la carpeta de spam). Te enviamos un enlace mágico.";
+        document.getElementById('emailRecuperar').value = '';
+      } catch (err) {
+        console.error(err);
+        errorMsg.textContent = "Error: " + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Enviar enlace 🔗';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Cuenta</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-body">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-lock">💖</div>
+      <h1>Crea tu cuenta</h1>
+      <p class="login-sub">Empieza a construir su historia.</p>
+
+      <form id="formRegistro">
+        <input type="text" id="creadorNombre" placeholder="Tu nombre (Creador)" required style="width:100%; padding:16px; margin-bottom:10px; border-radius:14px; border:2px solid var(--rosa-suave);" />
+        <input type="text" id="parejaNombre" placeholder="Nombre de tu pareja" required style="width:100%; padding:16px; margin-bottom:10px; border-radius:14px; border:2px solid var(--rosa-suave);" />
+        <input type="email" id="parejaEmail" placeholder="Correo de tu pareja (su cuenta de acceso)" required style="width:100%; padding:16px; margin-bottom:10px; border-radius:14px; border:2px solid var(--rosa-suave);" />
+        
+        <hr style="border: 0; border-top: 1px dashed #ccc; margin: 15px 0;">
+        
+        <input type="email" id="email" placeholder="Tu correo electrónico (Admin)" required style="width:100%; padding:16px; margin-bottom:10px; border-radius:14px; border:2px solid var(--rosa-suave);" />
+        <input type="password" id="password" placeholder="Contraseña (mín. 6 caracteres)" required minlength="6" style="width:100%; padding:16px; margin-bottom:10px; border-radius:14px; border:2px solid var(--rosa-suave);" />
+        
+        <div style="text-align: left; margin-bottom: 15px;">
+          <label style="font-size:0.85rem; color:var(--texto-suave); margin-left: 5px;">¿Qué fecha empezaron a hablar?</label>
+          <input type="text" id="fechaInicio" placeholder="DD/MM/YYYY (Ej. 30/03/2026)" maxlength="10" required style="width:100%; padding:16px; border-radius:14px; border:2px solid var(--rosa-suave); font-family: inherit;" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btnRegistrar" style="width:100%;">Registrarse 💕</button>
+      </form>
+
+      <p class="login-error" id="errorMsg" style="color:red; margin-top:10px; font-weight: bold; font-size: 0.85rem;"></p>
+      <p style="margin-top: 20px; font-size: 0.9rem;">¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+
+    // 🛑 CONFIGURA TU API KEY DE BYTEPLANT AQUÍ
+    const BYTEPLANT_API_KEY = 'TU_API_KEY_DE_BYTEPLANT';
+
+    // Función para verificar si el correo es real usando Byteplant
+    async function verificarCorreoReal(email) {
+      try {
+        const url = `https://api.email-validator.net/api/verify?EmailAddress=${encodeURIComponent(email)}&APIKey=${BYTEPLANT_API_KEY}`;
+        const res = await fetch(url);
+        
+        if (!res.ok) {
+          console.warn("No se pudo verificar (HTTP " + res.status + "), se permite el registro.");
+          return true; 
+        }
+
+        const data = await res.json();
+
+        // Códigos de estado de Byteplant:
+        // 200 = OK (válido)
+        // 300 = OK pero con advertencia (ej. catch-all)
+        // 400+ = Inválido, no entregable, etc.
+        // Si el estado es >= 400, el correo no es válido o no existe.
+        if (data.status >= 400) {
+          console.log("Correo rechazado por Byteplant. Status:", data.status, "Info:", data.info);
+          return false;
+        }
+
+        // Si el estado es 200 o 300, lo permitimos
+        return true;
+
+      } catch (err) {
+        console.error("Error de red al verificar:", err);
+        // Si falla la red, permitimos el registro para no bloquear usuarios reales
+        return true; 
+      }
+    }
+
+    document.getElementById('fechaInicio').addEventListener('input', function (e) {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+      if (v.length >= 5) v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+      else if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+      e.target.value = v;
+    });
+
+    document.getElementById('formRegistro').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnRegistrar');
+      const errorMsg = document.getElementById('errorMsg');
+      btn.disabled = true; btn.textContent = 'Verificando datos...'; errorMsg.textContent = "";
+
+      const creadorNombre = document.getElementById('creadorNombre').value.trim();
+      const parejaNombre = document.getElementById('parejaNombre').value.trim();
+      const parejaEmail = document.getElementById('parejaEmail').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      let fechaInicio = document.getElementById('fechaInicio').value;
+
+      // Validación de fecha
+      if (!fechaInicio || fechaInicio.length < 10) {
+        errorMsg.textContent = "Ingresa la fecha completa (DD/MM/YYYY).";
+        btn.disabled = false; btn.textContent = 'Registrarse 💕'; return;
+      }
+
+      const [d, m, y] = fechaInicio.split('/');
+      const dateObj = new Date(`${y}-${m}-${d}T00:00:00`);
+      if (isNaN(dateObj.getTime()) || dateObj.getDate() !== parseInt(d) || (dateObj.getMonth() + 1) !== parseInt(m)) {
+        errorMsg.textContent = "Por favor, ingresa una fecha real.";
+        btn.disabled = false; btn.textContent = 'Registrarse 💕'; return;
+      }
+
+      // 🛑 VERIFICACIÓN DE AMBOS CORREOS CON BYTEPLANT
+      btn.textContent = 'Verificando correo del admin...';
+      const adminEmailValido = await verificarCorreoReal(email);
+      if (!adminEmailValido) {
+        errorMsg.textContent = "Los datos son incorrectos. El correo del administrador no es válido o no existe.";
+        btn.disabled = false; btn.textContent = 'Registrarse 💕'; return;
+      }
+
+      btn.textContent = 'Verificando correo de la pareja...';
+      const parejaEmailValido = await verificarCorreoReal(parejaEmail);
+      if (!parejaEmailValido) {
+        errorMsg.textContent = "Los datos son incorrectos. El correo de la pareja no es válido o no existe.";
+        btn.disabled = false; btn.textContent = 'Registrarse 💕'; return;
+      }
+
+      // Si ambos correos son válidos, procedemos a crear la cuenta
+      btn.textContent = 'Creando cuenta...';
+      fechaInicio = `${y}-${m}-${d}`; 
+
+      try {
+        const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+        
+        if (authError) {
+          if (authError.message.includes("already registered") || authError.status === 422) {
+            throw new Error("Este correo ya está registrado. Usa otro.");
+          }
+          throw new Error("Error de Auth: " + authError.message);
+        }
+        
+        if (!authData.user) throw new Error("Supabase no devolvió el usuario.");
+
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        const { error: dbError } = await supabase.from('couples').insert([{
+          owner_id: authData.user.id,
+          creador_nombre: creadorNombre,
+          pareja_nombre: parejaNombre,
+          pareja_email: parejaEmail,
+          fecha_inicio: fechaInicio,
+          partner_password_temp: "Pareja123456!"
+        }]);
+
+        if (dbError) throw new Error("Base de datos: " + dbError.message);
+
+        await supabase.auth.signOut();
+        alert('¡Cuenta creada con éxito! Ahora inicia sesión.');
+        window.location.href = 'login.html';
+
+      } catch (err) {
+        console.error("Error en registro:", err);
+        errorMsg.textContent = err.message;
+        btn.disabled = false; btn.textContent = 'Registrarse 💕';
+      }
+    });
+  </script>
+</body>
+</html>

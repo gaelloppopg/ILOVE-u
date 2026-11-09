@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Master Panel | Estadísticas Globales</title>
+  
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>" />
+
+  <!-- BLOQUEO DE SEGURIDAD (Solo Super Admin) -->
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+
+    async function verificarSuperAdmin() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { window.location.replace("login.html"); return; }
+
+      // La seguridad real está en la base de datos. 
+      // Si un usuario normal intenta acceder, la función RPC fallará y lo expulsaremos.
+      const { data, error } = await supabase.rpc('get_global_stats');
+      
+      if (error) {
+        alert("Acceso denegado. Solo el dueño de la aplicación puede ver esto.");
+        window.location.replace("index.html");
+        return;
+      }
+
+      // Si llegamos aquí, es seguro mostrar el panel
+      document.documentElement.style.visibility = "visible";
+      renderStats(data);
+    }
+
+    function renderStats(stats) {
+      // Llenar las tarjetas con los datos
+      document.getElementById('stat-usuarios').textContent = stats.total_usuarios;
+      document.getElementById('stat-parejas').textContent = stats.total_parejas;
+      document.getElementById('stat-arte').textContent = stats.total_obras_arte;
+      document.getElementById('stat-cartas').textContent = stats.total_cartas;
+      document.getElementById('stat-razones').textContent = stats.total_razones;
+      document.getElementById('stat-recuerdos').textContent = stats.total_recuerdos;
+      document.getElementById('stat-capitulos').textContent = stats.total_capitulos_historia;
+      document.getElementById('stat-preguntas').textContent = stats.total_preguntas_juego;
+      document.getElementById('stat-cupones').textContent = stats.total_cupones;
+      document.getElementById('stat-diario').textContent = stats.total_diario;
+
+      // Renderizar el Top 5 de parejas
+      const topList = document.getElementById('top-arte-lista');
+      if (stats.top_parejas_arte && stats.top_parejas_arte.length > 0) {
+        topList.innerHTML = stats.top_parejas_arte.map((item, index) => `
+          <div class="top-item">
+            <span class="top-rank">#${index + 1}</span>
+            <span class="top-id">ID: ${item.couple_id.substring(0, 8)}...</span>
+            <span class="top-count">${item.total} obras</span>
+          </div>
+        `).join('');
+      } else {
+        topList.innerHTML = '<p style="color:#888;">No hay datos aún.</p>';
+      }
+    }
+
+    document.documentElement.style.visibility = "hidden";
+    document.addEventListener("DOMContentLoaded", verificarSuperAdmin);
+  </script>
+
+  <style>
+    :root {
+      --bg-dark: #0a0a0c;
+      --panel-dark: #131316;
+      --border: #27272a;
+      --texto: #f4f4f5;
+      --texto-suave: #a1a1aa;
+      --acento: #6366f1;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .master-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: var(--panel-dark);
+      border-bottom: 1px solid var(--border);
+    }
+    .master-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin: 0;
+      color: var(--texto);
+    }
+    .master-header h1 span { color: var(--acento); }
+    .badge-admin {
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--acento);
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      border: 1px solid rgba(99, 102, 241, 0.5);
+    }
+    .btn-salir {
+      background: transparent;
+      color: var(--texto-suave);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      transition: 0.3s;
+    }
+    .btn-salir:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
+
+    /* Contenedor */
+    .master-container {
+      max-width: 1400px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    /* Grid de Estadísticas */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--panel-dark);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--acento);
+    }
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 3px;
+      background: var(--acento);
+    }
+
+    .stat-card-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--texto-suave);
+      font-weight: 600;
+    }
+    .stat-card-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--texto);
+      line-height: 1;
+    }
+    .stat-card-icon {
+      font-size: 1.5rem;
+      opacity: 0.5;
+      position: absolute;
+      top: 20px; right: 20px;
+    }
+
+    /* Top 5 */
+    .top-panel {
+      background: var(--panel-dark);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 25px;
+    }
+    .top-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .top-item:last-child { border-bottom: none; }
+    .top-rank { color: var(--acento); font-weight: 700; width: 40px; }
+    .top-id { font-family: monospace; color: var(--texto-suave); font-size: 0.9rem; }
+    .top-count { font-weight: 700; color: var(--texto); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .master-header { flex-direction: column; gap: 15px; text-align: center; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="master-header">
+    <h1>Master <span>Panel</span></h1>
+    <div class="badge-admin">👑 SUPER ADMIN</div>
+    <button class="btn-salir" onclick="window.location.replace('index.html')">← Volver a la App</button>
+  </header>
+
+  <main class="master-container">
+    
+    <h2 class="section-title">Estadísticas Globales (Todas las parejas)</h2>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-card-label">Usuarios Totales</span>
+        <span class="stat-card-value" id="stat-usuarios">0</span>
+        <span class="stat-card-icon">👥</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-label">Parejas Creadas</span>
+        <span class="stat-card-value" id="stat-parejas">0</span>
+        <span class="stat-card-icon">💕</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-label">Obras de Arte</span>
+        <span class="stat-card-value" id="stat-arte">0</span>
+        <span class="stat-card-icon">🎨</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-label">Cartas Escritas</span>
+        <span class="stat-card-value" id="stat-cartas">0</span>
+        <span class="stat-card-icon">💌</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-label">Razones de Amor</span>
+        <span class="stat-card-value" id="stat-razones">0</span>
+        <span class="stat-card-icon">🌸</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-label">Recuerdos Subidos</span>
+        <span class="stat-card-value" id="stat-recuerdos">0</span>
+        <span class="stat-card-icon">📸</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-label">Capítulos de Historia</span>
+        <span class="stat-card-value" id="stat-capitulos">0</span>
+        <span class="stat-card-icon">📖</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-label">Preguntas del Juego</span>
+        <span class="stat-card-value" id="stat-preguntas">0</span>
+        <span class="stat-card-icon">🎮</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-label">Cupones Creados</span>
+        <span class="stat-card-value" id="stat-cupones">0</span>
+        <span class="stat-card-icon">🎟️</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-label">Entradas del Diario</span>
+        <span class="stat-card-value" id="stat-diario">0</span>
+        <span class="stat-card-icon">📝</span>
+      </div>
+    </div>
+
+    <h2 class="section-title">Top 5 - Parejas más Artísticas</h2>
+    <div class="top-panel" id="top-arte-lista">
+      <p style="color: #888;">Cargando datos...</p>
+    </div>
+
+  </main>
+
+</body>
+</html>

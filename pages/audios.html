@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notas de Voz 🎙️</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#f8f4fb" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>" />
+
+  <script type="module">
+    import { protegerRuta } from '../js/proteger.js';
+    document.documentElement.style.visibility = "hidden";
+    protegerRuta().then((datos) => {
+      if (datos) document.documentElement.style.visibility = "visible";
+    });
+  </script>
+
+  <style>
+    :root {
+      --bg-main: #f8f4fb;
+      --bg-chat: #fdfafb;
+      --bubble-mine: linear-gradient(135deg, #d8b4fe, #e9d5ff);
+      --bubble-other: #ffffff;
+      --texto: #3a2145;
+      --texto-suave: #7a5c8c;
+      --acento: #a874e8;
+      --borde: #f0e6f5;
+    }
+
+    body.audios-body {
+      background-color: var(--bg-main);
+      color: var(--texto);
+      font-family: 'Inter', sans-serif;
+      margin: 0; padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .audios-nav {
+      padding: 15px 30px;
+      background: #fff;
+      border-bottom: 1px solid var(--borde);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+    .audios-nav a { color: var(--texto-suave); text-decoration: none; font-weight: 500; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+    .audios-nav a:hover { color: var(--acento); }
+    .audios-nav h1 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0; color: var(--texto); }
+
+    /* 🛑 CONTENEDOR DE CHAT 🛑 */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .chat-fecha {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--texto-suave);
+      margin: 10px 0 20px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .audio-bubble {
+      display: flex;
+      flex-direction: column;
+      max-width: 85%;
+      position: relative;
+      animation: fadeInUp 0.4s ease backwards;
+    }
+    
+    .audio-bubble.propia { align-self: flex-end; align-items: flex-end; }
+    .audio-bubble.pareja { align-self: flex-start; align-items: flex-start; }
+
+    .bubble-autor {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--texto-suave);
+      margin-bottom: 5px;
+      padding: 0 10px;
+      letter-spacing: 0.5px;
+    }
+    .propia .bubble-autor { text-align: right; color: var(--acento); }
+
+    .bubble-content {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px 18px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(168, 116, 232, 0.05);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .propia .bubble-content { 
+      background: var(--bubble-mine); 
+      border-bottom-right-radius: 4px; 
+      box-shadow: 0 8px 20px rgba(168, 116, 232, 0.2);
+    }
+    .pareja .bubble-content { 
+      background: var(--bubble-other); 
+      border-bottom-left-radius: 4px; 
+      border: 1px solid var(--borde); 
+    }
+
+    .bubble-content:hover { transform: scale(1.02); box-shadow: 0 10px 25px rgba(168, 116, 232, 0.15); }
+
+    .btn-play {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #fff; border: none; display: flex; align-items: center; justify-content: center;
+      color: var(--acento); cursor: pointer; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.3s;
+    }
+    .propia .btn-play { background: #fff; color: var(--acento); }
+    .btn-play:hover { transform: scale(1.1); }
+    .btn-play svg { width: 18px; height: 18px; fill: currentColor; }
+
+    .waveform {
+      display: flex; align-items: center; gap: 3px; height: 24px; flex: 1; min-width: 100px;
+    }
+    .waveform span {
+      display: block; width: 3px; border-radius: 2px; background: var(--acento); opacity: 0.4;
+      transition: height 0.2s ease, opacity 0.2s ease;
+    }
+    .propia .waveform span { background: #7a5c8c; }
+    
+    .audio-bubble.reproduciendo .waveform span { animation: wave 1s ease-in-out infinite alternate; opacity: 0.9; }
+    .audio-bubble.reproduciendo .waveform span:nth-child(even) { animation-delay: 0.2s; }
+    .audio-bubble.reproduciendo .waveform span:nth-child(3n) { animation-delay: 0.4s; }
+    @keyframes wave { 0% { height: 4px; } 100% { height: 24px; } }
+
+    .bubble-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+      padding: 0 10px;
+      width: 100%;
+    }
+    .bubble-titulo { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--texto); font-style: italic; }
+    .bubble-fecha { font-size: 0.7rem; color: var(--texto-suave); opacity: 0.7; }
+
+    .btn-delete-audio {
+      background: transparent; border: none; color: #d96666; cursor: pointer;
+      opacity: 0; transition: opacity 0.3s; padding: 5px; margin-left: auto;
+    }
+    .audio-bubble:hover .btn-delete-audio { opacity: 1; }
+
+    /* 🛑 BOTÓN DE FAVORITO (ESTRELLA) 🛑 */
+    .btn-favorito {
+      background: transparent; border: none; color: #cbd5e1; cursor: pointer;
+      font-size: 1.2rem; padding: 5px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin-left: 5px;
+    }
+    .btn-favorito:hover { transform: scale(1.2); color: #fbbf24; }
+    .btn-favorito.activo { color: #fbbf24; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+
+    /* 🛑 DISEÑO PREMIUM PARA FAVORITOS 🛑 */
+    .audio-bubble.es-favorito .bubble-content {
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      border: 2px solid #fbbf24;
+      box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3), inset 0 0 20px rgba(251, 191, 36, 0.1);
+    }
+    .audio-bubble.es-favorito .bubble-titulo { color: #b45309; font-weight: 700; }
+    .audio-bubble.es-favorito .waveform span { background: #f59e0b; }
+    .audio-bubble.es-favorito .btn-play { background: #fbbf24; color: #fff; }
+    
+    .vacio-chat {
+      text-align: center; color: var(--texto-suave); margin-top: 50px; font-style: italic;
+      font-family: 'Playfair Display', serif; font-size: 1.2rem;
+    }
+
+    .chat-input-bar {
+      background: #fff;
+      border-top: 1px solid var(--borde);
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      background: var(--bg-chat);
+      border: 1.5px solid var(--borde);
+      border-radius: 50px;
+      padding: 5px 10px 5px 20px;
+      width: 100%;
+      max-width: 600px;
+      transition: border-color 0.3s;
+    }
+    .input-container.grabando { border-color: #ff4b4b; background: #fff0f0; }
+
+    .input-titulo {
+      flex: 1; border: none; background: transparent; outline: none;
+      font-family: inherit; font-size: 0.95rem; color: var(--texto); padding: 10px 0;
+    }
+    .input-titulo::placeholder { color: #bbb; }
+
+    .btn-microfono {
+      width: 45px; height: 45px; border-radius: 50%; border: none;
+      background: var(--acento); color: #fff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: 0.3s; flex-shrink: 0;
+      box-shadow: 0 4px 15px rgba(168, 116, 232, 0.4);
+    }
+    .btn-microfono:hover { transform: scale(1.05); }
+    .btn-microfono svg { width: 20px; height: 20px; fill: currentColor; }
+
+    .grabacion-ui {
+      display: none; align-items: center; gap: 15px; width: 100%; justify-content: center;
+    }
+    .input-container.grabando .input-titulo { display: none; }
+    .input-container.grabando .btn-microfono { display: none; }
+    .input-container.grabando .grabacion-ui { display: flex; }
+
+    .tiempo-grabacion {
+      font-family: monospace; font-size: 1.2rem; font-weight: 700; color: #ff4b4b; display: flex; align-items: center; gap: 10px;
+    }
+    .dot-grabando {
+      width: 12px; height: 12px; background: #ff4b4b; border-radius: 50%;
+      animation: pulseRed 1s infinite alternate;
+    }
+    @keyframes pulseRed { from { opacity: 1; } to { opacity: 0.3; } }
+
+    .btn-grabacion {
+      padding: 10px 20px; border-radius: 50px; border: none; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-cancelar { background: transparent; color: var(--texto-suave); }
+    .btn-enviar { background: #ff4b4b; color: #fff; box-shadow: 0 4px 10px rgba(255, 75, 75, 0.3); }
+    .btn-enviar:hover { background: #e63939; transform: scale(1.05); }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-container::-webkit-scrollbar { width: 6px; }
+    .chat-container::-webkit-scrollbar-track { background: transparent; }
+    .chat-container::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 10px; }
+  </style>
+</head>
+<body class="audios-body">
+
+  <nav class="audios-nav">
+    <a href="../index.html">
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Volver
+    </a>
+    <h1>Notas de Voz</h1>
+    <div style="width: 50px;"></div>
+  </nav>
+
+  <div class="chat-container" id="chatContainer">
+    <div class="vacio-chat">Cargando mensajes...</div>
+  </div>
+
+  <div class="chat-input-bar">
+    <div class="input-container" id="inputContainer">
+      
+      <input type="text" id="inputTitulo" class="input-titulo" placeholder="Escribe un título (opcional)..." maxlength="40" />
+      
+      <div class="grabacion-ui">
+        <div class="tiempo-grabacion">
+          <span class="dot-grabando"></span>
+          <span id="tiempoGrabacion">00:00</span>
+        </div>
+        <button class="btn-grabacion btn-cancelar" id="btnCancelar">Cancelar</button>
+        <button class="btn-grabacion btn-enviar" id="btnDetenerEnviar">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          Enviar
+        </button>
+      </div>
+
+      <button class="btn-microfono" id="btnMicrofono" title="Grabar audio">
+        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from '../js/supabase.js';
+    import { subirArchivo } from '../js/storage.js';
+    import { iniciarRealtimeGlobal } from '../js/realtime.js';
+    import { protegerRuta } from '../js/proteger.js';
+
+    let coupleId = null;
+    let miUserId = null; 
+    let miNombre = "";
+    
+    let mediaRecorder = null;
+    let chunks = [];
+    let tiempoInterval = null;
+    let segundosGrabacion = 0;
+    let audioBlob = null;
+    
+    let audioActual = null;
+    let bubbleActual = null;
+    
+    // 🛑 Lista de favoritos del usuario
+    let misFavoritos = []; 
+
+    async function initAudios() {
+      const datos = await protegerRuta();
+      if (!datos) return;
+      
+      miUserId = datos.user.id;
+      coupleId = datos.couple.id;
+      
+      if (String(datos.couple.owner_id) === String(miUserId)) {
+        miNombre = datos.couple.creador_nombre || "Admin";
+      } else {
+        miNombre = datos.couple.pareja_nombre || "Pareja";
+      }
+
+      document.getElementById('btnMicrofono').onclick = iniciarGrabacion;
+      document.getElementById('btnCancelar').onclick = cancelarGrabacion;
+      document.getElementById('btnDetenerEnviar').onclick = detenerYEnviar;
+
+      await cargarFavoritos();
+      await cargarAudios();
+
+      // 🛑 REALTIME
+      iniciarRealtimeGlobal(coupleId);
+
+      window.addEventListener('supabase-cambio', (e) => {
+        if (e.detail.tabla === 'notas_voz') {
+          console.log("Nueva nota de voz, recargando...");
+          cargarAudios();
+        }
+      });
+    }
+
+    // 🛑 CARGAR FAVORITOS DEL USUARIO
+    async function cargarFavoritos() {
+      const { data } = await supabase.from('audios_favoritos').select('audio_id').eq('couple_id', coupleId);
+      misFavoritos = data ? data.map(f => f.audio_id) : [];
+    }
+
+    async function cargarAudios() {
+      const { data, error } = await supabase.from('notas_voz').select('*').eq('couple_id', coupleId).order('fecha', { ascending: true });
+      const chat = document.getElementById('chatContainer');
+
+      if (error || !data || data.length === 0) {
+        chat.innerHTML = '<div class="vacio-chat">Aún no hay mensajes. ¡Graba el primero!</div>';
+        return;
+      }
+
+      chat.innerHTML = '';
+      let ultimaFecha = '';
+
+      data.forEach((item, index) => {
+        const fechaObj = new Date(item.fecha);
+        const fechaStr = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+        
+        if (fechaStr !== ultimaFecha) {
+          chat.innerHTML += `<div class="chat-fecha">${fechaStr}</div>`;
+          ultimaFecha = fechaStr;
+        }
+
+        const esMia = String(item.user_id) === String(miUserId);
+        const claseBubble = esMia ? 'propia' : 'pareja';
+        
+        // 🛑 VERIFICAR SI ES FAVORITO
+        const esFavorito = misFavoritos.includes(item.id);
+        const claseFavorito = esFavorito ? 'es-favorito' : '';
+        
+        let barrasHTML = '';
+        for(let i=0; i<25; i++) {
+          const altura = Math.floor(Math.random() * 16) + 4; 
+          barrasHTML += `<span style="height: ${altura}px;"></span>`;
+        }
+
+        chat.innerHTML += `
+          <div class="audio-bubble ${claseBubble} ${claseFavorito}" data-id="${item.id}" style="animation-delay: ${index * 0.05}s">
+            <div class="bubble-autor">${item.autor || 'Anónimo'}</div>
+            <div class="bubble-content" onclick="togglePlay(this, '${item.audio_url}')">
+              <button class="btn-play">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+              <div class="waveform">${barrasHTML}</div>
+            </div>
+            <div class="bubble-meta">
+              <span class="bubble-titulo">${item.titulo}</span>
+              <div style="display:flex; align-items:center;">
+                <button class="btn-favorito ${esFavorito ? 'activo' : ''}" onclick="event.stopPropagation(); toggleFavorito('${item.id}', this)" title="${esFavorito ? 'Quitar de favoritos' : 'Marcar como favorito'}">
+                  ${esFavorito ? '★' : '☆'}
+                </button>
+                <button class="btn-delete-audio" onclick="event.stopPropagation(); borrarAudio('${item.id}', '${item.audio_url}')">✕</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    // 🛑 FUNCIÓN PARA MARCAR/DESMARCAR FAVORITO
+    window.toggleFavorito = async function(audioId, btn) {
+      const esFavorito = misFavoritos.includes(audioId);
+      const bubble = btn.closest('.audio-bubble');
+
+      if (esFavorito) {
+        // Quitar de favoritos
+        await supabase.from('audios_favoritos').delete().eq('audio_id', audioId);
+        misFavoritos = misFavoritos.filter(id => id !== audioId);
+        btn.classList.remove('activo');
+        btn.innerHTML = '☆';
+        bubble.classList.remove('es-favorito');
+        if (window.lanzarConfeti) window.lanzarConfeti(300);
+      } else {
+        // Añadir a favoritos
+        await supabase.from('audios_favoritos').insert([{ couple_id: coupleId, audio_id: audioId }]);
+        misFavoritos.push(audioId);
+        btn.classList.add('activo');
+        btn.innerHTML = '★';
+        bubble.classList.add('es-favorito');
+        if (window.lanzarConfeti) window.lanzarConfeti(1000);
+      }
+    };
+
+    window.togglePlay = function(contenedor, url) {
+      const bubble = contenedor.closest('.audio-bubble');
+      const btnPlay = contenedor.querySelector('.btn-play');
+
+      if (audioActual) {
+        audioActual.pause();
+        if (bubbleActual) {
+          bubbleActual.classList.remove('reproduciendo');
+          bubbleActual.querySelector('.btn-play').innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+        }
+        if (audioActual.src === url) {
+          audioActual = null;
+          bubbleActual = null;
+          return;
+        }
+      }
+
+      audioActual = new Audio(url);
+      bubbleActual = bubble;
+      
+      audioActual.play();
+      bubble.classList.add('reproduciendo');
+      btnPlay.innerHTML = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+      
+      audioActual.onended = () => {
+        bubble.classList.remove('reproduciendo');
+        btnPlay.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+        audioActual = null;
+        bubbleActual = null;
+      };
+    }
+
+    window.borrarAudio = async function(id, url) {
+      if (!confirm("¿Eliminar este mensaje de voz?")) return;
+
+      try {
+        if (url && url.includes('/media/')) {
+          const path = url.split('/media/')[1];
+          await supabase.storage.from('media').remove([path]);
+        }
+        await supabase.from('audios_favoritos').delete().eq('audio_id', id);
+        await supabase.from('notas_voz').delete().eq('id', id);
+        await cargarAudios();
+      } catch (err) {
+        alert("Error al eliminar: " + err.message);
+      }
+    }
+
+    async function iniciarGrabacion() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        chunks = [];
+
+        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          audioBlob = new Blob(chunks, { type: 'audio/webm' });
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorder.start();
+        document.getElementById('inputContainer').classList.add('grabando');
+        segundosGrabacion = 0;
+        actualizarTiempo();
+        tiempoInterval = setInterval(() => { segundosGrabacion++; actualizarTiempo(); }, 1000);
+
+      } catch (err) {
+        alert("No se pudo acceder al micrófono: " + err.message);
+      }
+    }
+
+    function cancelarGrabacion() {
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
+      resetUI();
+    }
+
+    async function detenerYEnviar() {
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
+      clearInterval(tiempoInterval);
+      
+      setTimeout(async () => {
+        if (!audioBlob) return;
+        
+        const titulo = document.getElementById('inputTitulo').value.trim() || "Mensaje de voz";
+        
+        try {
+          const file = new File([audioBlob], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
+          const { url } = await subirArchivo(file, "audios");
+
+          const { error } = await supabase.from('notas_voz').insert([{
+            couple_id: coupleId,
+            titulo: titulo,
+            audio_url: url,
+            autor: miNombre,
+            user_id: miUserId 
+          }]);
+
+          if (error) throw new Error("La base de datos rechazó el audio: " + error.message);
+
+          resetUI();
+          await cargarAudios();
+          if (window.lanzarConfeti) window.lanzarConfeti(1000);
+
+        } catch (err) {
+          alert("Error al subir audio: " + err.message);
+          resetUI();
+        }
+      }, 100);
+    }
+
+    function resetUI() {
+      document.getElementById('inputContainer').classList.remove('grabando');
+      document.getElementById('inputTitulo').value = '';
+      audioBlob = null;
+      clearInterval(tiempoInterval);
+    }
+
+    function actualizarTiempo() {
+      const mins = String(Math.floor(segundosGrabacion / 60)).padStart(2, '0');
+      const segs = String(segundosGrabacion % 60).padStart(2, '0');
+      document.getElementById('tiempoGrabacion').textContent = `${mins}:${segs}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', initAudios);
+  </script>
+</body>
+</html>

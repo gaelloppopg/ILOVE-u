@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuestros Sueños Juntos</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Poppins:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#fbf9f6" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♡</text></svg>" />
+
+  <script type="module">
+    import { protegerRuta } from '../js/proteger.js';
+    document.documentElement.style.visibility = "hidden";
+    protegerRuta().then((datos) => {
+      if (datos) document.documentElement.style.visibility = "visible";
+    });
+  </script>
+
+  <style>
+    :root {
+      --bg-puro: #fbf9f6;
+      --bg-secundario: #f5f0eb;
+      --texto-principal: #2c1a24;
+      --texto-suave: #6b5560;
+      --acento-vino: #8a3b4c;
+      --acento-dorado: #c9a050;
+      --borde-sutil: #e8e0d5;
+      --sombra-suave: 0 10px 30px rgba(0,0,0,0.03);
+      --fuente-titulo: 'Playfair Display', serif;
+      --fuente-texto: 'Cormorant Garamond', serif;
+      --fuente-ui: 'Poppins', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-puro);
+      color: var(--texto-principal);
+      font-family: var(--fuente-texto);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .nav-back {
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--borde-sutil);
+      background: rgba(251, 249, 246, 0.9);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-back a {
+      color: var(--texto-suave);
+      text-decoration: none;
+      font-family: var(--fuente-ui);
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.3s ease;
+    }
+    .nav-back a:hover { color: var(--acento-vino); }
+    .nav-back a svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .metas-header {
+      text-align: center;
+      padding: 80px 20px 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .metas-header h1 {
+      font-family: var(--fuente-titulo);
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--texto-principal);
+      margin-bottom: 16px;
+      line-height: 1.1;
+    }
+    .metas-header p {
+      font-size: 1.3rem;
+      font-style: italic;
+      color: var(--texto-suave);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .metas-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px 100px;
+    }
+
+    .metas-form {
+      background: #fff;
+      border: 1px solid var(--borde-sutil);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 48px;
+      box-shadow: var(--sombra-suave);
+    }
+    .metas-form h2 {
+      font-family: var(--fuente-titulo);
+      font-size: 1.5rem;
+      font-weight: 400;
+      font-style: italic;
+      margin-bottom: 24px;
+      color: var(--texto-principal);
+      border-bottom: 1px solid var(--borde-sutil);
+      padding-bottom: 12px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-family: var(--fuente-ui);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--texto-suave);
+      margin-bottom: 8px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg-puro);
+      border: 1px solid var(--borde-sutil);
+      border-radius: 8px;
+      font-family: var(--fuente-texto);
+      font-size: 1.1rem;
+      color: var(--texto-principal);
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .form-control:focus {
+      border-color: var(--acento-dorado);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(201, 160, 80, 0.1);
+    }
+    textarea.form-control { resize: vertical; min-height: 80px; }
+
+    .btn-primary {
+      background: var(--acento-vino);
+      color: #fff;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-family: var(--fuente-ui);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    .btn-primary:hover { background: #6e2d3a; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(138, 59, 76, 0.2); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Lista de Metas */
+    .meta-item {
+      background: #fff;
+      border: 1px solid var(--borde-sutil);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .meta-item:hover { border-color: var(--acento-dorado); box-shadow: 0 10px 25px rgba(0,0,0,0.05); transform: translateY(-2px); }
+    
+    /* Checkbox personalizado */
+    .meta-checkbox {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--borde-sutil);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 2px;
+    }
+    .meta-checkbox:hover { border-color: var(--acento-dorado); }
+    .meta-checkbox svg { width: 18px; height: 18px; stroke: var(--acento-dorado); fill: none; stroke-width: 2.5; opacity: 0; transition: opacity 0.3s ease; }
+    
+    .meta-item.completada .meta-checkbox { background: var(--acento-dorado); border-color: var(--acento-dorado); }
+    .meta-item.completada .meta-checkbox svg { opacity: 1; stroke: #fff; }
+
+    /* Contenido de la meta */
+    .meta-contenido { flex: 1; }
+    .meta-titulo {
+      font-family: var(--fuente-titulo);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--texto-principal);
+      margin-bottom: 6px;
+      transition: all 0.3s ease;
+    }
+    .meta-item.completada .meta-titulo {
+      text-decoration: line-through;
+      color: var(--texto-suave);
+      opacity: 0.7;
+    }
+    .meta-desc {
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--texto-suave);
+      line-height: 1.5;
+    }
+    .meta-fecha {
+      margin-top: 8px;
+      font-family: var(--fuente-ui);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--acento-dorado);
+      font-weight: 600;
+    }
+
+    /* Botones de acción */
+    .meta-acciones {
+      flex-shrink: 0;
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .meta-item:hover .meta-acciones { opacity: 1; }
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--texto-suave);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .btn-icon:hover { background: var(--bg-secundario); color: var(--texto-principal); }
+    .btn-icon.delete:hover { color: #d96666; }
+    .btn-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+    /* Estado vacío */
+    .metas-vacio {
+      text-align: center;
+      padding: 80px 20px;
+      font-family: var(--fuente-texto);
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--texto-suave);
+    }
+    .metas-vacio svg { width: 60px; height: 60px; stroke: var(--borde-sutil); fill: none; stroke-width: 1; margin-bottom: 20px; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      border-top: 1px solid var(--borde-sutil);
+      font-family: var(--fuente-texto);
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--texto-suave);
+    }
+
+    @media (max-width: 600px) {
+      .metas-header { padding: 60px 20px 30px; }
+      .metas-form { padding: 24px; }
+      .meta-item { padding: 20px; gap: 16px; }
+      .meta-titulo { font-size: 1.2rem; }
+      .meta-desc { font-size: 1rem; }
+      .meta-acciones { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav-back">
+    <a href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      Volver al inicio
+    </a>
+  </nav>
+
+  <header class="metas-header">
+    <h1>Nuestros Sueños Juntos</h1>
+    <p>Una lista de todo lo que queremos vivir, construir y soñar. Cada meta cumplida es un paso más en nuestra historia.</p>
+  </header>
+
+  <div class="metas-container">
+    
+    <div class="metas-form">
+      <h2>Agregar un nuevo sueño</h2>
+      <div class="form-group">
+        <label for="metaTitulo">¿Qué queremos lograr?</label>
+        <input type="text" id="metaTitulo" class="form-control" placeholder="Ej. Viajar a Japón" maxlength="80" />
+      </div>
+      <div class="form-group">
+        <label for="metaDesc">Descripción (opcional)</label>
+        <textarea id="metaDesc" class="form-control" placeholder="Cuéntame más sobre este sueño..." maxlength="300"></textarea>
+      </div>
+      <button class="btn-primary" id="btnAgregarMeta">Agregar Sueño</button>
+    </div>
+
+    <div id="listaMetas">
+      <p class="metas-vacio">Cargando sueños...</p>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p>Hecho con amor, solo para ti.</p>
+  </footer>
+
+  <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
+  <script src="../js/script.js"></script>
+  <script src="../js/confeti.js"></script>
+
+  <script type="module">
+    import { supabase } from '../js/supabase.js';
+    import { protegerRuta } from '../js/proteger.js';
+
+    let coupleId = null;
+
+    async function initMetas() {
+      const datos = await protegerRuta();
+      if (!datos) return;
+      
+      coupleId = datos.couple.id;
+
+      document.getElementById('btnAgregarMeta').addEventListener('click', agregarMeta);
+      await cargarMetas();
+    }
+
+    async function cargarMetas() {
+      const { data, error } = await supabase
+        .from('metas')
+        .select('*')
+        .eq('couple_id', coupleId)
+        .order('created_at', { ascending: false });
+
+      const lista = document.getElementById('listaMetas');
+      
+      if (error) { 
+        console.error(error);
+        lista.innerHTML = '<p class="metas-vacio">Error al cargar las metas. Verifica los permisos.</p>'; 
+        return; 
+      }
+      
+      if (!data || data.length === 0) {
+        lista.innerHTML = `
+          <div class="metas-vacio">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            <p>Aún no tienen sueños registrados. ¡Agreguen el primero!</p>
+          </div>
+        `;
+        return;
+      }
+
+      lista.innerHTML = data.map(meta => {
+        const fechaFormat = meta.fecha_cumplida 
+          ? new Date(meta.fecha_cumplida).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })
+          : null;
+        
+        return `
+          <div class="meta-item ${meta.completada ? 'completada' : ''}" data-id="${meta.id}">
+            <div class="meta-checkbox" onclick="window.toggleMeta('${meta.id}', ${meta.completada})">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <div class="meta-contenido">
+              <h3 class="meta-titulo">${escaparHTML(meta.titulo)}</h3>
+              ${meta.descripcion ? `<p class="meta-desc">${escaparHTML(meta.descripcion)}</p>` : ''}
+              ${fechaFormat ? `<div class="meta-fecha">Cumplida el ${fechaFormat}</div>` : ''}
+            </div>
+            <div class="meta-acciones">
+              <button class="btn-icon delete" onclick="window.eliminarMeta('${meta.id}')" title="Eliminar">
+                <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function agregarMeta() {
+      const titulo = document.getElementById('metaTitulo').value.trim();
+      const desc = document.getElementById('metaDesc').value.trim();
+      
+      if (!titulo) return alert("Escribe el título del sueño.");
+      
+      const btn = document.getElementById('btnAgregarMeta');
+      btn.disabled = true;
+      btn.textContent = 'Guardando...';
+
+      try {
+        const { error } = await supabase.from('metas').insert([{
+          couple_id: coupleId,
+          titulo,
+          descripcion: desc || null,
+          completada: false
+        }]);
+
+        if (error) throw error;
+
+        document.getElementById('metaTitulo').value = '';
+        document.getElementById('metaDesc').value = '';
+        
+        if (window.lanzarConfeti) window.lanzarConfeti(800);
+        await cargarMetas();
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Agregar Sueño';
+      }
+    }
+
+    window.toggleMeta = async function(id, completada) {
+      try {
+        const nuevaCompletada = !completada;
+        const updateData = { completada: nuevaCompletada };
+        
+        if (nuevaCompletada) {
+          updateData.fecha_cumplida = new Date().toISOString();
+        } else {
+          updateData.fecha_cumplida = null;
+        }
+
+        const { error } = await supabase.from('metas').update(updateData).eq('id', id);
+        if (error) throw error;
+
+        if (nuevaCompletada && window.lanzarConfeti) {
+          window.lanzarConfeti(2000);
+        }
+
+        await cargarMetas();
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    };
+
+    window.eliminarMeta = async function(id) {
+      if (!confirm("¿Eliminar este sueño de la lista?")) return;
+      try {
+        const { error } = await supabase.from('metas').delete().eq('id', id);
+        if (error) throw error;
+        await cargarMetas();
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    };
+
+    function escaparHTML(texto) {
+      if (!texto) return '';
+      const div = document.createElement('div');
+      div.textContent = texto;
+      return div.innerHTML;
+    }
+
+    document.addEventListener('DOMContentLoaded', initMetas);
+  </script>
+</body>
+</html>

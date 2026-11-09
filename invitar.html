@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invitar a mi Pareja 💌</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <script type="module">
+    import { protegerRuta } from './js/proteger.js';
+    protegerRuta();
+  </script>
+</head>
+<body class="login-body">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-lock">💌</div>
+      <h1>Invita a tu Pareja</h1>
+      <p class="login-sub">Este es su código único y permanente de acceso.</p>
+
+      <div id="panelGenerar" style="text-align:center;">
+        <button id="btnGenerar" class="btn btn-primary" style="width:100%;">Generar Código y QR 🔗</button>
+      </div>
+
+      <div id="panelCodigo" style="display:none; margin-top: 20px;">
+        <p style="font-size:0.9rem; color:#666; margin-bottom:10px; text-align:center;">Su código permanente:</p>
+        <h2 id="codigoTexto" style="font-size: 2rem; color: var(--rosa); letter-spacing: 5px; background: #fff; padding: 15px; border-radius: 10px; border: 2px dashed var(--rosa-suave); text-align:center;"></h2>
+        
+        <div id="qrContainer" style="margin: 30px auto; text-align: center; width: 300px; height: 300px; background-size: contain; background-repeat: no-repeat; background-position: center; position: relative;">
+          <div id="qrcode" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+          <button id="btnCopiar" class="btn btn-outline" style="flex:1;">Copiar Código</button>
+          <button id="btnDescargarQR" class="btn btn-primary" style="flex:1;">Descargar QR</button>
+        </div>
+      </div>
+
+      <p style="margin-top: 30px; font-size: 0.9rem; text-align: center;">
+        <a href="index.html">← Volver al inicio</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+
+    let coupleIdActual = null;
+    let qrCodeInstance = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      const { data: couple } = await supabase.from('couples').select('id').or(`owner_id.eq.${user.id},partner_id.eq.${user.id}`).maybeSingle();
+      if (!couple) return;
+      coupleIdActual = couple.id;
+    });
+
+    document.getElementById('btnGenerar').addEventListener('click', async () => {
+      if (!coupleIdActual) return alert("Cargando datos... espera un segundo.");
+
+      const btn = document.getElementById('btnGenerar');
+      btn.disabled = true;
+      btn.textContent = 'Generando...';
+
+      // 🛑 GENERAMOS UN CÓDIGO ÚNICO PERMANENTE (Los primeros 8 caracteres del ID)
+      const codigoUnico = coupleIdActual.substring(0, 8).toUpperCase();
+
+      document.getElementById('panelGenerar').style.display = 'none';
+      document.getElementById('panelCodigo').style.display = 'block';
+      document.getElementById('codigoTexto').textContent = codigoUnico;
+
+      document.getElementById('qrcode').innerHTML = '';
+      qrCodeInstance = new QRCode(document.getElementById("qrcode"), {
+        text: codigoUnico,
+        width: 150,
+        height: 150,
+        colorDark : "#3a2145",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+
+      const qrContainer = document.getElementById('qrContainer');
+      qrContainer.style.backgroundImage = "url('assets/images/marco-invitacion.png')";
+    });
+
+    document.getElementById('btnCopiar').addEventListener('click', () => {
+      const texto = document.getElementById('codigoTexto').textContent;
+      navigator.clipboard.writeText(texto);
+      alert("¡Código copiado!");
+    });
+
+    document.getElementById('btnDescargarQR').addEventListener('click', () => {
+      const qrImage = document.querySelector('#qrcode img');
+      if (!qrImage) return alert("El QR aún no está listo.");
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = 600;
+      canvas.height = 600;
+
+      const bgImg = new Image();
+      bgImg.src = 'assets/images/marco-invitacion.png';
+      
+      bgImg.onload = () => {
+        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+        const qrSize = 200;
+        const x = (canvas.width - qrSize) / 2;
+        const y = (canvas.height - qrSize) / 2;
+        ctx.drawImage(qrImage, x, y, qrSize, qrSize);
+
+        const link = document.createElement('a');
+        link.download = 'invitacion-pareja.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
+    });
+  </script>
+</body>
+</html>

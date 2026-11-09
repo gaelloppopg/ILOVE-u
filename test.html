@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prueba Supabase</title>
+</head>
+<body>
+  <h2>Prueba de conexión</h2>
+  
+  <h3>Registrarse (Crear usuario)</h3>
+  <input type="email" id="email" placeholder="correo@ejemplo.com">
+  <input type="password" id="password" placeholder="contraseña">
+  <button id="btnRegistro">Registrarse</button>
+
+  <h3>Iniciar Sesión</h3>
+  <button id="btnLogin">Iniciar Sesión</button>
+
+  <hr>
+
+  <h3>Estado actual</h3>
+  <pre id="status">No has iniciado sesión.</pre>
+
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+
+    const status = document.getElementById('status');
+
+    // 1. Registro
+    document.getElementById('btnRegistro').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        status.textContent = '¡Usuario creado! Ahora inicia sesión.';
+      }
+    });
+
+    // 2. Login
+    document.getElementById('btnLogin').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        status.textContent = 'Error: ' + error.message;
+      } else {
+        status.textContent = '¡Login exitoso!\n\nUsuario:\n' + JSON.stringify(data.user, null, 2);
+      }
+    });
+  </script>
+</body>
+</html>

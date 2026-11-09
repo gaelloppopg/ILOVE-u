@@ -1,0 +1,243 @@
+/* css/exportar.css */
+
+/* 🛑 MODAL CON EFECTO CRISTAL Y FONDO OSCURO PROFUNDO 🛑 */
+.modal-exportar { 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(15, 10, 25, 0.85); 
+  backdrop-filter: blur(15px); 
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 99999; 
+  display: none; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 20px; 
+}
+.modal-exportar.activo { 
+  display: flex; 
+  animation: fadeInModal 0.3s ease;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(15px); }
+}
+
+/* 🛑 CONTENEDOR PRINCIPAL CON SOMBRA 3D 🛑 */
+.exportar-box { 
+  background: #ffffff; 
+  border-radius: 24px; 
+  padding: 35px; 
+  width: 100%; 
+  max-width: 1100px; 
+  display: flex; 
+  gap: 35px; 
+  flex-wrap: wrap; 
+  max-height: 90vh; 
+  overflow-y: auto; 
+  box-shadow: 0 30px 80px -10px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1); 
+  position: relative;
+}
+
+/* 🛑 SCROLLBAR PERSONALIZADO PARA EL MODAL 🛑 */
+.exportar-box::-webkit-scrollbar { width: 8px; }
+.exportar-box::-webkit-scrollbar-track { background: transparent; }
+.exportar-box::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+.exportar-box::-webkit-scrollbar-thumb:hover { background: #a874e8; }
+
+/* Controles (Izquierda) */
+.exportar-controles { 
+  flex: 1; 
+  min-width: 340px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 18px; 
+}
+.exportar-box h2 { 
+  font-family: 'Playfair Display', serif; 
+  color: #1a202c; 
+  margin: 0 0 5px; 
+  font-size: 1.9rem; 
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* 🛑 LISTA DE RECUERDOS CON MEJOR CONTRASTE 🛑 */
+.exportar-lista { 
+  max-height: 140px; 
+  overflow-y: auto; 
+  border: 2px solid #edf2f7; 
+  border-radius: 16px; 
+  padding: 12px; 
+  background: #f8fafc; 
+  transition: all 0.3s ease;
+}
+.exportar-lista:focus-within {
+  border-color: #a874e8;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(168, 116, 232, 0.1);
+}
+.exportar-item { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 10px; 
+  border-bottom: 1px solid #e2e8f0; 
+  transition: background 0.2s;
+  border-radius: 8px;
+}
+.exportar-item:hover { background: #fff; }
+.exportar-item:last-child { border-bottom: none; }
+.exportar-item input { 
+  width: 20px; 
+  height: 20px; 
+  cursor: pointer; 
+  accent-color: #a874e8; 
+  border-radius: 6px;
+}
+.exportar-item label { 
+  font-size: 0.95rem; 
+  cursor: pointer; 
+  color: #2d3748; 
+  font-weight: 600; 
+}
+
+/* 🛑 GRID DE TEMAS ESTILO TARJETA 3D 🛑 */
+.temas-grid { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 14px; 
+  margin-top: 5px; 
+  max-height: 350px; 
+  overflow-y: auto; 
+  padding-right: 8px; 
+  padding-bottom: 5px;
+}
+.temas-grid::-webkit-scrollbar { width: 6px; }
+.temas-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.temas-grid::-webkit-scrollbar-thumb:hover { background: #a874e8; }
+
+.tema-btn { 
+  background: #fff; 
+  border: 2px solid #edf2f7; 
+  border-radius: 16px; 
+  padding: 8px; 
+  cursor: pointer; 
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  text-align: center; 
+  font-size: 0.8rem; 
+  font-weight: 700; 
+  color: #64748b; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+.tema-btn:hover { 
+  border-color: #c99cf0; 
+  transform: translateY(-4px); 
+  box-shadow: 0 12px 20px -5px rgba(0,0,0,0.1); 
+  color: #4a5568;
+}
+.tema-btn.activo { 
+  border-color: #a874e8; 
+  background: #fcf8ff; 
+  color: #7c3aed; 
+  box-shadow: 0 10px 20px -5px rgba(168, 116, 232, 0.3), inset 0 0 0 2px rgba(168, 116, 232, 0.2); 
+  transform: translateY(-2px);
+}
+
+.tema-preview { 
+  width: 100%; 
+  height: 65px; 
+  border-radius: 10px; 
+  background-size: cover; 
+  background-position: center; 
+  border: 1px solid #e2e8f0; 
+  background-color: #e9ecef; 
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease;
+}
+.tema-btn:hover .tema-preview {
+  transform: scale(1.02);
+}
+
+/* 🛑 VISTA PREVIA (DERECHA) CON SOMBRA 3D 🛑 */
+.exportar-preview-container { 
+  flex: 1; 
+  min-width: 340px; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  background: linear-gradient(145deg, #f8fafc, #edf2f7); 
+  border-radius: 20px; 
+  padding: 25px; 
+  border: 2px dashed #cbd5e1; 
+  position: relative;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+}
+#previewCanvas { 
+  width: 100%; 
+  height: auto; 
+  max-height: 480px; 
+  object-fit: contain; 
+  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25), 0 0 0 8px #ffffff, 0 0 0 9px #e2e8f0; 
+  border-radius: 8px; 
+  background: #fff; 
+  transition: all 0.3s ease; 
+}
+#previewCanvas:hover {
+  transform: scale(1.01);
+  box-shadow: 0 25px 50px -10px rgba(0,0,0,0.3), 0 0 0 8px #ffffff, 0 0 0 9px #a874e8;
+}
+
+/* 🛑 BOTONES PREMIUM 🛑 */
+.exportar-botones { 
+  display: flex; 
+  gap: 16px; 
+  margin-top: 15px; 
+  width: 100%; 
+}
+.btn-cancelar { 
+  flex: 1; 
+  padding: 16px; 
+  background: #f1f5f9; 
+  color: #475569; 
+  border: 2px solid transparent; 
+  border-radius: 16px; 
+  cursor: pointer; 
+  font-weight: 700; 
+  font-size: 0.95rem;
+  transition: all 0.3s ease; 
+}
+.btn-cancelar:hover { 
+  background: #e2e8f0; 
+  color: #1e293b;
+  transform: translateY(-2px);
+}
+.btn-guardar { 
+  flex: 1; 
+  padding: 16px; 
+  background: linear-gradient(135deg, #a874e8, #7c3aed); 
+  color: #fff; 
+  border: 2px solid rgba(255,255,255,0.2); 
+  border-radius: 16px; 
+  cursor: pointer; 
+  font-weight: 800; 
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  box-shadow: 0 10px 20px -5px rgba(124, 58, 237, 0.4), inset 0 2px 4px rgba(255,255,255,0.3); 
+}
+.btn-guardar:hover { 
+  transform: translateY(-3px); 
+  box-shadow: 0 15px 30px -5px rgba(124, 58, 237, 0.6), inset 0 2px 4px rgba(255,255,255,0.4); 
+}
+.btn-guardar:disabled { 
+  opacity: 0.6; 
+  transform: none; 
+  box-shadow: none; 
+  cursor: not-allowed; 
+  background: #cbd5e1;
+  border-color: transparent;
+}

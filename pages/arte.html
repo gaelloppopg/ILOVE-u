@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Galería de Arte | Estudio Creativo</title>
+  
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link rel="stylesheet" href="../css/arte-libro.css" />
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet" />
+  
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>" />
+
+  <script type="module">
+    import { protegerRuta } from '../js/proteger.js';
+    document.documentElement.style.visibility = "hidden";
+    protegerRuta().then((datos) => {
+      if (datos) {
+        document.documentElement.style.visibility = "visible";
+        document.body.classList.add("cargado");
+      }
+    });
+  </script>
+</head>
+<body class="page-inner album-body" data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti" data-tema="minimalista">
+
+  <div class="fondo-galeria-decorativo"></div>
+
+  <nav class="nav-back album-nav">
+    <a href="../index.html">
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Volver al Inicio
+    </a>
+  </nav>
+
+  <header class="album-header">
+    <div class="header-content">
+      <span class="header-badge">Colección Privada</span>
+      <h1>Nuestra Galería</h1>
+      <p>Un espacio sagrado para el arte que creamos juntos.</p>
+      
+      <div class="header-acciones">
+        <button type="button" class="btn-crear-obra" id="btnNuevaObra">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Crear Nueva Obra
+        </button>
+
+        <button class="btn-menu-temas" id="btnAbrirPanelTemas">
+          <span class="color-preview" id="previewColorActual"></span>
+          Cambiar Estilo de Página
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="libro-escenario">
+    <button class="btn-flotante-cerrar" id="btnCerrarLibro" title="Cerrar Álbum">
+      <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+
+    <div class="libro-wrapper" id="libroWrapper">
+      <div class="libro-sombra-suelo"></div>
+      <div class="libro" id="libro">
+        <div class="libro-lomo"><div class="lomo-textura"></div></div>
+        <div class="libro-portada" id="libroPortada">
+          <div class="portada-frente">
+            <div class="portada-marco-dorado"></div>
+            <h2 class="portada-titulo">Mis Artes</h2>
+            <p class="portada-subtitulo">Galería Personal</p>
+            <div class="portada-sello">✧</div>
+            <div class="portada-cosido"></div>
+          </div>
+          <div class="portada-dorso"><div class="dorso-textura"></div></div>
+        </div>
+        <div class="libro-paginas" id="libroPaginas"></div>
+        <div class="sombra-pagina" id="sombraPagina"></div>
+      </div>
+    </div>
+
+    <div class="libro-controles" id="libroControles">
+      <button class="btn-pagina" id="btnPrev" aria-label="Página Anterior">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <span>Anterior</span>
+      </button>
+      <div class="indicador-paginas">
+        <span id="indicadorPaginas">Páginas 1 - 2</span>
+      </div>
+      <button class="btn-pagina" id="btnNext" aria-label="Página Siguiente">
+        <span>Siguiente</span>
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </main>
+
+  <div class="panel-temas-overlay" id="panelTemasOverlay"></div>
+  <aside class="panel-temas-drawer" id="panelTemasDrawer">
+    <div class="drawer-header">
+      <h2>Estilos de Página</h2>
+      <button class="drawer-cerrar" id="btnCerrarPanelTemas">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    
+    <div class="drawer-body">
+      <p class="drawer-desc">Selecciona un entorno visual para transformar toda la galería.</p>
+      
+      <div class="temas-lista">
+        <button class="tema-card activo" data-set-tema="minimalista">
+          <div class="tema-card-preview" style="background: #f4f4f5; border: 1px solid #e4e4e7;"></div>
+          <div class="tema-card-info">
+            <span class="tema-card-nombre">Minimalista</span>
+            <span class="tema-card-desc">Limpio y enfocado en el arte</span>
+          </div>
+          <div class="tema-check">✓</div>
+        </button>
+
+        <button class="tema-card" data-set-tema="vinilo">
+          <div class="tema-card-preview" style="background: repeating-radial-gradient(circle, #111 0, #111 2px, #222 3px, #222 4px);"></div>
+          <div class="tema-card-info">
+            <span class="tema-card-nombre">Vinilo / Música</span>
+            <span class="tema-card-desc">Oscuro, analógico y elegante</span>
+          </div>
+          <div class="tema-check">✓</div>
+        </button>
+
+        <button class="tema-card" data-set-tema="liquido">
+          <div class="tema-card-preview" style="background: linear-gradient(135deg, #000, #444, #000);"></div>
+          <div class="tema-card-info">
+            <span class="tema-card-nombre">Metal Líquido</span>
+            <span class="tema-card-desc">Ondas plateadas y reflejos</span>
+          </div>
+          <div class="tema-check">✓</div>
+        </button>
+
+        <button class="tema-card" data-set-tema="iridiscente">
+          <div class="tema-card-preview" style="background: linear-gradient(45deg, #ff00cc, #333399, #00ffff);"></div>
+          <div class="tema-card-info">
+            <span class="tema-card-nombre">Iridiscente</span>
+            <span class="tema-card-desc">Colores cromados vibrantes</span>
+          </div>
+          <div class="tema-check">✓</div>
+        </button>
+
+        <button class="tema-card" data-set-tema="noche">
+          <div class="tema-card-preview" style="background: #0a1128;"></div>
+          <div class="tema-card-info">
+            <span class="tema-card-nombre">Noche Estrellada</span>
+            <span class="tema-card-desc">Azul profundo y estrellas</span>
+          </div>
+          <div class="tema-check">✓</div>
+        </button>
+
+        <button class="tema-card" data-set-tema="grafiti">
+          <div class="tema-card-preview" style="background: linear-gradient(135deg, #f43f5e, #eab308);"></div>
+          <div class="tema-card-info">
+            <span class="tema-card-nombre">Grafiti</span>
+            <span class="tema-card-desc">Urbano, vibrante y concreto</span>
+          </div>
+          <div class="tema-check">✓</div>
+        </button>
+
+        <button class="tema-card" data-set-tema="tv">
+          <div class="tema-card-preview" style="background: repeating-linear-gradient(0deg, #333 0, #333 1px, #111 2px, #111 3px);"></div>
+          <div class="tema-card-info">
+            <span class="tema-card-nombre">Ciberpunk TV</span>
+            <span class="tema-card-desc">Estática retro y neón</span>
+          </div>
+          <div class="tema-check">✓</div>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="museo-overlay" id="museoOverlay">
+    <div class="museo-sala">
+      <button type="button" class="museo-cerrar" id="btnCerrarMuseo">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div class="museo-cuadro-marco">
+        <img id="museoImagen" src="" alt="Obra de Arte" class="museo-obra-img" />
+      </div>
+      <div class="museo-placa">
+        <h3 id="museoTitulo">Título de la obra</h3>
+        <span id="museoFecha">Fecha</span>
+        <div class="museo-placa-linea"></div>
+        <div class="museo-acciones">
+          <button class="btn-museo borrar" id="btnBorrarObra">Eliminar</button>
+          <button class="btn-museo descargar" id="btnDescargarObra">Descargar PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="estudio-overlay" id="estudioOverlay">
+    <div class="estudio" id="estudio">
+      <div class="estudio-topbar">
+        <div class="estudio-titulo-app"><span class="app-logo">🎨</span><span>Estudio Creativo</span></div>
+        <input type="text" id="tituloObra" placeholder="Título de tu obra maestra..." maxlength="40" />
+        <button type="button" class="estudio-cerrar" id="cerrarEstudio" title="Cerrar Estudio">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="estudio-toolbar">
+        <div class="tool-group herramientas">
+          <span class="tool-label">Herramientas</span>
+          <button type="button" class="tool-btn active" data-tool="pincel">Pincel</button>
+          <button type="button" class="tool-btn" data-tool="lapiz">Lápiz</button>
+          <button type="button" class="tool-btn" data-tool="neon">Neón</button>
+          <button type="button" class="tool-btn" data-tool="spray">Espray</button>
+          <button type="button" class="tool-btn" data-tool="borrador">Borrador</button>
+        </div>
+        <div class="tool-group grosor">
+          <span class="tool-label">Grosor</span>
+          <div class="grosor-control">
+            <input type="range" id="grosor" min="1" max="50" value="8" />
+            <span id="grosorValor" class="grosor-badge">8</span>
+          </div>
+        </div>
+        <div class="tool-group colores">
+          <span class="tool-label">Paleta</span>
+          <div class="colores-grid">
+            <button type="button" class="color-btn active" data-color="#1a1a1a" style="--c:#1a1a1a"></button>
+            <button type="button" class="color-btn" data-color="#e63946" style="--c:#e63946"></button>
+            <button type="button" class="color-btn" data-color="#f4a261" style="--c:#f4a261"></button>
+            <button type="button" class="color-btn" data-color="#2a9d8f" style="--c:#2a9d8f"></button>
+            <button type="button" class="color-btn" data-color="#457b9d" style="--c:#457b9d"></button>
+            <button type="button" class="color-btn" data-color="#9d4edd" style="--c:#9d4edd"></button>
+            <button type="button" class="color-btn" data-color="#f28ca6" style="--c:#f28ca6"></button>
+          </div>
+          <div class="color-custom"><input type="color" id="colorPicker" value="#1a1a1a" /></div>
+        </div>
+      </div>
+      <div class="estudio-canvas-wrapper">
+        <div class="canvas-stack">
+          <canvas id="lienzoFondo" width="900" height="600"></canvas>
+          <canvas id="lienzo" width="900" height="600"></canvas>
+        </div>
+      </div>
+      <div class="estudio-footer">
+        <div class="footer-left">
+          <span class="footer-label">Fondo:</span>
+          <div class="fondo-controles">
+            <input type="color" id="fondoColor" value="#ffffff" class="fondo-color-input" />
+            <button type="button" class="btn-footer-icon" id="btnSubirFondo">Subir</button>
+            <input type="file" id="inputFondo" accept="image/*" hidden />
+            <button type="button" class="btn-footer-icon borrar" id="btnQuitarFondo">Quitar</button>
+          </div>
+        </div>
+        <div class="footer-right">
+          <button type="button" class="btn-accion secundario" id="btnLimpiar">Limpiar Lienzo</button>
+          <button type="button" class="btn-accion primario" id="btnGuardar">Guardar Obra</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
+
+  <script src="../js/confeti.js"></script>
+  <script type="module" src="../js/arte.js"></script>
+</body>
+</html>

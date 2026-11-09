@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unirse a mi pareja 💕</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="login-body">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-lock">🤝</div>
+      <h1>Unirse</h1>
+      <p class="login-sub">Ingresa el código de tu pareja y su fecha especial.</p>
+
+      <form id="formUnirse">
+        <div id="pasoCodigo">
+          <input type="text" id="codigoInput" placeholder="Ej. A1B2C3D4" required maxlength="8" style="width:100%; padding:16px; margin-bottom:10px; border-radius:14px; border:2px solid var(--rosa-suave); text-transform: uppercase; text-align: center; letter-spacing: 5px; font-size: 1.2rem;" />
+          <button type="button" class="btn btn-primary" id="btnSiguiente" style="width:100%;">Siguiente →</button>
+        </div>
+
+        <div id="pasoFecha" style="display:none;">
+          <p style="font-size:0.9rem; margin-bottom:10px;">💬 ¿Qué fecha empezaron a hablar? (DD/MM/YYYY)</p>
+          <input type="text" id="fechaLogin" placeholder="DD/MM/YYYY" maxlength="10" required style="width:100%; padding:16px; margin-bottom:20px; border-radius:14px; border:2px solid var(--rosa-suave); font-family: inherit; text-align: center; letter-spacing: 2px;" />
+          <button type="submit" class="btn btn-primary" id="btnUnirse" style="width:100%;">Unirme 💕</button>
+        </div>
+      </form>
+
+      <p class="login-error" id="errorMsg" style="color:red; margin-top:10px; font-weight: bold; font-size: 0.85rem;"></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+
+    const form = document.getElementById('formUnirse');
+    const errorMsg = document.getElementById('errorMsg');
+    const btnSiguiente = document.getElementById('btnSiguiente');
+    const btnUnirse = document.getElementById('btnUnirse');
+    
+    let coupleIdValidado = "";
+    let emailInvitado = "";
+
+    document.getElementById('fechaLogin').addEventListener('input', function (e) {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+      if (v.length >= 5) v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+      else if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+      e.target.value = v;
+    });
+
+    btnSiguiente.addEventListener('click', async () => {
+      const codigo = document.getElementById('codigoInput').value.toUpperCase().trim();
+      if (!codigo || codigo.length < 8) return errorMsg.textContent = "Ingresa un código válido.";
+      btnSiguiente.disabled = true; btnSiguiente.textContent = 'Verificando...'; errorMsg.textContent = '';
+
+      try {
+        const { data: parejas, error } = await supabase.from('couples').select('id, pareja_email');
+        if (error) throw error;
+        const pareja = parejas.find(p => p.id.toUpperCase().startsWith(codigo));
+        if (!pareja) throw new Error("Código inválido.");
+
+        coupleIdValidado = pareja.id;
+        emailInvitado = pareja.pareja_email;
+        if (!emailInvitado) throw new Error("El correo de la pareja no está registrado.");
+
+        document.getElementById('pasoCodigo').style.display = 'none';
+        document.getElementById('pasoFecha').style.display = 'block';
+        document.getElementById('fechaLogin').focus();
+      } catch (error) {
+        errorMsg.textContent = error.message;
+      } finally {
+        btnSiguiente.disabled = false; btnSiguiente.textContent = 'Siguiente →';
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fechaIngresada = document.getElementById('fechaLogin').value;
+      if (!fechaIngresada || fechaIngresada.length < 10) return errorMsg.textContent = "Ingresa la fecha completa.";
+
+      let fechaConvertida = fechaIngresada;
+      if (fechaIngresada.includes('/')) { const [d, m, y] = fechaIngresada.split('/'); fechaConvertida = `${y}-${m}-${d}`; }
+
+      btnUnirse.disabled = true; btnUnirse.textContent = 'Verificando...'; errorMsg.textContent = '';
+
+      try {
+        const { data: pareja, error: errPareja } = await supabase.from('couples').select('fecha_inicio, partner_password_temp').eq('id', coupleIdValidado).single();
+        if (errPareja) throw errPareja;
+        if (pareja.fecha_inicio !== fechaConvertida) throw new Error("La fecha no coincide.");
+
+        // 🛑 1. Cerramos cualquier sesión previa (por si acaso)
+        await supabase.auth.signOut();
+
+        // 🛑 2. Obtenemos la contraseña guardada en registro.html
+        const passwordAUsar = pareja.partner_password_temp || "Pareja123456!";
+
+        // 🛑 3. Intentamos loguearnos directamente (crea la sesión y nos da el usuario)
+        let loginData = await supabase.auth.signInWithPassword({ email: emailInvitado, password: passwordAUsar });
+
+        if (loginData.error) {
+          // Si la cuenta no existía (porque es la primera vez), la creamos
+          await supabase.auth.signUp({ email: emailInvitado, password: passwordAUsar });
+          loginData = await supabase.auth.signInWithPassword({ email: emailInvitado, password: passwordAUsar });
+        }
+
+        if (loginData.error) throw new Error("Error al iniciar sesión automática: " + loginData.error.message);
+
+        // 🛑 4. Vinculamos el partner_id en la base de datos
+        const { error: updateError } = await supabase.from('couples').update({ partner_id: loginData.data.user.id }).eq('id', coupleIdValidado);
+        if (updateError) throw new Error("No se pudo vincular: " + updateError.message);
+
+        // 🛑 5. Redirigir inmediatamente al index
+        window.location.replace('index.html');
+
+      } catch (error) {
+        console.error(error);
+        errorMsg.textContent = error.message;
+        btnUnirse.disabled = false; btnUnirse.textContent = 'Unirme 💕';
+      }
+    });
+  </script>
+</body>
+</html>

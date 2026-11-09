@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Recuerdos 📸</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&family=Caveat:wght@400;700&family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#f28ca6" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>" />
+
+  <script type="module">
+    import { protegerRuta } from '../js/proteger.js';
+    document.documentElement.style.visibility = "hidden";
+    protegerRuta().then((datos) => {
+      if (datos) document.documentElement.style.visibility = "visible";
+    });
+  </script>
+
+  <style>
+    /* ============================================
+       1. ESTILOS GENERALES Y BIBLIOTECA
+       ============================================ */
+    .biblioteca-header { text-align: center; max-width: 1200px; margin: 40px auto 20px; padding: 0 24px; }
+    .titulo-seccion { max-width: 1200px; margin: 50px auto 30px; padding: 0 24px; font-family: 'Playfair Display', serif; font-size: 2rem; color: #3a2145; display: flex; align-items: center; gap: 20px; font-style: italic; }
+    .titulo-seccion::before, .titulo-seccion::after { content: ""; flex: 1; height: 2px; background: linear-gradient(to right, transparent, #d4a373, transparent); }
+    .biblioteca-acciones { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; align-items: center; margin-top: 20px; }
+    
+    .btn-agregar-galeria { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; background: linear-gradient(135deg, #f28ca6, #d4a373); color: #fff; border: none; border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 600; letter-spacing: 1px; cursor: pointer; transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 10px 24px rgba(242, 140, 166, 0.4); }
+    .btn-agregar-galeria:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 16px 34px rgba(242, 140, 166, 0.6); }
+    
+    .albumes-estante { max-width: 1200px; margin: 40px auto 60px; padding: 0 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 60px; perspective: 2000px; }
+    .album-libro { position: relative; cursor: pointer; transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; transform-style: preserve-3d; transform: translateY(0) rotateY(-5deg); }
+    .album-libro:hover { transform: translateY(-10px) rotateY(0deg); }
+
+    /* VINILO SUPERPUESTO 3D */
+    .album-vinilo-wrapper { position: absolute; top: 5%; right: -15%; width: 300px; height: 300px; z-index: 1; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); transform: translateX(0) rotateZ(0deg); filter: drop-shadow(10px 10px 20px rgba(0,0,0,0.5)); }
+    .album-libro:hover .album-vinilo-wrapper { transform: translateX(25%) rotateZ(5deg); }
+
+    .album-vinilo-disco { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle, transparent 0 20%, rgba(255,255,255,0.06) 20% 21%, transparent 21% 100%), repeating-radial-gradient(circle at center, #111 0 2px, #222 2px 4px, #0a0a0a 4px 6px); box-shadow: inset 0 0 20px rgba(0,0,0,0.9), inset 0 0 5px rgba(255,255,255,0.1); position: relative; display: flex; align-items: center; justify-content: center; animation: girarVinilo 12s linear infinite; animation-play-state: paused; overflow: hidden; }
+    .album-libro:hover .album-vinilo-disco { animation-play-state: running; }
+    @keyframes girarVinilo { 100% { transform: rotate(360deg); } }
+
+    /* COLLAGE DE FOTOS Y VIDEOS DINÁMICO EN EL VINILO */
+    .vinilo-fotos-collage { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; opacity: 0.45; mix-blend-mode: luminosity; display: flex; flex-wrap: wrap; }
+    .vinilo-fotos-collage img, .vinilo-fotos-collage video { width: 33.33%; height: 33.33%; object-fit: cover; border: 1px solid rgba(0,0,0,0.2); display: block; }
+    .vinilo-fotos-collage img:nth-child(1), .vinilo-fotos-collage video:nth-child(1) { width: 50%; height: 50%; }
+    .vinilo-fotos-collage img:nth-child(2), .vinilo-fotos-collage video:nth-child(2) { width: 50%; height: 50%; }
+    .vinilo-fotos-collage img:nth-child(3), .vinilo-fotos-collage video:nth-child(3) { width: 50%; height: 50%; }
+    .vinilo-fotos-collage img:nth-child(4), .vinilo-fotos-collage video:nth-child(4) { width: 50%; height: 50%; }
+    .vinilo-fotos-collage img:nth-child(n+5), .vinilo-fotos-collage video:nth-child(n+5) { display: none; }
+
+    .album-vinilo-disco::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: repeating-radial-gradient(circle at center, transparent 0 3px, rgba(0,0,0,0.6) 3px 4px); z-index: 2; pointer-events: none; }
+    .album-vinilo-label { position: absolute; width: 90px; height: 90px; border-radius: 50%; background: #fbfbfb; z-index: 3; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.2); overflow: hidden; border: 4px solid #111; }
+    .album-vinilo-hole { position: absolute; width: 10px; height: 10px; background: #000; border-radius: 50%; z-index: 4; box-shadow: inset 0 1px 3px rgba(255,255,255,0.3); }
+
+    /* PORTADA DEL ÁLBUM */
+    .album-portada { aspect-ratio: 1 / 1; width: 100%; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); position: relative; overflow: hidden; border-radius: 2px; box-shadow: 20px 20px 40px rgba(0,0,0,0.25), -2px 0 5px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.05); z-index: 2; transition: box-shadow 0.5s ease; display: flex; align-items: center; justify-content: center; }
+    .album-libro:hover .album-portada { box-shadow: 30px 30px 60px rgba(0,0,0,0.35), -2px 0 5px rgba(0,0,0,0.1); }
+    .album-portada img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    
+    .album-info { margin-top: 15px; text-align: center; z-index: 3; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 12px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transform: translateZ(20px); }
+    .album-info h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #3a2145; margin: 0 0 5px 0; }
+    .album-info p { font-size: 0.85rem; color: #888; margin: 0; font-weight: 500; }
+    
+    .btn-acciones-album { position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; z-index: 10; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; }
+    .album-portada:hover .btn-acciones-album { opacity: 1; transform: translateY(0); }
+    .btn-accion-album { width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px); color: #6a4780; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 1rem; }
+    .btn-accion-album:hover { background: #fff; transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    .btn-accion-album.editar:hover { background: #a874e8; color: #fff; }
+    .btn-accion-album.borrar:hover { background: #d96666; color: #fff; }
+
+    /* ============================================
+       2. LÍNEA DE TIEMPO
+       ============================================ */
+    .timeline-container { max-width: 1000px; margin: 50px auto 100px; padding: 0 20px; position: relative; }
+    .timeline-container::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 4px; height: 100%; background: linear-gradient(to bottom, #fbd5dd, #a874e8, #fbd5dd); border-radius: 2px; }
+    
+    .timeline-item { position: relative; width: 50%; padding: 20px 40px; box-sizing: border-box; opacity: 0; transform: translateY(30px); transition: all 0.6s ease-out; }
+    .timeline-item.visible { opacity: 1; transform: translateY(0); }
+    .timeline-item:nth-child(odd) { left: 0; text-align: right; }
+    .timeline-item:nth-child(even) { left: 50%; text-align: left; }
+
+    .timeline-dot { position: absolute; top: 30px; width: 20px; height: 20px; background: #fff; border: 4px solid #a874e8; border-radius: 50%; z-index: 10; box-shadow: 0 0 10px rgba(168, 116, 232, 0.5); transition: 0.3s; }
+    .timeline-item:hover .timeline-dot { background: #a874e8; transform: scale(1.2); }
+    .timeline-item:nth-child(odd) .timeline-dot { right: -10px; }
+    .timeline-item:nth-child(even) .timeline-dot { left: -10px; }
+
+    .timeline-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(242, 140, 166, 0.15); border: 1px solid rgba(242, 140, 166, 0.1); position: relative; cursor: pointer; transition: 0.3s; }
+    .timeline-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(242, 140, 166, 0.3); }
+    .timeline-fecha { font-family: 'Caveat', cursive; font-size: 1.4rem; color: #a874e8; margin-bottom: 8px; display: inline-block; background: rgba(168, 116, 232, 0.1); padding: 2px 12px; border-radius: 20px; }
+    .timeline-media { width: 100%; height: 240px; object-fit: cover; display: block; background: #f0f0f0; }
+    
+    /* ============================================================
+       🎞️ ESTILO: ROLLO FOTOGRÁFICO PARA VIDEOS
+       ============================================================ */
+    .rollo-fotografico {
+      position: relative;
+      background: linear-gradient(180deg, #2a1f1a 0%, #1a1210 100%);
+      padding: 28px 14px;
+      border-radius: 4px;
+      margin: 10px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35), inset 0 0 40px rgba(0,0,0,0.6);
+    }
+    .rollo-fotografico::before, .rollo-fotografico::after {
+      content: ""; position: absolute; left: 0; right: 0; height: 16px;
+      background-image: repeating-linear-gradient(to right, transparent 0px, transparent 6px, rgba(240, 230, 210, 0.85) 6px, rgba(240, 230, 210, 0.85) 14px, transparent 14px, transparent 22px);
+      background-color: #1a1210; z-index: 3; border-radius: 2px;
+    }
+    .rollo-fotografico::before { top: 6px; box-shadow: inset 0 -1px 0 rgba(0,0,0,0.5); }
+    .rollo-fotografico::after { bottom: 6px; box-shadow: inset 0 1px 0 rgba(0,0,0,0.5); }
+
+    .rollo-frame { position: relative; background: #0d0a08; border-radius: 3px; overflow: hidden; border: 3px solid #0d0a08; box-shadow: inset 0 0 20px rgba(0,0,0,0.9); z-index: 2; }
+    .rollo-frame video { width: 100%; height: 240px; object-fit: cover; display: block; filter: sepia(0.15) contrast(1.05) saturate(1.1); transition: filter 0.4s ease, transform 0.4s ease; }
+    .rollo-fotografico:hover .rollo-frame video { filter: sepia(0) contrast(1.1) saturate(1.2); transform: scale(1.02); }
+    .rollo-marca { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-family: 'Courier New', monospace; font-size: 9px; letter-spacing: 3px; color: rgba(255, 200, 120, 0.75); text-shadow: 0 0 6px rgba(255, 180, 80, 0.5); z-index: 4; pointer-events: none; text-transform: uppercase; white-space: nowrap; }
+    .rollo-play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(4px); border: 2px solid rgba(255, 255, 255, 0.7); display: flex; align-items: center; justify-content: center; z-index: 5; pointer-events: none; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    .rollo-play-icon::after { content: ""; width: 0; height: 0; border-left: 16px solid rgba(255, 255, 255, 0.95); border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 4px; }
+    .rollo-fotografico:hover .rollo-play-icon { background: rgba(242, 140, 166, 0.4); border-color: #fff; transform: translate(-50%, -50%) scale(1.1); }
+    .rollo-frame::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.03) 40%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 60%, transparent 100%); pointer-events: none; z-index: 3; }
+
+    /* ============================================================
+       📷 ESTILO: FOTOGRAFÍA ANTIGUA PARA IMÁGENES
+       ============================================================ */
+    .foto-antigua { position: relative; padding: 16px 16px 50px 16px; background: linear-gradient(135deg, #f5f0e6 0%, #ebe4d5 100%); border-radius: 3px; margin: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.15), inset 0 0 40px rgba(139, 115, 85, 0.15); transform: rotate(-0.5deg); transition: transform 0.4s ease, box-shadow 0.4s ease; }
+    .foto-antigua:nth-child(even) { transform: rotate(0.7deg); }
+    .timeline-card:hover .foto-antigua { transform: rotate(0deg) translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.18), inset 0 0 40px rgba(139, 115, 85, 0.2); }
+    .foto-antigua .foto-frame { position: relative; background: #2a2018; padding: 6px; border-radius: 2px; box-shadow: inset 0 0 8px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.2); overflow: hidden; }
+    .foto-antigua .foto-frame img { width: 100%; height: 220px; object-fit: cover; display: block; filter: sepia(0.45) contrast(1.05) saturate(0.85) brightness(0.98); transition: filter 0.5s ease, transform 0.6s ease; border-radius: 1px; }
+    .timeline-card:hover .foto-antigua .foto-frame img { filter: sepia(0.2) contrast(1.1) saturate(1) brightness(1.02); transform: scale(1.03); }
+    .foto-antigua .foto-frame::after { content: ""; position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0%, transparent 3%), radial-gradient(circle at 70% 60%, rgba(0,0,0,0.1) 0%, transparent 2%), radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 0%, transparent 2%), radial-gradient(circle at 85% 15%, rgba(0,0,0,0.08) 0%, transparent 2%); background-size: 100% 100%; mix-blend-mode: overlay; opacity: 0.9; }
+    .foto-antigua .foto-frame::before { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 30px rgba(60, 40, 20, 0.45), inset 0 0 60px rgba(60, 40, 20, 0.2); z-index: 2; border-radius: 1px; }
+    .foto-antigua .foto-pie { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-family: 'Caveat', cursive; font-size: 1.05rem; color: #6b4f36; opacity: 0.85; padding: 0 20px; pointer-events: none; text-shadow: 0 1px 0 rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .foto-antigua::before, .foto-antigua::after { content: ""; position: absolute; width: 22px; height: 22px; border: 2px solid rgba(139, 115, 85, 0.5); z-index: 3; pointer-events: none; }
+    .foto-antigua::before { top: 4px; left: 4px; border-right: none; border-bottom: none; border-top-left-radius: 4px; }
+    .foto-antigua::after { bottom: 4px; right: 4px; border-left: none; border-top: none; border-bottom-right-radius: 4px; }
+    .foto-antigua .foto-cinta { position: absolute; top: -8px; left: 50%; transform: translateX(-50%) rotate(-2deg); width: 70px; height: 20px; background: linear-gradient(180deg, rgba(255, 248, 220, 0.85) 0%, rgba(230, 220, 190, 0.85) 100%); box-shadow: 0 2px 4px rgba(0,0,0,0.15); z-index: 4; opacity: 0.9; border-left: 1px dashed rgba(180, 160, 130, 0.6); border-right: 1px dashed rgba(180, 160, 130, 0.6); }
+
+    .timeline-info { padding: 20px; }
+    .timeline-titulo { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #3a2145; margin-bottom: 5px; }
+    .timeline-desc { font-size: 0.9rem; color: #7a5c8c; line-height: 1.5; }
+    .timeline-autor { font-size: 0.75rem; color: #a874e8; font-weight: 600; margin-top: 10px; display: block; }
+    .btn-borrar-recuerdo { position: absolute; top: 15px; right: 15px; width: 35px; height: 35px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.3s; z-index: 5; }
+    .timeline-card:hover .btn-borrar-recuerdo { opacity: 1; }
+    .btn-borrar-recuerdo:hover { background: #d96666; transform: scale(1.1); }
+
+    /* ============================================
+       3. MODALES Y ESTUDIO (MANTENIDOS)
+       ============================================ */
+    .editar-opciones { position: fixed; inset: 0; z-index: 9998; background: rgba(20, 10, 30, 0.85); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(10px); padding: 20px; }
+    .editar-opciones.activo { opacity: 1; pointer-events: auto; }
+    .editar-papel { background: #fff; padding: 40px; border-radius: 24px; text-align: center; max-width: 400px; width: 100%; transform: scale(0.9); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .editar-opciones.activo .editar-papel { transform: scale(1); }
+    .editar-papel h2 { font-family: 'Playfair Display', serif; color: #3a2145; margin-bottom: 10px; }
+    .editar-papel p { color: #666; margin-bottom: 25px; font-size: 0.9rem; }
+    .editar-btn { display: block; width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 12px; border: none; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; }
+    .editar-btn.foto { background: #f28ca6; color: #fff; }
+    .editar-btn.dibujo { background: #a874e8; color: #fff; }
+    .editar-btn.cancelar { background: #f0f0f0; color: #666; }
+    .editar-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+    .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox.activo { display: flex; }
+    .lightbox-content { max-width: 90vw; max-height: 90vh; position: relative; background: #111; border-radius: 12px; overflow: hidden; }
+    .lightbox-content img, .lightbox-content video { max-width: 90vw; max-height: 82vh; display: block; }
+    .lightbox-caption { padding: 16px; background: #1a1a1a; color: #fff; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+    .lightbox-close { position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,0.15); color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; }
+    .lightbox-close:hover { background: rgba(255,255,255,0.3); }
+    .btn-mover-recuerdo { background: #8b5cf6; border: none; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
+    .btn-mover-recuerdo:hover { background: #a78bfa; }
+
+    .modal-mover, .modal-subida { position: fixed; inset: 0; background: rgba(20,10,30,0.85); z-index: 10001; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
+    .modal-mover.activo, .modal-subida.activo { display: flex; }
+    .modal-mover-box, .modal-subida-box { background: #fff; border-radius: 20px; padding: 30px; max-width: 420px; width: 100%; }
+    .modal-mover-box h2, .modal-subida-box h2 { font-family: 'Playfair Display', serif; color: #3a2145; margin: 0 0 20px; }
+    .modal-mover-box select, .modal-subida-box input, .modal-subida-box textarea, .modal-subida-box select { width: 100%; padding: 12px 14px; border: 1.5px solid #e0d5ea; border-radius: 10px; margin-bottom: 12px; font-family: inherit; font-size: 0.9rem; outline: none; box-sizing: border-box; }
+    .modal-subida-box textarea { resize: vertical; min-height: 70px; }
+    .modal-mover-actions, .modal-subida-actions { display: flex; gap: 10px; margin-top: 8px; }
+    .modal-mover-actions button, .modal-subida-actions button { flex: 1; padding: 13px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .modal-mover-actions .btn-cancel, .modal-subida-actions .btn-cancel { background: #f0f0f0; color: #666; }
+    .modal-mover-actions .btn-save, .modal-subida-actions .btn-save { background: linear-gradient(135deg, #f28ca6, #a874e8); color: #fff; }
+
+    /* ESTUDIO PRO v16 (CSS COMPLETO) */
+    .estudio-overlay { position: fixed; inset: 0; z-index: 10000; background: #121214; display: none; flex-direction: column; font-family: 'Inter', system-ui, sans-serif; color: #e4e4e7; font-size: 13px; overflow: hidden; }
+    .estudio-overlay.activo { display: flex; }
+    .estudio-topbar { height: 52px; background: #1e1e21; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 10px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 100; }
+    .estudio-topbar .titulo { font-weight: 700; font-size: 14px; color: #a78bfa; display: flex; align-items: center; gap: 8px; }
+    .estudio-topbar .acciones { display: flex; gap: 8px; align-items: center; }
+    .icon-btn { background: transparent; border: 1px solid transparent; color: #a1a1aa; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+    .icon-btn:hover { background: #333; color: #fff; }
+    .icon-btn.active { background: #8b5cf6; color: #fff; border-color: #8b5cf6; box-shadow: 0 0 10px rgba(139,92,246,0.4); }
+    .icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .icon-btn svg { width: 18px; height: 18px; fill: currentColor; pointer-events: none; }
+    .btn { background: #2a2a2e; border: 1px solid #444; color: #e4e4e7; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+    .btn:hover { background: #3f3f46; }
+    .btn.primary { background: #8b5cf6; border-color: #8b5cf6; color: #fff; }
+    .btn.primary:hover { background: #a78bfa; }
+    .btn.danger { color: #fca5a5; border-color: #7f1d1d; background: transparent; }
+    .btn.danger:hover { background: #7f1d1d; color: #fff; }
+    .estudio-main { flex: 1; display: flex; overflow: hidden; position: relative; min-height: 0; }
+    .toolbar-left { width: 56px; background: #1e1e21; border-right: 1px solid #333; display: flex; flex-direction: column; align-items: center; padding: 10px 0; gap: 4px; z-index: 10; overflow-y: auto; flex-shrink: 0; }
+    .toolbar-left::-webkit-scrollbar { width: 0; }
+    .toolbar-left .divider { width: 60%; height: 1px; background: #333; margin: 6px 0; }
+    .canvas-area { flex: 1; background: #0f0f10; display: flex; align-items: center; justify-content: center; overflow: auto; position: relative; padding: 40px; background-image: radial-gradient(circle, #2a2a2e 1px, transparent 1px); background-size: 20px 20px; }
+    .canvas-area::-webkit-scrollbar { width: 10px; height: 10px; }
+    .canvas-area::-webkit-scrollbar-track { background: #18181b; }
+    .canvas-area::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 5px; }
+    .svg-stage { position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 0 1px #444; background: #fff; flex-shrink: 0; transform-origin: center center; aspect-ratio: 1 / 1; border-radius: 2px; }
+    #svgCanvas { display: block; touch-action: none; user-select: none; width: 100%; height: 100%; }
+    #selectionOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+    .handle { fill: #fff; stroke: #8b5cf6; stroke-width: 2; pointer-events: all; transition: transform 0.1s, fill 0.1s; }
+    .handle:hover { fill: #8b5cf6; stroke: #fff; transform: scale(1.2); }
+    .handle.nw, .handle.se { cursor: nwse-resize; }
+    .handle.ne, .handle.sw { cursor: nesw-resize; }
+    .handle.n, .handle.s { cursor: ns-resize; }
+    .handle.e, .handle.w { cursor: ew-resize; }
+    .handle.rotate { cursor: grab; fill: #8b5cf6; stroke: #fff; }
+    .selection-rect { fill: none; stroke: #8b5cf6; stroke-width: 1.5; stroke-dasharray: 6 4; pointer-events: none; }
+    .rotation-line { stroke: #8b5cf6; stroke-width: 1; stroke-dasharray: 3 3; pointer-events: none; }
+    .properties-panel { width: 320px; background: #1e1e21; border-left: 1px solid #333; display: flex; flex-direction: column; z-index: 10; overflow-y: auto; flex-shrink: 0; }
+    .properties-panel::-webkit-scrollbar { width: 6px; }
+    .properties-panel::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+    .panel-header { padding: 14px 16px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: #a78bfa; border-bottom: 1px solid #333; display: flex; align-items: center; gap: 6px; background: #1e1e21; position: sticky; top: 0; z-index: 2; }
+    .panel-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 16px; }
+    .prop-grupo { display: flex; flex-direction: column; gap: 8px; }
+    .prop-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #999; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+    .prop-label .val { color: #a78bfa; font-weight: 700; font-size: 11px; background: rgba(167,139,250,0.1); padding: 2px 6px; border-radius: 4px; }
+    .prop-input { width: 100%; padding: 8px 10px; background: #121214; border: 1px solid #333; border-radius: 6px; color: #fff; font-size: 12px; outline: none; font-family: inherit; box-sizing: border-box; transition: border-color 0.15s; }
+    .prop-input:focus { border-color: #8b5cf6; box-shadow: 0 0 0 2px rgba(139,92,246,0.2); }
+    .prop-row { display: flex; gap: 8px; align-items: center; }
+    .prop-row > * { flex: 1; min-width: 0; }
+    input[type="range"] { accent-color: #8b5cf6; width: 100%; cursor: pointer; }
+    input[type="checkbox"] { accent-color: #8b5cf6; width: 16px; height: 16px; cursor: pointer; }
+    .prop-colors { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .color-box { width: 100%; aspect-ratio: 1; border-radius: 4px; border: 2px solid transparent; cursor: pointer; transition: 0.1s; }
+    .color-box:hover { transform: scale(1.1); border-color: #777; }
+    .color-box.active { border-color: #fff; box-shadow: 0 0 0 2px #8b5cf6; }
+    .color-picker-wrapper { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
+    .color-picker-wrapper input[type="color"] { width: 40px; height: 40px; padding: 0; border: none; border-radius: 6px; cursor: pointer; background: transparent; }
+    .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-picker-wrapper input[type="color"]::-webkit-color-swatch { border: 2px solid #555; border-radius: 6px; }
+    .hex-input { flex: 1; text-transform: uppercase; font-family: monospace; letter-spacing: 1px; text-align: center; }
+    .font-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 4px; }
+    .font-list::-webkit-scrollbar { width: 6px; }
+    .font-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+    .font-item { padding: 12px 14px; background: #121214; border: 1px solid #333; border-radius: 6px; cursor: pointer; transition: 0.1s; display: flex; flex-direction: column; gap: 4px; }
+    .font-item:hover { background: #2a2a2e; border-color: #555; }
+    .font-item.active { background: #8b5cf6; border-color: #8b5cf6; color: #fff; }
+    .font-item .preview { font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .font-item .name { font-size: 10px; opacity: 0.6; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+    .statusbar { height: 30px; background: #1e1e21; border-top: 1px solid #333; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 11px; color: #888; flex-shrink: 0; gap: 12px; }
+    .zoom-controls { display: flex; gap: 6px; align-items: center; }
+    .zoom-btn { background: transparent; border: 1px solid #444; color: #d4d4d8; height: 22px; min-width: 22px; padding: 0 6px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+    .zoom-btn:hover { background: #333; color: #fff; }
+    #zoomLevel { min-width: 45px; text-align: center; font-weight: 600; color: #d4d4d8; }
+    .text-editor-floating { position: absolute; display: none; z-index: 100; pointer-events: none; }
+    .text-editor-floating textarea { background: #fff; border: 2px solid #8b5cf6; outline: none; resize: none; overflow: hidden; color: #000; line-height: 1.2; padding: 6px 8px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto; min-width: 120px; min-height: 40px; box-sizing: content-box; white-space: pre; font-family: inherit; }
+    .magnifier-lens { position: fixed; width: 100px; height: 100px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.5); pointer-events: none; z-index: 10001; display: none; background-repeat: no-repeat; background-size: 400px 400px; transform: translate(-50%, -50%); }
+    .magnifier-lens::after { content: ""; position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #fff; border: 1px solid #000; border-radius: 50%; transform: translate(-50%, -50%); }
+    .quick-actions { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e1e21; border: 1px solid #333; border-radius: 8px; padding: 4px; display: none; gap: 2px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+    .quick-actions.visible { display: flex; }
+    .quick-actions button { background: transparent; border: none; color: #a1a1aa; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
+    .quick-actions button:hover { background: #333; color: #fff; }
+    .svg-stage[data-tool="brush"] #svgCanvas, .svg-stage[data-tool="fill"] #svgCanvas, .svg-stage[data-tool="eyedropper"] #svgCanvas { cursor: none; }
+    .svg-stage[data-tool="text"] #svgCanvas { cursor: text; }
+    .svg-stage[data-tool="select"] #svgCanvas { cursor: default; }
+    .svg-stage:not([data-tool="eyedropper"]) .magnifier-lens { display: none !important; }
+    .svg-object { transition: opacity 0.15s; }
+    .exporting-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 20000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    .exporting-overlay.activo { display: flex; }
+    .exporting-box { background: #1e1e21; border: 1px solid #333; padding: 32px 40px; border-radius: 16px; text-align: center; color: #fff; font-size: 14px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .spinner { width: 40px; height: 40px; border: 3px solid #333; border-top-color: #8b5cf6; border-radius: 50%; margin: 0 auto 16px; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive Timeline */
+    @media (max-width: 768px) {
+      .timeline-container::before { left: 30px; }
+      .timeline-item { width: 100%; padding-left: 70px; padding-right: 0; text-align: left !important; }
+      .timeline-item:nth-child(even) { left: 0; }
+      .timeline-dot { left: 20px !important; right: auto !important; }
+    }
+  </style>
+</head>
+<body class="page-inner" data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti 💕">
+
+  <nav class="nav-back"><a href="../index.html">← Volver</a></nav>
+
+  <header class="biblioteca-header">
+    <h1 style="font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3rem); color: #f28ca6; margin-bottom: 10px;">Cosas que me recuerdan a ti</h1>
+    <p style="color: #6b5560; font-size: 1.1rem; margin-bottom: 30px;">Pequeños detalles que son tuyos sin serlo</p>
+    <div class="biblioteca-acciones" id="acciones-principales">
+      <button class="btn-agregar-galeria" id="btnAgregarRecuerdo">📸 Agregar foto</button>
+      <button class="btn-agregar-galeria" id="btnAgregarVideo" style="background: linear-gradient(135deg, #a874e8, #f28ca6);">🎬 Agregar video</button>
+      <button class="btn-nuevo-album" id="btnNuevoAlbum" style="padding: 14px 32px; border-radius: 50px; background: linear-gradient(135deg, #c99cf0, #a874e8); color: #fff; border: none; font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; box-shadow: 0 10px 24px rgba(168, 116, 232, 0.4);">📁 Nuevo álbum</button>
+    </div>
+  </header>
+
+  <div id="vista-albumes">
+    <div class="titulo-seccion">Nuestros Álbumes</div>
+    <div class="albumes-estante" id="albumesEstante"></div>
+    
+    <div class="titulo-seccion" id="titulo-sueltos" style="display: none;">Línea de Tiempo de Recuerdos</div>
+    <div class="timeline-container" id="galeriaSueltos"></div>
+  </div>
+
+  <div id="vista-album-abierto" style="display: none;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+      <button class="btn-volver" id="btnVolverAlbumes" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #fff; color: #a874e8; border: 1.5px solid #a874e8; border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-bottom: 20px;">← Volver a la Biblioteca</button>
+      <h2 class="titulo-seccion" id="tituloAlbumAbierto">Nombre del Álbum</h2>
+    </div>
+    <section class="galeria" id="galeriaAlbumAbierto" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; max-width: 1200px; margin: 0 auto 60px; padding: 0 24px;"></section>
+  </div>
+
+  <div class="editar-opciones" id="editarOpciones">
+    <div class="editar-papel">
+      <h2>Editar Portada</h2>
+      <p>¿Cómo quieres personalizar este álbum?</p>
+      <button class="editar-btn foto" id="optSubirFoto">📸 Subir una Imagen</button>
+      <button class="editar-btn dibujo" id="optAbrirDibujo">🎨 Abrir Estudio de Diseño</button>
+      <button class="editar-btn cancelar" id="optCancelarEdicion">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-content">
+      <button class="lightbox-close" id="lightboxClose">×</button>
+      <div id="lightboxMedia"></div>
+      <div class="lightbox-caption">
+        <span id="lightboxCaption"></span>
+        <button class="btn-mover-recuerdo" id="btnLightboxMover">📁 Mover a...</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mover" id="modalMover">
+    <div class="modal-mover-box">
+      <h2>Mover a Álbum</h2>
+      <select id="selectMoverAlbum"></select>
+      <div class="modal-mover-actions">
+        <button class="btn-cancel" id="btnCancelarMover">Cancelar</button>
+        <button class="btn-save" id="btnGuardarMover">Mover</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-subida" id="modalSubida">
+    <div class="modal-subida-box">
+      <h2 id="modalSubidaTitulo">Agregar recuerdo</h2>
+      <input type="file" id="inputArchivo" accept="image/*,video/*" />
+      <input type="text" id="inputTitulo" placeholder="Título" />
+      <textarea id="inputDescripcion" placeholder="Descripción (opcional)"></textarea>
+      <select id="selectAlbum"></select>
+      <div class="modal-subida-actions">
+        <button class="btn-cancel" id="btnCancelarSubida">Cancelar</button>
+        <button class="btn-save" id="btnGuardarSubida">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="estudio-overlay" id="estudioOverlay">
+    <div class="estudio-topbar">
+      <div class="titulo">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>Estudio PRO v16</span>
+      </div>
+      <div class="acciones">
+        <button class="btn" id="btnFondo" style="background:#333;">🖼️ Fondo</button>
+        <button class="icon-btn" id="btnUndo" title="Deshacer (Ctrl+Z)" disabled>
+          <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+        </button>
+        <button class="icon-btn" id="btnRedo" title="Rehacer (Ctrl+Y)" disabled>
+          <svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+        </button>
+        <button class="icon-btn" id="btnClearAll" title="Limpiar todo">
+          <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
+        <button class="btn primary" id="btnGuardarPortada">💾 Guardar Portada</button>
+        <button class="btn danger" id="btnCancelarEstudio">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="estudio-main">
+      <div class="toolbar-left">
+        <button class="icon-btn active" data-tool="select" title="Seleccionar (V)"><svg viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg></button>
+        <div class="divider"></div>
+        <button class="icon-btn" data-tool="brush" title="Pincel (B)"><svg viewBox="0 0 24 24"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34c-.39-.39-1.02-.39-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z"/></svg></button>
+        <button class="icon-btn" data-tool="eraser" title="Borrador (E)"><svg viewBox="0 0 24 24"><path d="M16.24 3.56l4.95 4.95c.78.78.78 2.05 0 2.83L12 20.53a4.008 4.008 0 0 1-5.66 0L2.81 17c-.78-.78-.78-2.05 0-2.83l10.6-10.61c.79-.78 2.05-.78 2.83 0z"/></svg></button>
+        <button class="icon-btn" data-tool="fill" title="Cubeta (F)"><svg viewBox="0 0 24 24"><path d="M16.56 8.94L7.62 0 6.21 1.41l2.38 2.38-5.15 5.15c-.59.59-.59 1.54 0 2.12l5.5 5.5c.29.29.68.44 1.06.44s.77-.15 1.06-.44l5.5-5.5c.59-.58.59-1.53 0-2.12zM5.21 10L10 5.21 14.79 10H5.21zM19 11.5s-2 2.17-2 3.5c0 1.1.9 2 2 2s2-.9 2-2c0-1.33-2-3.5-2-3.5z"/></svg></button>
+        <div class="divider"></div>
+        <button class="icon-btn" data-tool="rect" title="Rectángulo (R)"><svg viewBox="0 0 24 24"><path d="M3 5v14h18V5H3zm16 12H5V7h14v10z"/></svg></button>
+        <button class="icon-btn" data-tool="circle" title="Círculo (C)"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></button>
+        <button class="icon-btn" data-tool="triangle" title="Triángulo (T)"><svg viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 5l7 13H5l7-13z"/></svg></button>
+        <button class="icon-btn" data-tool="star" title="Estrella (S)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+        <button class="icon-btn" data-tool="polygon" title="Polígono"><svg viewBox="0 0 24 24"><path d="M12 2l9 7-3.5 11h-11L3 9z"/></svg></button>
+        <button class="icon-btn" data-tool="heart" title="Corazón"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+        <div class="divider"></div>
+        <button class="icon-btn" data-tool="text" title="Texto (X)"><svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg></button>
+        <button class="icon-btn" data-tool="image" title="Insertar imagen"><svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></button>
+        <button class="icon-btn" data-tool="eyedropper" title="Cuentagotas (I)"><svg viewBox="0 0 24 24"><path d="M17.66 5.41l.92.92-2.69 2.69-.92-.92 2.69-2.69M17.67 3c-.26 0-.51.1-.71.29l-3.12 3.12-1.93-1.91-1.41 1.41 1.42 1.42L3 16.35V21h4.65l8.84-8.92 1.42 1.42 1.41-1.41-1.92-1.92 3.12-3.12c.4-.4.4-1.03.01-1.43l-1.44-1.44c-.2-.2-.45-.29-.71-.29z"/></svg></button>
+      </div>
+
+      <div class="canvas-area" id="canvasArea">
+        <div class="svg-stage" id="svgStage" data-tool="select">
+          <svg id="svgCanvas" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" preserveAspectRatio="xMidYMid meet"></svg>
+          <svg id="selectionOverlay" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="text-editor-floating" id="textEditorFloating">
+            <textarea id="textInput" rows="1" spellcheck="false"></textarea>
+          </div>
+        </div>
+        
+        <div class="quick-actions" id="quickActions">
+          <button id="qaAlignLeft" title="Alinear izquierda"><svg viewBox="0 0 24 24"><path d="M3 3h18v2H3V3zm0 4h12v2H3V7zm0 4h18v2H3v-2zm0 4h12v2H3v-2zm0 4h18v2H3v-2z"/></svg></button>
+          <button id="qaAlignCenter" title="Centrar"><svg viewBox="0 0 24 24"><path d="M3 3h18v2H3V3zm3 4h12v2H6V7zm-3 4h18v2H3v-2zm3 4h12v2H6v-2zm-3 4h18v2H3v-2z"/></svg></button>
+          <button id="qaAlignRight" title="Alinear derecha"><svg viewBox="0 0 24 24"><path d="M3 3h18v2H3V3zm6 4h12v2H9V7zm-6 4h18v2H3v-2zm6 4h12v2H9v-2zm-6 4h18v2H3v-2z"/></svg></button>
+        </div>
+      </div>
+
+      <div class="magnifier-lens" id="magnifierLens"></div>
+
+      <div class="properties-panel" id="propertiesPanel">
+        <div class="panel-header"><span class="icon">⚙️</span> <span id="panelTitle">Propiedades</span></div>
+        <div class="panel-body">
+          <div id="panelEmpty" class="panel-empty" style="text-align:center; padding: 30px; color:#666;">
+            <div style="font-size: 32px; margin-bottom: 10px; opacity: 0.5;">🎨</div>
+            Selecciona una herramienta o un objeto.
+          </div>
+
+          <div class="prop-grupo" id="groupFillTool" style="display:none;">
+            <div class="prop-label">Color de Relleno Global</div>
+            <div class="color-picker-wrapper">
+              <input type="color" id="inputFillColorTool" value="#f28ca6" />
+              <input type="text" id="hexFillTool" class="prop-input hex-input" value="#F28CA6" maxlength="7" />
+            </div>
+            <div style="font-size:10px; color:#888; margin-top:5px;">Haz clic en el lienzo o en un objeto para rellenarlo.</div>
+          </div>
+
+          <div class="prop-grupo" id="groupColors" style="display:none;">
+            <div class="prop-label">Color de Trazo</div>
+            <div class="color-picker-wrapper">
+              <input type="color" id="inputColorPicker" value="#1a1a1a" />
+              <input type="text" id="hexColorPicker" class="prop-input hex-input" value="#1A1A1A" maxlength="7" />
+            </div>
+            <div class="prop-label" style="margin-top: 8px;"><input type="checkbox" id="inputFillEnabled"> Relleno de Color</div>
+            <div class="color-picker-wrapper" id="fillColorObjWrapper" style="display:none;">
+              <input type="color" id="inputFillColor" value="#f28ca6" />
+              <input type="text" id="hexFillColor" class="prop-input hex-input" value="#F28CA6" maxlength="7" />
+            </div>
+          </div>
+
+          <div class="prop-grupo" id="groupStroke" style="display:none;">
+            <div class="prop-label">Grosor <span class="val" id="lblGrosor">4</span></div>
+            <input type="range" id="inputGrosor" min="1" max="80" value="4" />
+            <div class="prop-label" style="margin-top:8px;">Opacidad <span class="val" id="lblOpacity">100%</span></div>
+            <input type="range" id="inputOpacity" min="0" max="100" value="100" />
+          </div>
+
+          <div class="prop-grupo" id="groupText" style="display:none;">
+            <div class="prop-label">Fuente</div>
+            <div class="font-list" id="fontList"></div>
+            <div class="prop-label" style="margin-top:8px;">Tamaño <span class="val" id="lblFontSize">32</span></div>
+            <input type="range" id="inputFontSize" min="8" max="200" value="32" />
+            <div class="prop-label" style="margin-top:8px;">Curvatura <span class="val" id="lblCurve">0%</span></div>
+            <input type="range" id="inputCurve" min="-100" max="100" value="0" />
+          </div>
+
+          <div class="prop-grupo" id="groupEffects" style="display:none;">
+            <div class="prop-label">Efectos 3D / Físicas</div>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" id="inputShadowEnabled"> Sombra (Drop Shadow)
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;">
+              <input type="checkbox" id="inputBevelEnabled"> Bisel / Relieve
+            </label>
+          </div>
+
+          <div class="prop-grupo" id="groupTransform" style="display:none;">
+            <div class="prop-label">Posición X/Y</div>
+            <div class="prop-row">
+              <input type="number" id="inputX" class="prop-input" placeholder="X" />
+              <input type="number" id="inputY" class="prop-input" placeholder="Y" />
+            </div>
+            <div class="prop-label" style="margin-top:8px;">Rotación <span class="val" id="lblRotation">0°</span></div>
+            <input type="range" id="inputRotation" min="-180" max="180" value="0" />
+          </div>
+
+          <div class="prop-grupo" id="groupActions" style="display:none;">
+            <div class="prop-row">
+              <button class="btn danger" id="btnDeleteSelected" style="width:100%;">🗑️ Eliminar Objeto</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="statusbar">
+      <div><span id="statusText">Listo</span></div>
+      <div class="zoom-controls">
+        <button class="zoom-btn" id="btnZoomOut">−</button>
+        <span id="zoomLevel">100%</span>
+        <button class="zoom-btn" id="btnZoomIn">+</button>
+        <button class="zoom-btn" id="btnZoomFit">Ajustar</button>
+      </div>
+      <div id="statusCoords">X: 0 Y: 0</div>
+    </div>
+
+    <div class="exporting-overlay" id="exportingOverlay">
+      <div class="exporting-box"><div class="spinner"></div>Exportando...</div>
+    </div>
+  </div>
+
+  <footer class="footer"><p>Sigue con <a href="cartas.html">Cartas →</a></p></footer>
+  <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
+
+  <script src="../js/script.js"></script>
+  <script src="../js/confeti.js"></script>
+  <script src="../js/pwa.js"></script>
+
+  <script type="module">
+    import { supabase } from '../js/supabase.js';
+
+    // ==============================================================
+    // VARIABLES GLOBALES Y LÓGICA DE USUARIO
+    // ==============================================================
+    let coupleId = null;
+    let miUserId = null; 
+    let miNombre = "Desconocido";
+    
+    let todosLosRecuerdos = [];
+    let albumsDisponibles = [];
+    let albumAbiertoId = null;
+    let albumEditando = null;
+    let recuerdoEnLightbox = null;
+    let studio = null;
+
+    function escaparHTML(str) {
+      if (!str) return '';
+      return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    async function initGaleria() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        // 🛑 DETECCIÓN DE USUARIO Y NOMBRE (Basado en audios.html)
+        miUserId = user.id;
+        const { data: couple } = await supabase.from('couples').select('*').or(`owner_id.eq.${user.id},partner_id.eq.${user.id}`).maybeSingle();
+        if (!couple) return;
+        coupleId = couple.id;
+
+        if (String(couple.owner_id) === String(miUserId)) {
+          miNombre = couple.creador_nombre || "Admin";
+        } else if (couple.partner_id && String(couple.partner_id) === String(miUserId)) {
+          miNombre = couple.pareja_nombre || "Pareja";
+        } else {
+          miNombre = "Desconocido";
+        }
+
+        // CONECTAR BOTONES
+        document.getElementById("btnAgregarRecuerdo").onclick = () => abrirModalSubida("imagen");
+        document.getElementById("btnAgregarVideo").onclick = () => abrirModalSubida("video");
+        document.getElementById("btnNuevoAlbum").onclick = () => { albumEditando = null; abrirModalEdicionOpciones(); };
+        document.getElementById("btnVolverAlbumes").onclick = () => mostrarVistaAlbumes();
+        document.getElementById("lightboxClose").onclick = cerrarLightbox;
+        document.getElementById("lightbox").onclick = (e) => { if (e.target.id === 'lightbox') cerrarLightbox(); };
+        document.getElementById("btnLightboxMover").onclick = abrirModalMover;
+        document.getElementById("btnCancelarSubida").onclick = () => document.getElementById("modalSubida").classList.remove("activo");
+        document.getElementById("btnGuardarSubida").onclick = guardarRecuerdo;
+        document.getElementById("btnCancelarMover").onclick = () => document.getElementById("modalMover").classList.remove("activo");
+        document.getElementById("btnGuardarMover").onclick = guardarMover;
+
+        await cargarDatos();
+        studio = new StudioEngine();
+      } catch (err) {
+        console.error("Error init:", err);
+      }
+    }
+
+    async function cargarDatos() {
+      const { data: recs } = await supabase.from('recuerdos').select('*').eq('couple_id', coupleId).order('fecha', { ascending: false });
+      todosLosRecuerdos = recs || [];
+      const { data: albs } = await supabase.from('albums').select('*').eq('couple_id', coupleId);
+      albumsDisponibles = albs || [];
+      if (albumAbiertoId) renderizarAlbumAbierto();
+      else renderizarVistaAlbumes();
+    }
+
+    // ==============================================================
+    // SUBIDA DE ARCHIVOS
+    // ==============================================================
+    function abrirModalSubida(tipo) {
+      document.getElementById("modalSubidaTitulo").textContent = tipo === 'video' ? 'Agregar video' : 'Agregar foto';
+      document.getElementById("inputArchivo").accept = tipo === 'video' ? 'video/*' : 'image/*';
+      document.getElementById("inputArchivo").value = "";
+      document.getElementById("inputTitulo").value = "";
+      document.getElementById("inputDescripcion").value = "";
+      const selectAlbum = document.getElementById("selectAlbum");
+      selectAlbum.innerHTML = '<option value="">Sin álbum (recuerdo suelto)</option>' +
+        albumsDisponibles.map(a => `<option value="${a.id}">${escaparHTML(a.nombre)}</option>`).join('');
+      if (albumAbiertoId) selectAlbum.value = albumAbiertoId;
+      document.getElementById("modalSubida").classList.add("activo");
+    }
+
+    async function guardarRecuerdo() {
+      const fileInput = document.getElementById("inputArchivo");
+      const archivo = fileInput.files[0];
+      if (!archivo) { alert("Selecciona un archivo"); return; }
+
+      let tipoReal = 'imagen';
+      if (archivo.type.startsWith('video/')) tipoReal = 'video';
+      else if (archivo.type.startsWith('image/')) tipoReal = 'imagen';
+      else { alert("Formato no soportado. Usa imagen o video."); return; }
+
+      const titulo = document.getElementById("inputTitulo").value.trim() || "Recuerdo";
+      const descripcion = document.getElementById("inputDescripcion").value.trim();
+      const albumId = document.getElementById("selectAlbum").value || null;
+      const btn = document.getElementById("btnGuardarSubida");
+      btn.disabled = true; btn.textContent = "Subiendo...";
+
+      try {
+        const ext = archivo.name.split('.').pop() || 'bin';
+        const path = `${coupleId}/${tipoReal}s/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+        
+        const { error: upErr } = await supabase.storage.from('media').upload(path, archivo, { cacheControl: '3600', upsert: false, contentType: archivo.type });
+        if (upErr) throw upErr;
+        
+        const { data: pub } = supabase.storage.from('media').getPublicUrl(path);
+
+        const { error: dbErr } = await supabase.from('recuerdos').insert([{
+          couple_id: coupleId,
+          titulo: titulo, descripcion: descripcion,
+          tipo: tipoReal,
+          url: pub.publicUrl,
+          album_id: albumId,
+          autor: miNombre, // Lógica de audios
+          fecha: new Date().toISOString()
+        }]);
+        
+        if (dbErr) throw dbErr;
+
+        document.getElementById("modalSubida").classList.remove("activo");
+        await cargarDatos();
+        if (window.lanzarConfeti) window.lanzarConfeti(800);
+      } catch (err) {
+        console.error("Error detallado:", err);
+        alert("Error al subir: " + err.message);
+      } finally {
+        btn.disabled = false; btn.textContent = "Guardar";
+      }
+    }
+
+    // ==============================================================
+    // RENDER ÁLBUMES Y VINILO 3D
+    // ==============================================================
+    function renderizarVistaAlbumes() {
+      document.getElementById("vista-albumes").style.display = "block";
+      document.getElementById("vista-album-abierto").style.display = "none";
+      document.getElementById("acciones-principales").style.display = "flex";
+
+      const estante = document.getElementById("albumesEstante");
+      if (albumsDisponibles.length === 0) {
+        estante.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:#888;padding:20px;">Aún no hay álbumes creados. ¡Crea el primero! 💜</div>`;
+      } else {
+        estante.innerHTML = albumsDisponibles.map(album => {
+          const fotosAlbum = todosLosRecuerdos.filter(r => r.album_id === album.id);
+          const cantidadFotos = fotosAlbum.length;
+          
+          let portadaHtml = '';
+          if (album.portada_url) {
+            portadaHtml = `<img src="${escaparHTML(album.portada_url)}" alt="${escaparHTML(album.nombre)}">`;
+          } else if (fotosAlbum.length > 0) {
+            portadaHtml = `<img src="${escaparHTML(fotosAlbum[0].url)}" alt="${escaparHTML(album.nombre)}">`;
+          } else {
+            portadaHtml = `<span style="font-size: 4rem; opacity: 0.3;">📘</span>`;
+          }
+
+          let viniloCollage = "";
+          const mediaItems = fotosAlbum.filter(f => f.tipo === 'imagen' || f.tipo === 'video');
+          if (mediaItems.length > 0) {
+            const shuffled = [...mediaItems].sort(() => 0.5 - Math.random());
+            const numItems = Math.min(4, shuffled.length);
+            for (let i = 0; i < numItems; i++) {
+              const item = shuffled[i];
+              if (item.tipo === 'video') {
+                viniloCollage += `<video src="${escaparHTML(item.url)}" muted autoplay loop playsinline preload="metadata"></video>`;
+              } else {
+                viniloCollage += `<img src="${escaparHTML(item.url)}" alt="">`;
+              }
+            }
+          } else {
+            viniloCollage = `<div style="width:100%;height:100%;background:#333;"></div>`;
+          }
+
+          return `
+            <div class="album-libro" data-album-id="${album.id}">
+              <div class="album-vinilo-wrapper">
+                <div class="album-vinilo-disco">
+                  <div class="vinilo-fotos-collage">${viniloCollage}</div>
+                  <div class="album-vinilo-label"><div class="album-vinilo-hole"></div></div>
+                </div>
+              </div>
+              
+              <div class="album-portada">
+                <div class="btn-acciones-album">
+                  <button class="btn-accion-album editar" data-action="editar" title="Editar">✏️</button>
+                  <button class="btn-accion-album borrar" data-action="borrar" title="Eliminar">🗑️</button>
+                </div>
+                ${portadaHtml}
+              </div>
+              <div class="album-info">
+                <h3>${escaparHTML(album.nombre)}</h3>
+                <p>${cantidadFotos} recuerdo${cantidadFotos === 1 ? '' : 's'}</p>
+              </div>
+            </div>
+          `;
+        }).join("");
+        
+        estante.querySelectorAll('.album-libro').forEach(el => {
+          el.onclick = (e) => {
+            if (e.target.closest('[data-action]')) return;
+            abrirAlbum(el.dataset.albumId);
+          };
+        });
+        estante.querySelectorAll('[data-action="editar"]').forEach(b => {
+          b.onclick = (e) => { e.stopPropagation(); abrirModalAlbumEdicion(b.closest('.album-libro').dataset.albumId); };
+        });
+        estante.querySelectorAll('[data-action="borrar"]').forEach(b => {
+          b.onclick = (e) => { e.stopPropagation(); eliminarAlbum(b.closest('.album-libro').dataset.albumId); };
+        });
+      }
+
+      const sueltos = todosLosRecuerdos.filter(r => !r.album_id);
+      const galeriaSueltos = document.getElementById("galeriaSueltos");
+      const tituloSueltos = document.getElementById("titulo-sueltos");
+      
+      if (sueltos.length > 0) {
+        tituloSueltos.style.display = "flex";
+        galeriaSueltos.innerHTML = sueltos.map((rec, index) => {
+          const fechaObj = new Date(rec.fecha);
+          const fechaFormat = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+          
+          let mediaHtml = "";
+          if (rec.tipo === 'video') {
+            mediaHtml = `
+              <div class="rollo-fotografico">
+                <div class="rollo-frame">
+                  <div class="rollo-marca">★ ROLLO ${String(index + 1).padStart(2, '0')} ★</div>
+                  <video src="${escaparHTML(rec.url)}" class="timeline-media" preload="metadata" muted></video>
+                  <div class="rollo-play-icon"></div>
+                </div>
+              </div>
+            `;
+          } else {
+            const pieTexto = escaparHTML(rec.titulo || '');
+            mediaHtml = `
+              <div class="foto-antigua">
+                <div class="foto-cinta"></div>
+                <div class="foto-frame">
+                  <img src="${escaparHTML(rec.url)}" alt="${escaparHTML(rec.titulo)}" loading="lazy" />
+                </div>
+                <div class="foto-pie">${pieTexto}</div>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="timeline-item" data-id="${rec.id}">
+              <div class="timeline-dot"></div>
+              <div class="timeline-card">
+                <button class="btn-borrar-recuerdo" onclick="eliminarRecuerdo(event, '${rec.id}', '${escaparHTML(rec.url)}')">🗑️</button>
+                ${mediaHtml}
+                <div class="timeline-info">
+                  <span class="timeline-fecha">${fechaFormat}</span>
+                  <h3 class="timeline-titulo">${escaparHTML(rec.titulo)}</h3>
+                  <p class="timeline-desc">${escaparHTML(rec.descripcion || '')}</p>
+                  <span class="timeline-autor">Subido por ${escaparHTML(rec.autor || miNombre)}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        const items = galeriaSueltos.querySelectorAll('.timeline-item');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        items.forEach(item => observer.observe(item));
+
+        galeriaSueltos.querySelectorAll('.timeline-card').forEach(card => {
+          card.onclick = (e) => {
+            if (e.target.closest('.btn-borrar-recuerdo')) return;
+            const id = card.closest('.timeline-item').dataset.id;
+            const recuerdo = todosLosRecuerdos.find(r => r.id === id);
+            if (recuerdo) abrirLightbox(recuerdo);
+          };
+        });
+
+      } else {
+        tituloSueltos.style.display = "none";
+        galeriaSueltos.innerHTML = "";
+      }
+    }
+
+    window.abrirModalAlbumEdicion = function(albumId) {
+      const album = albumsDisponibles.find(a => a.id === albumId);
+      if (album) { albumEditando = album; abrirModalEdicionOpciones(); }
+    };
+
+    window.abrirAlbum = function(albumId) {
+      albumAbiertoId = albumId;
+      document.getElementById("vista-albumes").style.display = "none";
+      document.getElementById("vista-album-abierto").style.display = "block";
+      document.getElementById("acciones-principales").style.display = "none";
+      renderizarAlbumAbierto();
+    };
+
+    function mostrarVistaAlbumes() { albumAbiertoId = null; renderizarVistaAlbumes(); }
+
+    function renderizarAlbumAbierto() {
+      const album = albumsDisponibles.find(a => a.id === albumAbiertoId);
+      if (!album) return mostrarVistaAlbumes();
+      document.getElementById("tituloAlbumAbierto").textContent = album.nombre;
+      const fotosAlbum = todosLosRecuerdos.filter(r => r.album_id === albumAbiertoId);
+      const galeria = document.getElementById("galeriaAlbumAbierto");
+      if (fotosAlbum.length === 0) galeria.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px;color:#a08bb8;">Este álbum está vacío 💜 ¡Sube el primer recuerdo!</div>`;
+      else { galeria.innerHTML = fotosAlbum.map(item => crearHtmlRecuerdo(item)).join(""); agregarEventosGaleria(galeria, fotosAlbum); }
+    }
+
+    async function eliminarAlbum(albumId) {
+      if (!confirm("¿Eliminar este álbum?")) return;
+      await supabase.from('recuerdos').update({ album_id: null }).eq('album_id', albumId).eq('couple_id', coupleId);
+      await supabase.from('albums').delete().eq('id', albumId);
+      if (albumAbiertoId === albumId) albumAbiertoId = null;
+      cargarDatos();
+    }
+
+    // ==============================================================
+    // MODALES Y GESTIÓN DE PORTADAS
+    // ==============================================================
+    function abrirModalEdicionOpciones() { document.getElementById("editarOpciones").classList.add("activo"); }
+    document.getElementById("optCancelarEdicion").onclick = () => document.getElementById("editarOpciones").classList.remove("activo");
+
+    document.getElementById("optSubirFoto").onclick = () => {
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = 'image/*';
+      input.onchange = async (e) => {
+        const archivo = e.target.files[0];
+        if (!archivo) return;
+        try {
+          const ext = archivo.name.split('.').pop() || 'jpg';
+          const path = `${coupleId}/portadas/${Date.now()}.${ext}`;
+          const { error: upErr } = await supabase.storage.from('media').upload(path, archivo, { cacheControl: '3600', upsert: false, contentType: archivo.type });
+          if (upErr) throw upErr;
+          const { data: pub } = supabase.storage.from('media').getPublicUrl(path);
+          pedirNombreYGuardarAlbum(pub.publicUrl);
+        } catch (err) { alert("Error al subir portada: " + err.message); }
+      };
+      input.click();
+    };
+
+    document.getElementById("optAbrirDibujo").onclick = () => {
+      document.getElementById("editarOpciones").classList.remove("activo");
+      document.getElementById("estudioOverlay").classList.add("activo");
+      studio.resetCanvas();
+      if (albumEditando && albumEditando.portada_url) studio.loadBackground(albumEditando.portada_url);
+      setTimeout(() => studio.fitToView(), 100);
+    };
+
+    function pedirNombreYGuardarAlbum(urlPortada) {
+      const nombre = prompt("Nombre del álbum:");
+      if (!nombre) return;
+      guardarAlbum(nombre, urlPortada);
+    }
+
+    async function guardarAlbum(nombre, urlPortada) {
+      try {
+        if (albumEditando) {
+          await supabase.from('albums').update({ nombre, portada_url: urlPortada }).eq('id', albumEditando.id);
+        } else {
+          await supabase.from('albums').insert([{ id: 'alb-' + Date.now(), couple_id: coupleId, nombre, portada_url: urlPortada, autor: miNombre }]);
+        }
+        document.getElementById("editarOpciones").classList.remove("activo");
+        cargarDatos();
+        if (window.lanzarConfeti) window.lanzarConfeti(1000);
+      } catch (err) { alert("Error: " + err.message); }
+    }
+
+    // ==============================================================
+    // HELPER RECUERDOS (PARA ÁLBUMES)
+    // ==============================================================
+    function crearHtmlRecuerdo(item) {
+      const mediaHtml = item.tipo === 'video'
+        ? `<video src="${escaparHTML(item.url)}" preload="metadata" muted></video><div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:3rem; color:rgba(255,255,255,0.8); pointer-events:none; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">▶</div>`
+        : `<img src="${escaparHTML(item.url)}" alt="${escaparHTML(item.titulo)}" loading="lazy">`;
+      return `
+        <figure class="galeria-item" data-id="${item.id}" style="position: relative; margin: 0; border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.1); cursor: pointer;">
+          ${mediaHtml}
+          <figcaption style="padding: 12px 14px;">
+            <div class="recuerdo-fecha" style="font-size: 0.72rem; color: #a874e8; font-weight: 600; margin-bottom: 4px;">${new Date(item.fecha).toLocaleDateString('es-ES')} · ${escaparHTML(item.autor || miNombre)}</div>
+            <p class="recuerdo-texto" style="font-size: 0.85rem; color: #444; margin: 0; line-height: 1.35;">${escaparHTML(item.descripcion || item.titulo)}</p>
+            <button class="btn-eliminar-recuerdo" data-delete="${item.id}" data-url="${escaparHTML(item.url)}" style="position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(0,0,0,0.5); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; font-size: 0.9rem;">🗑️</button>
+          </figcaption>
+        </figure>
+      `;
+    }
+
+    function agregarEventosGaleria(contenedor, lista) {
+      contenedor.querySelectorAll('.galeria-item').forEach((el) => {
+        el.onclick = (e) => {
+          if (e.target.closest('[data-delete]')) return;
+          const item = lista.find(r => r.id === el.dataset.id);
+          if (item) abrirLightbox(item);
+        };
+        const btn = el.querySelector('.btn-eliminar-recuerdo');
+        if(btn) {
+          el.onmouseenter = () => btn.style.opacity = '1';
+          el.onmouseleave = () => btn.style.opacity = '0';
+        }
+      });
+      contenedor.querySelectorAll('[data-delete]').forEach(b => {
+        b.onclick = (e) => { e.stopPropagation(); eliminarRecuerdo(e, b.dataset.delete, b.dataset.url); };
+      });
+    }
+
+    window.eliminarRecuerdo = async function(event, id, url) {
+      if (event) event.stopPropagation();
+      if (!confirm("¿Eliminar este recuerdo?")) return;
+      try {
+        if (url && url.includes('/media/')) {
+          const path = url.split('/media/')[1];
+          await supabase.storage.from('media').remove([path]);
+        }
+        await supabase.from('recuerdos').delete().eq('id', id);
+        cargarDatos();
+      } catch (err) {
+        console.error("Error al eliminar:", err);
+        await supabase.from('recuerdos').delete().eq('id', id);
+        cargarDatos();
+      }
+    };
+
+    // ==============================================================
+    // LIGHTBOX Y MOVER RECUERDOS
+    // ==============================================================
+    function abrirLightbox(item) {
+      recuerdoEnLightbox = item;
+      const media = document.getElementById("lightboxMedia");
+      media.innerHTML = item.tipo === 'video'
+        ? `<video src="${escaparHTML(item.url)}" controls autoplay></video>`
+        : `<img src="${escaparHTML(item.url)}" alt="${escaparHTML(item.titulo)}">`;
+      document.getElementById("lightboxCaption").textContent = item.descripcion || item.titulo || "";
+      
+      const btnMover = document.getElementById("btnLightboxMover");
+      btnMover.textContent = "📁 Mover a...";
+      btnMover.style.display = "flex";
+      
+      document.getElementById("lightbox").classList.add("activo");
+    }
+    function cerrarLightbox() {
+      document.getElementById("lightbox").classList.remove("activo");
+      document.getElementById("lightboxMedia").innerHTML = "";
+      recuerdoEnLightbox = null;
+    }
+
+    function abrirModalMover() {
+      if (!recuerdoEnLightbox) return;
+      const select = document.getElementById("selectMoverAlbum");
+      let opciones = `<option value="">— Sin álbum (Sueltos) —</option>`;
+      opciones += albumsDisponibles.map(a => `<option value="${a.id}" ${recuerdoEnLightbox.album_id === a.id ? 'selected' : ''}>${escaparHTML(a.nombre)}</option>`).join('');
+      select.innerHTML = opciones;
+      document.getElementById("modalMover").classList.add("activo");
+    }
+
+    async function guardarMover() {
+      if (!recuerdoEnLightbox) return;
+      const nuevoAlbumId = document.getElementById("selectMoverAlbum").value || null;
+      await supabase.from('recuerdos').update({ album_id: nuevoAlbumId }).eq('id', recuerdoEnLightbox.id);
+      document.getElementById("modalMover").classList.remove("activo");
+      cerrarLightbox();
+      cargarDatos();
+      if (window.lanzarConfeti) window.lanzarConfeti(800);
+    }
+
+    // ==============================================================
+    // STUDIO ENGINE v16 (INTACTO)
+    // ==============================================================
+    class StudioEngine {
+      constructor() {
+        this.svgCanvas = document.getElementById("svgCanvas");
+        this.selectionOverlay = document.getElementById("selectionOverlay");
+        this.textEditorFloating = document.getElementById("textEditorFloating");
+        this.textInput = document.getElementById("textInput");
+        this.svgStage = document.getElementById("svgStage");
+        this.canvasArea = document.getElementById("canvasArea");
+        this.quickActions = document.getElementById("quickActions");
+        this.magnifierLens = document.getElementById("magnifierLens");
+
+        this.VB_W = 800; 
+        this.VB_H = 800;
+
+        this.state = {
+          objects: [],
+          selectedId: null,
+          currentTool: 'select',
+          color: '#1a1a1a',
+          fillColor: '#f28ca6', 
+          fillEnabled: false,
+          strokeWidth: 4,
+          fontFamily: 'Arial',
+          fontSize: 32,
+          fontWeight: 'normal',
+          fontStyle: 'normal',
+          textDecoration: 'none',
+          textAlign: 'start',
+          curve: 0,
+          opacity: 1,
+          shadowEnabled: false,
+          bevelEnabled: false,
+          history: [], historyIndex: -1,
+          isDrawing: false, isDragging: false, isResizing: false, isRotating: false,
+          dragMode: null, dragStart: null, originalObj: null,
+          startPoint: { x: 0, y: 0 }, currentElement: null,
+          backgroundImage: null, zoom: 1
+        };
+
+        this.fontList = [
+          { label: 'Arial', value: 'Arial' },
+          { label: 'Georgia', value: 'Georgia, serif' },
+          { label: 'Impact', value: 'Impact, sans-serif' },
+          { label: 'Playfair', value: '"Playfair Display", serif' },
+          { label: 'Poppins', value: 'Poppins, sans-serif' },
+          { label: 'Caveat', value: 'Caveat, cursive' },
+          { label: 'Dancing', value: '"Dancing Script", cursive' },
+          { label: 'Great Vibes', value: '"Great Vibes", cursive' },
+          { label: 'Oswald', value: 'Oswald, sans-serif' },
+          { label: 'Bebas', value: '"Bebas Neue", sans-serif' },
+          { label: 'Pacifico', value: 'Pacifico, cursive' },
+          { label: 'Lobster', value: 'Lobster, cursive' }
+        ];
+
+        this.setupEvents();
+        this.setupUI();
+        this.buildFontList();
+        this.fitToView();
+      }
+
+      clientToSvg(e) {
+        const pt = this.svgCanvas.createSVGPoint();
+        pt.x = e.clientX; pt.y = e.clientY;
+        const ctm = this.svgCanvas.getScreenCTM();
+        if (!ctm) return { x: 0, y: 0 };
+        const svgP = pt.matrixTransform(ctm.inverse());
+        return { x: svgP.x, y: svgP.y };
+      }
+
+      resetCanvas() {
+        this.svgCanvas.innerHTML = '';
+        this.selectionOverlay.innerHTML = '';
+        this.state.objects = [];
+        this.state.selectedId = null;
+        this.state.history = []; this.state.historyIndex = -1;
+        this.state.backgroundImage = null;
+        this.state.canvasBgColor = '#ffffff';
+        this.svgCanvas.style.backgroundColor = '#ffffff';
+        this.saveHistory();
+        this.deselect();
+        this.setTool('select');
+      }
+
+      loadBackground(url) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => { this.state.backgroundImage = img; this.renderBackground(); };
+        img.src = url;
+      }
+
+      renderBackground() {
+        this.svgCanvas.innerHTML = '';
+        this.getOrCreateDefs();
+        
+        if (this.state.backgroundImage) {
+          const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "image");
+          bgRect.setAttribute("href", this.state.backgroundImage.src);
+          bgRect.setAttribute("x", "0"); bgRect.setAttribute("y", "0");
+          bgRect.setAttribute("width", this.VB_W); bgRect.setAttribute("height", this.VB_H);
+          bgRect.setAttribute("preserveAspectRatio", "xMidYMid slice");
+          bgRect.setAttribute("data-bg", "1"); bgRect.setAttribute("pointer-events", "none");
+          this.svgCanvas.appendChild(bgRect);
+        } else {
+          const bgColor = this.state.canvasBgColor || '#ffffff';
+          this.svgCanvas.style.backgroundColor = bgColor;
+        }
+
+        this.state.objects.forEach(obj => this.renderObject(obj));
+        this.deselect();
+      }
+
+      setupEvents() {
+        this.svgCanvas.addEventListener('pointerdown', this.onCanvasDown.bind(this));
+        this.svgCanvas.addEventListener('pointermove', this.onCanvasMove.bind(this));
+        this.svgCanvas.addEventListener('pointerup', this.onCanvasUp.bind(this));
+        this.svgCanvas.addEventListener('pointerleave', this.onCanvasUp.bind(this));
+        this.selectionOverlay.addEventListener('pointerdown', this.onHandleDown.bind(this));
+        this.selectionOverlay.addEventListener('pointermove', this.onHandleMove.bind(this));
+        this.selectionOverlay.addEventListener('pointerup', this.onHandleUp.bind(this));
+        this.selectionOverlay.addEventListener('pointercancel', this.onHandleUp.bind(this));
+
+        document.addEventListener('keydown', (e) => {
+          if (!document.getElementById('estudioOverlay').classList.contains('activo')) return;
+          const tag = (e.target.tagName || '').toUpperCase();
+          if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+          if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); this.undo(); }
+          if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); this.redo(); }
+          if (e.key === 'Delete' || e.key === 'Backspace') { if (this.state.selectedId) { e.preventDefault(); this.deleteSelected(); } }
+        });
+      }
+
+      setupUI() {
+        document.querySelectorAll('.toolbar-left .icon-btn').forEach(btn => {
+          if (btn.dataset.tool === 'image') return;
+          btn.onclick = () => this.setTool(btn.dataset.tool);
+        });
+
+        document.querySelector('[data-tool="image"]').addEventListener('click', () => {
+          const input = document.createElement('input');
+          input.type = 'file'; input.accept = 'image/*';
+          input.onchange = (e) => {
+            const f = e.target.files[0];
+            if (f) { const reader = new FileReader(); reader.onload = (ev) => this.addImage(ev.target.result); reader.readAsDataURL(f); }
+          };
+          input.click();
+        });
+
+        document.getElementById('btnFondo').onclick = () => {
+          const input = document.createElement('input');
+          input.type = 'file'; input.accept = 'image/*';
+          input.onchange = (e) => {
+            const f = e.target.files[0];
+            if (f) { const reader = new FileReader(); reader.onload = (ev) => this.loadBackground(ev.target.result); reader.readAsDataURL(f); }
+          };
+          input.click();
+        };
+
+        const syncColorInputs = (colorInput, hexInput, prop) => {
+          colorInput.oninput = (e) => {
+            hexInput.value = e.target.value.toUpperCase();
+            this.state[prop] = e.target.value;
+            if (this.state.selectedId) this.applyProp(prop, e.target.value);
+          };
+          hexInput.onchange = (e) => {
+            let val = e.target.value.trim();
+            if (!val.startsWith('#')) val = '#' + val;
+            if (/^#[0-9A-Fa-f]{6}$/i.test(val)) {
+              colorInput.value = val;
+              this.state[prop] = val;
+              if (this.state.selectedId) this.applyProp(prop, val);
+            } else {
+              hexInput.value = this.state[prop].toUpperCase();
+            }
+          };
+        };
+
+        syncColorInputs(document.getElementById('inputColorPicker'), document.getElementById('hexColorPicker'), 'color');
+        syncColorInputs(document.getElementById('inputFillColorTool'), document.getElementById('hexFillTool'), 'fillColor');
+        syncColorInputs(document.getElementById('inputFillColor'), document.getElementById('hexFillColor'), 'fillColor');
+
+        document.getElementById('inputFillEnabled').onchange = (e) => {
+          this.state.fillEnabled = e.target.checked;
+          document.getElementById('fillColorObjWrapper').style.display = e.target.checked ? 'flex' : 'none';
+          if (this.state.selectedId) this.applyProp('fillEnabled', e.target.checked);
+        };
+
+        document.getElementById('inputGrosor').oninput = (e) => {
+          this.state.strokeWidth = parseInt(e.target.value); document.getElementById('lblGrosor').textContent = this.state.strokeWidth;
+          if (this.state.selectedId) this.applyProp('strokeWidth', this.state.strokeWidth);
+        };
+        document.getElementById('inputOpacity').oninput = (e) => {
+          this.state.opacity = parseInt(e.target.value) / 100; document.getElementById('lblOpacity').textContent = e.target.value + '%';
+          if (this.state.selectedId) this.applyProp('opacity', this.state.opacity);
+        };
+
+        document.getElementById('inputFontSize').oninput = (e) => {
+          this.state.fontSize = parseInt(e.target.value); document.getElementById('lblFontSize').textContent = this.state.fontSize;
+          if (this.state.selectedId) this.applyProp('fontSize', this.state.fontSize);
+        };
+        document.getElementById('inputCurve').oninput = (e) => {
+          this.state.curve = parseInt(e.target.value); document.getElementById('lblCurve').textContent = this.state.curve + '%';
+          if (this.state.selectedId) this.applyProp('curve', this.state.curve);
+        };
+
+        document.getElementById('inputShadowEnabled').onchange = (e) => {
+          this.state.shadowEnabled = e.target.checked;
+          if (this.state.selectedId) this.applyProp('shadowEnabled', e.target.checked);
+        };
+        document.getElementById('inputBevelEnabled').onchange = (e) => {
+          this.state.bevelEnabled = e.target.checked;
+          if (this.state.selectedId) this.applyProp('bevelEnabled', e.target.checked);
+        };
+
+        document.getElementById('inputRotation').oninput = (e) => {
+          document.getElementById('lblRotation').textContent = e.target.value + '°';
+          if (this.state.selectedId) this.applyProp('rotation', parseInt(e.target.value));
+        };
+        document.getElementById('btnDeleteSelected').onclick = () => this.deleteSelected();
+        document.getElementById('btnUndo').onclick = () => this.undo();
+        document.getElementById('btnRedo').onclick = () => this.redo();
+        document.getElementById('btnClearAll').onclick = () => { if (confirm("¿Borrar todo?")) this.resetCanvas(); };
+        document.getElementById('btnGuardarPortada').onclick = () => this.exportarYGuardar();
+        document.getElementById('btnCancelarEstudio').onclick = () => document.getElementById('estudioOverlay').classList.remove('activo');
+        document.getElementById('btnZoomIn').onclick = () => this.zoom(0.15);
+        document.getElementById('btnZoomOut').onclick = () => this.zoom(-0.15);
+        document.getElementById('btnZoomFit').onclick = () => this.fitToView();
+        
+        document.getElementById('qaAlignLeft').onclick = () => this.alignSelected('left');
+        document.getElementById('qaAlignCenter').onclick = () => this.alignSelected('center');
+        document.getElementById('qaAlignRight').onclick = () => this.alignSelected('right');
+      }
+
+      buildFontList() {
+        const list = document.getElementById('fontList');
+        list.innerHTML = this.fontList.map(f => `<div class="font-item" data-font="${escaparHTML(f.value)}"><span class="preview" style="font-family:${f.value};">${escaparHTML(f.label)}</span></div>`).join('');
+        list.querySelectorAll('.font-item').forEach(item => {
+          item.onclick = () => {
+            this.state.fontFamily = item.dataset.font;
+            list.querySelectorAll('.font-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            if (this.state.selectedId) this.applyProp('fontFamily', this.state.fontFamily);
+          };
+        });
+      }
+
+      updateStageSize() {
+        const areaRect = this.canvasArea.getBoundingClientRect();
+        const availW = areaRect.width - 80; const availH = areaRect.height - 80;
+        const scale = Math.min(availW / this.VB_W, availH / this.VB_H);
+        const finalScale = Math.max(0.15, Math.min(scale, 3));
+        this.state.zoom = finalScale;
+        this.svgStage.style.width = (this.VB_W * finalScale) + 'px';
+        this.svgStage.style.height = (this.VB_H * finalScale) + 'px';
+        document.getElementById('zoomLevel').textContent = Math.round(finalScale * 100) + '%';
+      }
+      fitToView() { this.updateStageSize(); }
+      zoom(delta) {
+        const areaRect = this.canvasArea.getBoundingClientRect();
+        const maxScale = Math.min((areaRect.width - 80) / this.VB_W, (areaRect.height - 80) / this.VB_H) * 3;
+        const newZoom = Math.max(0.15, Math.min(maxScale, this.state.zoom + delta));
+        this.state.zoom = newZoom;
+        this.svgStage.style.width = (this.VB_W * newZoom) + 'px';
+        this.svgStage.style.height = (this.VB_H * newZoom) + 'px';
+        document.getElementById('zoomLevel').textContent = Math.round(newZoom * 100) + '%';
+      }
+
+      setTool(tool) {
+        this.state.currentTool = tool;
+        document.querySelectorAll('.toolbar-left .icon-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tool === tool));
+        this.svgStage.dataset.tool = tool;
+        if (tool !== 'select') this.deselect();
+        this.updatePanel(tool);
+        
+        if (tool !== 'eyedropper') this.magnifierLens.style.display = 'none';
+      }
+
+      updatePanel(tool) {
+        const empty = document.getElementById('panelEmpty');
+        const groups = ['groupFillTool', 'groupColors', 'groupStroke', 'groupText', 'groupEffects', 'groupTransform', 'groupActions'];
+        groups.forEach(g => document.getElementById(g).style.display = 'none');
+        
+        if (tool === 'select') {
+          if (this.state.selectedId) this.updateUI();
+          else empty.style.display = 'block';
+          return;
+        }
+        
+        empty.style.display = 'none';
+        document.getElementById('panelTitle').textContent = tool.toUpperCase();
+        
+        if (tool === 'fill') {
+          document.getElementById('groupFillTool').style.display = 'flex';
+        } else if (tool === 'brush' || tool === 'eraser' || ['line', 'rect','circle','triangle','star','polygon','heart'].includes(tool)) {
+          document.getElementById('groupColors').style.display = 'flex';
+          document.getElementById('groupStroke').style.display = 'flex';
+          document.getElementById('groupEffects').style.display = 'flex';
+        } else if (tool === 'text') {
+          document.getElementById('groupColors').style.display = 'flex';
+          document.getElementById('groupText').style.display = 'flex';
+          document.getElementById('groupEffects').style.display = 'flex';
+        }
+      }
+
+      onCanvasDown(e) {
+        if (e.button !== 0) return;
+        const pos = this.clientToSvg(e);
+        this.state.startPoint = pos;
+
+        const el = e.target.closest('.svg-object');
+        
+        if (el && this.state.currentTool !== 'eraser' && this.state.currentTool !== 'text' && this.state.currentTool !== 'eyedropper') {
+          this.select(el.dataset.id);
+          const obj = this.state.objects.find(o => o.id === el.dataset.id);
+          if (obj) {
+            this.state.isDragging = true;
+            this.state.dragMode = 'move';
+            this.state.dragStart = { x: pos.x, y: pos.y };
+            this.state.originalObj = JSON.parse(JSON.stringify(obj));
+            try { this.svgCanvas.setPointerCapture(e.pointerId); } catch(_) {}
+          }
+          return;
+        }
+
+        if (this.state.currentTool === 'select') {
+          if (!el) this.deselect();
+          return;
+        }
+
+        if (this.state.currentTool === 'text') { this.showTextEditor(pos); return; }
+        
+        if (this.state.currentTool === 'eyedropper') { 
+          this.pickColor(e); 
+          this.setTool('select'); 
+          this.magnifierLens.style.display = 'none';
+          return; 
+        }
+
+        if (this.state.currentTool === 'fill') {
+          this.floodFill(e, pos);
+          return;
+        }
+
+        this.state.isDrawing = true;
+        try { this.svgCanvas.setPointerCapture(e.pointerId); } catch(_) {}
+        const id = 'obj-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+        const isShape = ['rect','circle','triangle','star','polygon','heart'].includes(this.state.currentTool);
+
+        if (this.state.currentTool === 'brush' || this.state.currentTool === 'eraser') {
+          this.state.currentElement = {
+            id, type: 'path', color: this.state.currentTool === 'eraser' ? '#ffffff' : this.state.color,
+            strokeWidth: this.state.strokeWidth, opacity: 1, points: [{x: pos.x, y: pos.y}], d: `M ${pos.x} ${pos.y}`
+          };
+        } else if (isShape) {
+          this.state.currentElement = {
+            id, type: this.state.currentTool, color: this.state.color, strokeWidth: this.state.strokeWidth,
+            fillEnabled: this.state.fillEnabled, fillColor: this.state.fillColor, shadowEnabled: this.state.shadowEnabled, bevelEnabled: this.state.bevelEnabled,
+            opacity: 1, x: pos.x, y: pos.y, w: 0, h: 0, rotation: 0
+          };
+        }
+
+        if (this.state.currentElement) {
+          this.state.objects.push(this.state.currentElement);
+          this.renderObject(this.state.currentElement);
+        }
+      }
+
+      onCanvasMove(e) {
+        const pos = this.clientToSvg(e);
+        document.getElementById('statusCoords').textContent = `X: ${Math.round(pos.x)} Y: ${Math.round(pos.y)}`;
+
+        if (this.state.currentTool === 'eyedropper') {
+          this.updateMagnifier(e);
+        }
+
+        if (this.state.isDragging && this.state.dragMode === 'move' && this.state.originalObj) {
+          const dx = pos.x - this.state.dragStart.x; const dy = pos.y - this.state.dragStart.y;
+          const obj = this.state.objects.find(o => o.id === this.state.selectedId);
+          if (!obj) return;
+          obj.x = this.state.originalObj.x + dx; obj.y = this.state.originalObj.y + dy;
+          if (obj.type === 'path' && this.state.originalObj.points) {
+            obj.d = ''; obj.points = this.state.originalObj.points.map((p, i) => {
+              const np = { x: p.x + dx, y: p.y + dy }; obj.d += (i === 0 ? `M ${np.x} ${np.y}` : ` L ${np.x} ${np.y}`); return np;
+            });
+          }
+          this.renderObject(obj); this.renderSelectionBox(obj);
+          return;
+        }
+
+        if (!this.state.isDrawing || !this.state.currentElement) return;
+        const el = this.state.currentElement;
+
+        if (el.type === 'path') {
+          el.points.push({ x: pos.x, y: pos.y });
+          el.d += ` L ${pos.x} ${pos.y}`;
+        } else {
+          const sx = this.state.startPoint.x, sy = this.state.startPoint.y;
+          el.x = Math.min(sx, pos.x); el.y = Math.min(sy, pos.y);
+          el.w = Math.abs(pos.x - sx); el.h = Math.abs(pos.y - sy);
+        }
+        this.renderObject(el);
+      }
+
+      onCanvasUp(e) {
+        if (this.state.isDragging) { this.state.isDragging = false; this.saveHistory(); return; }
+        if (!this.state.isDrawing) return;
+        this.state.isDrawing = false;
+        if (this.state.currentElement) {
+          const el = this.state.currentElement;
+          if ((el.type === 'path' && el.points.length < 2) || (el.type !== 'path' && el.w < 5 && el.h < 5)) {
+            this.state.objects = this.state.objects.filter(o => o.id !== el.id);
+            const svgEl = this.svgCanvas.querySelector(`[data-id="${el.id}"]`); if (svgEl) svgEl.remove();
+          }
+        }
+        this.state.currentElement = null; this.saveHistory();
+      }
+
+      floodFill(e, pos) {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = this.VB_W; tempCanvas.height = this.VB_H;
+        const ctx = tempCanvas.getContext('2d', { willReadFrequently: true });
+        
+        ctx.fillStyle = this.state.canvasBgColor || '#ffffff';
+        ctx.fillRect(0, 0, this.VB_W, this.VB_H);
+
+        const svgData = new XMLSerializer().serializeToString(this.svgCanvas);
+        const img = new Image();
+        
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, this.VB_W, this.VB_H);
+          
+          const px = Math.floor(pos.x);
+          const py = Math.floor(pos.y);
+          if (px < 0 || px >= this.VB_W || py < 0 || py >= this.VB_H) return;
+
+          const imageData = ctx.getImageData(0, 0, this.VB_W, this.VB_H);
+          const data = imageData.data;
+          
+          const startIdx = (py * this.VB_W + px) * 4;
+          const startR = data[startIdx], startG = data[startIdx+1], startB = data[startIdx+2];
+          
+          const hex = this.state.fillColor;
+          const fillR = parseInt(hex.slice(1,3), 16);
+          const fillG = parseInt(hex.slice(3,5), 16);
+          const fillB = parseInt(hex.slice(5,7), 16);
+
+          if (Math.abs(startR - fillR) < 5 && Math.abs(startG - fillG) < 5 && Math.abs(startB - fillB) < 5) return;
+
+          const stack = [[px, py]];
+          const visited = new Uint8Array(this.VB_W * this.VB_H);
+          const tolerance = 30;
+          
+          while (stack.length > 0) {
+            const [x, y] = stack.pop();
+            const idx = y * this.VB_W + x;
+            
+            if (visited[idx]) continue;
+            visited[idx] = 1;
+            
+            const pIdx = idx * 4;
+            const r = data[pIdx], g = data[pIdx+1], b = data[pIdx+2];
+            
+            if (Math.abs(r - startR) < tolerance && Math.abs(g - startG) < tolerance && Math.abs(b - startB) < tolerance) {
+              data[pIdx] = fillR;
+              data[pIdx+1] = fillG;
+              data[pIdx+2] = fillB;
+              data[pIdx+3] = 255;
+              
+              if (x > 0) stack.push([x - 1, y]);
+              if (x < this.VB_W - 1) stack.push([x + 1, y]);
+              if (y > 0) stack.push([x, y - 1]);
+              if (y < this.VB_H - 1) stack.push([x, y + 1]);
+            }
+          }
+          
+          ctx.putImageData(imageData, 0, 0);
+          const dataUrl = tempCanvas.toDataURL('image/png');
+          
+          this.svgCanvas.innerHTML = '';
+          const bgImg = document.createElementNS("http://www.w3.org/2000/svg", "image");
+          bgImg.setAttribute("href", dataUrl);
+          bgImg.setAttribute("x", "0"); bgImg.setAttribute("y", "0");
+          bgImg.setAttribute("width", this.VB_W); bgImg.setAttribute("height", this.VB_H);
+          bgImg.setAttribute("data-bg", "1"); bgImg.setAttribute("pointer-events", "none");
+          this.svgCanvas.appendChild(bgImg);
+          
+          this.state.objects.forEach(obj => this.renderObject(obj));
+          
+          this.state.backgroundImage = new Image();
+          this.state.backgroundImage.src = dataUrl;
+          this.state.canvasBgColor = null;
+          
+          this.saveHistory();
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      }
+
+      updateMagnifier(e) {
+        const lens = this.magnifierLens;
+        lens.style.display = 'block';
+        lens.style.left = (e.clientX) + 'px';
+        lens.style.top = (e.clientY) + 'px';
+
+        const tempCanvas = document.createElement('canvas'); tempCanvas.width = 800; tempCanvas.height = 800;
+        const ctx = tempCanvas.getContext('2d');
+        ctx.fillStyle = this.svgCanvas.style.backgroundColor || '#ffffff'; ctx.fillRect(0,0,800,800);
+        const svgData = new XMLSerializer().serializeToString(this.svgCanvas);
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, 800, 800);
+          const pos = this.clientToSvg(e);
+          const zoomLevel = 10; 
+          const size = 40;
+          const sx = Math.max(0, pos.x - size/2);
+          const sy = Math.max(0, pos.y - size/2);
+          lens.style.backgroundImage = `url(${tempCanvas.toDataURL()})`;
+          lens.style.backgroundSize = `${800 * zoomLevel}px ${800 * zoomLevel}px`;
+          lens.style.backgroundPosition = `-${sx * zoomLevel}px -${sy * zoomLevel}px`;
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      }
+
+      renderObject(obj) {
+        let el = this.svgCanvas.querySelector(`[data-id="${obj.id}"]`);
+        const defs = this.getOrCreateDefs();
+
+        if (obj.shadowEnabled && !document.getElementById(`shadow-${obj.id}`)) {
+          const f = document.createElementNS("http://www.w3.org/2000/svg", "filter"); f.setAttribute('id', `shadow-${obj.id}`);
+          f.innerHTML = `<feDropShadow dx="4" dy="6" stdDeviation="5" flood-color="#000" flood-opacity="0.5"/>`;
+          defs.appendChild(f);
+        }
+        if (obj.bevelEnabled && !document.getElementById(`bevel-${obj.id}`)) {
+          const f = document.createElementNS("http://www.w3.org/2000/svg", "filter"); f.setAttribute('id', `bevel-${obj.id}`);
+          f.innerHTML = `<feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/><feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.8" specularExponent="20" lighting-color="#FFF" result="specOut"><fePointLight x="-50" y="-100" z="200"/></feSpecularLighting><feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut2"/><feComposite in="SourceGraphic" in2="specOut2" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>`;
+          defs.appendChild(f);
+        }
+        const filterAttr = obj.shadowEnabled ? `url(#shadow-${obj.id})` : (obj.bevelEnabled ? `url(#bevel-${obj.id})` : '');
+
+        const tagMap = { path:'path', rect:'rect', circle:'ellipse', triangle:'polygon', star:'polygon', polygon:'polygon', heart:'path', text:'text', image:'image' };
+        if (!el) {
+          el = document.createElementNS("http://www.w3.org/2000/svg", tagMap[obj.type] || 'rect');
+          el.setAttribute("data-id", obj.id); el.setAttribute("class", "svg-object"); el.style.cursor = 'move';
+          this.svgCanvas.appendChild(el);
+        }
+
+        const fillAttr = (obj.fillEnabled && obj.fillColor) ? obj.fillColor : 'none';
+        const strokeAttr = obj.color || '#000';
+
+        if (obj.type === 'path') {
+          el.setAttribute('d', obj.d); el.setAttribute('fill', 'none'); el.setAttribute('stroke', obj.color);
+          el.setAttribute('stroke-width', obj.strokeWidth); el.setAttribute('stroke-linecap', 'round');
+        } else if (obj.type === 'rect') {
+          el.setAttribute('x', obj.x); el.setAttribute('y', obj.y); el.setAttribute('width', Math.max(0, obj.w)); el.setAttribute('height', Math.max(0, obj.h));
+          el.setAttribute('fill', fillAttr); el.setAttribute('stroke', strokeAttr); el.setAttribute('stroke-width', obj.strokeWidth);
+        } else if (obj.type === 'circle') {
+          el.setAttribute('cx', obj.x + obj.w/2); el.setAttribute('cy', obj.y + obj.h/2); el.setAttribute('rx', Math.max(0, obj.w/2)); el.setAttribute('ry', Math.max(0, obj.h/2));
+          el.setAttribute('fill', fillAttr); el.setAttribute('stroke', strokeAttr); el.setAttribute('stroke-width', obj.strokeWidth);
+        } else if (['triangle','star','polygon','heart'].includes(obj.type)) {
+          let pts = '';
+          if (obj.type === 'triangle') pts = `${obj.x+obj.w/2},${obj.y} ${obj.x+obj.w},${obj.y+obj.h} ${obj.x},${obj.y+obj.h}`;
+          else if (obj.type === 'star') pts = this.starPoints(obj);
+          else if (obj.type === 'polygon') pts = this.polyPoints(obj, 5);
+          else if (obj.type === 'heart') el.setAttribute('d', this.heartPath(obj));
+          if (pts) el.setAttribute('points', pts);
+          el.setAttribute('fill', fillAttr); el.setAttribute('stroke', strokeAttr); el.setAttribute('stroke-width', obj.strokeWidth);
+        } else if (obj.type === 'text') {
+          let pathId = `textpath-${obj.id}`;
+          let textPathEl = document.getElementById(pathId);
+          
+          if (obj.curve !== 0) {
+            if (!textPathEl) {
+              textPathEl = document.createElementNS("http://www.w3.org/2000/svg", "path"); textPathEl.setAttribute("id", pathId); textPathEl.setAttribute("fill", "none"); defs.appendChild(textPathEl);
+            }
+            const cx = obj.x + obj.w/2; const cy = obj.y + obj.h/2;
+            const r = Math.abs(obj.curve) * 5 + 50;
+            const sweep = obj.curve > 0 ? 1 : 0;
+            const d = `M ${cx - r} ${cy} A ${r} ${r} 0 0 ${sweep} ${cx + r} ${cy}`;
+            textPathEl.setAttribute("d", d);
+            el.innerHTML = `<textPath href="#${pathId}" startOffset="50%" text-anchor="middle">${escaparHTML(obj.text)}</textPath>`;
+            el.setAttribute('x', 0); el.setAttribute('y', 0);
+          } else {
+            el.innerHTML = escaparHTML(obj.text);
+            el.setAttribute('x', obj.x); el.setAttribute('y', obj.y + (obj.fontSize || 32));
+          }
+          el.setAttribute('fill', obj.color); el.setAttribute('font-family', obj.fontFamily || 'Arial');
+          el.setAttribute('font-size', obj.fontSize || 32); el.setAttribute('font-weight', obj.fontWeight || 'normal');
+        } else if (obj.type === 'image') {
+          el.setAttribute('href', obj.href); el.setAttribute('x', obj.x); el.setAttribute('y', obj.y);
+          el.setAttribute('width', Math.max(1, obj.w)); el.setAttribute('height', Math.max(1, obj.h));
+        }
+
+        if (filterAttr) el.setAttribute('filter', filterAttr); else el.removeAttribute('filter');
+        el.setAttribute('opacity', obj.opacity ?? 1);
+        
+        if (obj.rotation) el.setAttribute('transform', `rotate(${obj.rotation} ${obj.x + obj.w/2} ${obj.y + obj.h/2})`);
+        else el.removeAttribute('transform');
+
+        if (this.state.selectedId === obj.id) this.renderSelectionBox(obj);
+      }
+
+      getOrCreateDefs() {
+        let defs = this.svgCanvas.querySelector('defs');
+        if (!defs) { defs = document.createElementNS("http://www.w3.org/2000/svg", "defs"); this.svgCanvas.prepend(defs); }
+        return defs;
+      }
+
+      starPoints(obj) {
+        const cx = obj.x + obj.w/2, cy = obj.y + obj.h/2, outerR = Math.min(obj.w, obj.h)/2, innerR = outerR * 0.4; const pts = [];
+        for (let i = 0; i < 10; i++) { const angle = (Math.PI / 5) * i - Math.PI / 2; const r = i % 2 === 0 ? outerR : innerR; pts.push(`${cx + Math.cos(angle) * r},${cy + Math.sin(angle) * r}`); }
+        return pts.join(' ');
+      }
+      polyPoints(obj, sides) {
+        const cx = obj.x + obj.w/2, cy = obj.y + obj.h/2, rx = obj.w/2, ry = obj.h/2; const pts = [];
+        for (let i = 0; i < sides; i++) { const angle = (Math.PI * 2 / sides) * i - Math.PI / 2; pts.push(`${cx + Math.cos(angle) * rx},${cy + Math.sin(angle) * ry}`); }
+        return pts.join(' ');
+      }
+      heartPath(obj) {
+        const cx = obj.x + obj.w/2, cy = obj.y + obj.h/2, w = obj.w, h = obj.h;
+        return `M ${cx} ${cy + h*0.35} C ${cx + w*0.6} ${cy + h*0.1}, ${cx + w*0.5} ${cy - h*0.4}, ${cx} ${cy - h*0.15} C ${cx - w*0.5} ${cy - h*0.4}, ${cx - w*0.6} ${cy + h*0.1}, ${cx} ${cy + h*0.35} Z`;
+      }
+
+      select(id) {
+        this.deselectSilent();
+        const obj = this.state.objects.find(o => o.id === id);
+        if (!obj) return;
+        this.state.selectedId = id;
+        this.renderSelectionBox(obj);
+        this.updateUI(); this.quickActions.classList.add('visible');
+      }
+      deselect() {
+        this.state.selectedId = null; this.selectionOverlay.innerHTML = ''; this.quickActions.classList.remove('visible'); this.updateUI();
+      }
+      deselectSilent() { this.state.selectedId = null; this.selectionOverlay.innerHTML = ''; }
+
+      renderSelectionBox(obj) {
+        this.selectionOverlay.innerHTML = '';
+        const box = this.getBBox(obj); const { x, y, w, h } = box;
+        
+        const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        if (obj.rotation) group.setAttribute('transform', `rotate(${obj.rotation} ${x + w/2} ${y + h/2})`);
+
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute('x', x); rect.setAttribute('y', y); rect.setAttribute('width', w); rect.setAttribute('height', h); rect.setAttribute('class', 'selection-rect');
+        group.appendChild(rect);
+
+        ['nw','n','ne','e','se','s','sw','w'].forEach(pos => {
+          let cx = x, cy = y;
+          if (pos.includes('e')) cx = x + w; if (pos.includes('s')) cy = y + h;
+          if (pos === 'n' || pos === 's') cx = x + w/2; if (pos === 'e' || pos === 'w') cy = y + h/2;
+          const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', 7); c.setAttribute('class', `handle ${pos}`); c.setAttribute('data-pos', pos);
+          group.appendChild(c);
+        });
+
+        const rotLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        rotLine.setAttribute('x1', x + w/2); rotLine.setAttribute('y1', y); rotLine.setAttribute('x2', x + w/2); rotLine.setAttribute('y2', y - 30); rotLine.setAttribute('class', 'rotation-line');
+        const rotHandle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        rotHandle.setAttribute('cx', x + w/2); rotHandle.setAttribute('cy', y - 30); rotHandle.setAttribute('r', 8); rotHandle.setAttribute('class', 'handle rotate'); rotHandle.setAttribute('data-pos', 'rotate');
+        
+        group.appendChild(rotLine); group.appendChild(rotHandle);
+        this.selectionOverlay.appendChild(group);
+      }
+
+      getBBox(obj) {
+        if (obj.type === 'path') {
+          let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+          obj.points.forEach(p => { minX = Math.min(minX, p.x); minY = Math.min(minY, p.y); maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y); });
+          return { x: minX - obj.strokeWidth, y: minY - obj.strokeWidth, w: Math.max(1, maxX - minX + obj.strokeWidth*2), h: Math.max(1, maxY - minY + obj.strokeWidth*2) };
+        }
+        if (obj.type === 'text') {
+          const textEl = this.svgCanvas.querySelector(`[data-id="${obj.id}"]`);
+          if (textEl && textEl.getBBox) { try { const b = textEl.getBBox(); return { x: b.x, y: b.y, w: Math.max(1, b.width), h: Math.max(1, b.height) }; } catch(e){} }
+          return { x: obj.x, y: obj.y, w: 100, h: 50 };
+        }
+        return { x: obj.x, y: obj.y, w: Math.max(1, obj.w || 1), h: Math.max(1, obj.h || 1) };
+      }
+
+      onHandleDown(e) {
+        const handle = e.target.closest('.handle'); if (!handle) return;
+        e.stopPropagation(); e.preventDefault();
+        const obj = this.state.objects.find(o => o.id === this.state.selectedId); if (!obj) return;
+        const pos = this.clientToSvg(e); const bbox = this.getBBox(obj);
+
+        if (handle.dataset.pos === 'rotate') {
+          this.state.isRotating = true;
+          this.state.dragStart = { pos, center: { x: bbox.x + bbox.w/2, y: bbox.y + bbox.h/2 }, initialRotation: obj.rotation || 0, initialAngle: Math.atan2(pos.y - (bbox.y + bbox.h/2), pos.x - (bbox.x + bbox.w/2)) };
+        } else {
+          this.state.isResizing = true;
+          this.state.dragStart = { pos, bbox: { ...bbox }, handle: handle.dataset.pos, original: JSON.parse(JSON.stringify(obj)) };
+        }
+        try { this.selectionOverlay.setPointerCapture(e.pointerId); } catch(_) {}
+      }
+
+      onHandleMove(e) {
+        const obj = this.state.objects.find(o => o.id === this.state.selectedId); if (!obj) return;
+        const pos = this.clientToSvg(e);
+
+        if (this.state.isRotating && this.state.dragStart) {
+          const ds = this.state.dragStart; const angle = Math.atan2(pos.y - ds.center.y, pos.x - ds.center.x);
+          obj.rotation = Math.round((ds.initialRotation + (angle - ds.initialAngle) * 180 / Math.PI) * 10) / 10;
+          this.renderObject(obj); this.renderSelectionBox(obj); document.getElementById('inputRotation').value = obj.rotation;
+          return;
+        }
+
+        if (this.state.isResizing && this.state.dragStart) {
+          const ds = this.state.dragStart; const dx = pos.x - ds.pos.x; const dy = pos.y - ds.pos.y; const orig = ds.original;
+          let nx = orig.x, ny = orig.y, nw = orig.w || 0, nh = orig.h || 0;
+          
+          if (ds.handle.includes('e')) nw = Math.max(1, orig.w + dx);
+          if (ds.handle.includes('w')) { nx = orig.x + dx; nw = Math.max(1, orig.w - dx); }
+          if (ds.handle.includes('s')) nh = Math.max(1, orig.h + dy);
+          if (ds.handle.includes('n')) { ny = orig.y + dy; nh = Math.max(1, orig.h - dy); }
+          if (ds.handle === 'n' || ds.handle === 's') nx = orig.x; if (ds.handle === 'e' || ds.handle === 'w') ny = orig.y;
+          
+          obj.x = nx; obj.y = ny; obj.w = nw; obj.h = nh;
+          
+          if (orig.type === 'text' && (ds.handle.includes('e') || ds.handle.includes('w'))) {
+             const scale = nw / Math.max(1, orig.w);
+             obj.fontSize = Math.max(8, Math.round(orig.fontSize * scale));
+             obj.w = orig.w; obj.x = nx;
+          }
+          this.renderObject(obj); this.renderSelectionBox(obj);
+        }
+      }
+
+      onHandleUp() { if (this.state.isResizing || this.state.isRotating) { this.state.isResizing = false; this.state.isRotating = false; this.saveHistory(); } }
+
+      applyProp(prop, val) {
+        const obj = this.state.objects.find(o => o.id === this.state.selectedId); if (!obj) return;
+        obj[prop] = val; this.renderObject(obj); this.renderSelectionBox(obj); this.saveHistory();
+      }
+
+      alignSelected(mode) {
+        const obj = this.state.objects.find(o => o.id === this.state.selectedId); if (!obj) return;
+        const b = this.getBBox(obj);
+        if (mode === 'left') obj.x = 20;
+        if (mode === 'right') obj.x = this.VB_W - b.w - 20;
+        if (mode === 'center') obj.x = (this.VB_W - b.w) / 2;
+        this.renderObject(obj); this.renderSelectionBox(obj); this.saveHistory();
+      }
+
+      updateUI() {
+        const obj = this.state.objects.find(o => o.id === this.state.selectedId);
+        const groups = ['groupFillTool', 'groupColors', 'groupStroke', 'groupText', 'groupEffects', 'groupTransform', 'groupActions'];
+        groups.forEach(g => document.getElementById(g).style.display = 'none');
+        if (!obj) { document.getElementById('panelEmpty').style.display = 'block'; return; }
+        
+        document.getElementById('panelEmpty').style.display = 'none';
+        document.getElementById('panelTitle').textContent = 'Objeto Seleccionado';
+        groups.forEach(g => document.getElementById(g).style.display = 'flex');
+        if (obj.type === 'text') document.getElementById('groupStroke').style.display = 'none';
+        if (obj.type !== 'text') document.getElementById('groupText').style.display = 'none';
+
+        document.getElementById('hexColorPicker').value = (obj.color || '#000000').toUpperCase();
+        document.getElementById('inputFillEnabled').checked = !!obj.fillEnabled;
+        document.getElementById('fillColorObjWrapper').style.display = obj.fillEnabled ? 'flex' : 'none';
+        document.getElementById('inputGrosor').value = obj.strokeWidth || 4;
+        document.getElementById('inputOpacity').value = (obj.opacity ?? 1) * 100;
+        document.getElementById('inputX').value = Math.round(obj.x); document.getElementById('inputY').value = Math.round(obj.y);
+        document.getElementById('inputRotation').value = obj.rotation || 0;
+        document.getElementById('inputShadowEnabled').checked = !!obj.shadowEnabled;
+        document.getElementById('inputBevelEnabled').checked = !!obj.bevelEnabled;
+        if (obj.type === 'text') {
+           document.getElementById('inputCurve').value = obj.curve || 0; document.getElementById('lblCurve').textContent = (obj.curve || 0) + '%';
+           document.getElementById('inputFontSize').value = obj.fontSize; document.getElementById('lblFontSize').textContent = obj.fontSize;
+        }
+      }
+
+      showTextEditor(pos) {
+        const ta = this.textInput; const rect = this.svgStage.getBoundingClientRect();
+        this.textEditorFloating.style.display = 'block';
+        this.textEditorFloating.style.left = (pos.x / this.VB_W) * rect.width + 'px';
+        this.textEditorFloating.style.top = (pos.y / this.VB_H) * rect.height + 'px';
+        ta.value = ''; ta.style.fontFamily = this.state.fontFamily; ta.style.fontSize = (this.state.fontSize * (rect.width / this.VB_W)) + 'px';
+        setTimeout(() => ta.focus(), 10);
+        
+        ta.onkeydown = (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            ta.blur();
+          }
+        };
+
+        ta.onblur = () => {
+          if (ta.value.trim()) {
+            const newText = { id: 'obj-'+Date.now(), type: 'text', text: ta.value, x: pos.x, y: pos.y, color: this.state.color, fontFamily: this.state.fontFamily, fontSize: this.state.fontSize, rotation: 0, curve: 0, opacity: 1, shadowEnabled: this.state.shadowEnabled, bevelEnabled: this.state.bevelEnabled };
+            this.state.objects.push(newText); this.renderObject(newText); this.saveHistory(); this.setTool('select'); this.select(newText.id);
+          }
+          this.textEditorFloating.style.display = 'none'; ta.onblur = null;
+        };
+      }
+
+      addImage(href) {
+        const img = { id: 'obj-'+Date.now(), type: 'image', href, x: 200, y: 200, w: 300, h: 300, rotation: 0, opacity: 1 };
+        this.state.objects.push(img); this.renderObject(img); this.saveHistory(); this.setTool('select'); this.select(img.id);
+      }
+
+      pickColor(e) {
+        const tempCanvas = document.createElement('canvas'); tempCanvas.width = this.VB_W; tempCanvas.height = this.VB_H;
+        const ctx = tempCanvas.getContext('2d', { willReadFrequently: true });
+        ctx.fillStyle = this.svgCanvas.style.backgroundColor || '#ffffff'; 
+        ctx.fillRect(0, 0, this.VB_W, this.VB_H);
+
+        const svgData = new XMLSerializer().serializeToString(this.svgCanvas);
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0, this.VB_W, this.VB_H);
+          const pos = this.clientToSvg(e); 
+          try {
+            const px = ctx.getImageData(Math.floor(pos.x), Math.floor(pos.y), 1, 1).data;
+            const hex = '#' + [px[0], px[1], px[2]].map(v => v.toString(16).padStart(2, '0')).join('');
+            this.state.color = hex; 
+            this.state.fillColor = hex;
+            document.getElementById('inputColorPicker').value = hex; 
+            document.getElementById('hexColorPicker').value = hex.toUpperCase();
+            document.getElementById('inputFillColorTool').value = hex; 
+            document.getElementById('hexFillTool').value = hex.toUpperCase();
+          } catch (err) {
+            console.warn("No se pudo leer el color:", err);
+          }
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      }
+
+      saveHistory() {
+        this.state.history = this.state.history.slice(0, this.state.historyIndex + 1);
+        this.state.history.push(JSON.parse(JSON.stringify(this.state.objects))); this.state.historyIndex++;
+        document.getElementById('btnUndo').disabled = this.state.historyIndex <= 0; document.getElementById('btnRedo').disabled = this.state.historyIndex >= this.state.history.length - 1;
+      }
+      undo() { if (this.state.historyIndex > 0) { this.state.historyIndex--; this.restoreFromHistory(); } }
+      redo() { if (this.state.historyIndex < this.state.history.length - 1) { this.state.historyIndex++; this.restoreFromHistory(); } }
+      restoreFromHistory() {
+        this.state.objects = JSON.parse(JSON.stringify(this.state.history[this.state.historyIndex]));
+        this.renderBackground();
+        document.getElementById('btnUndo').disabled = this.state.historyIndex <= 0; document.getElementById('btnRedo').disabled = this.state.historyIndex >= this.state.history.length - 1;
+      }
+
+      deleteSelected() { if (!this.state.selectedId) return; this.state.objects = this.state.objects.filter(o => o.id !== this.state.selectedId); this.svgCanvas.querySelector(`[data-id="${this.state.selectedId}"]`)?.remove(); this.deselect(); this.saveHistory(); }
+
+      async exportarYGuardar() {
+        document.getElementById('exportingOverlay').classList.add('activo');
+        try {
+          const clone = this.svgCanvas.cloneNode(true);
+          clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); clone.setAttribute('width', this.VB_W); clone.setAttribute('height', this.VB_H); clone.setAttribute('viewBox', `0 0 ${this.VB_W} ${this.VB_H}`);
+          const svgString = new XMLSerializer().serializeToString(clone);
+          const url = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' }));
+          const img = new Image(); img.crossOrigin = 'anonymous';
+          await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+          
+          const canvas = document.createElement('canvas'); canvas.width = this.VB_W; canvas.height = this.VB_H;
+          const ctx = canvas.getContext('2d'); 
+          ctx.fillStyle = this.state.canvasBgColor || '#ffffff'; 
+          ctx.fillRect(0, 0, this.VB_W, this.VB_H); 
+          ctx.drawImage(img, 0, 0, this.VB_W, this.VB_H);
+          
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          URL.revokeObjectURL(url);
+
+          const ext = 'png';
+          const path = `${coupleId}/portadas/${Date.now()}.${ext}`;
+          const { error: upErr } = await supabase.storage.from('media').upload(path, blob, { contentType: 'image/png' });
+          if (upErr) throw upErr;
+          
+          const { data: pub } = supabase.storage.from('media').getPublicUrl(path);
+
+          if (albumEditando) {
+            await supabase.from('albums').update({ portada_url: pub.publicUrl }).eq('id', albumEditando.id);
+            await cargarDatos(); document.getElementById('estudioOverlay').classList.remove('activo'); if (window.lanzarConfeti) window.lanzarConfeti(1000);
+          } else {
+            const nombre = prompt("Nombre del álbum:"); 
+            if (nombre) { 
+              await supabase.from('albums').insert([{ id: 'alb-' + Date.now(), couple_id: coupleId, nombre, portada_url: pub.publicUrl, autor: miNombre }]); 
+              await cargarDatos(); 
+            }
+            document.getElementById('estudioOverlay').classList.remove('activo');
+          }
+        } catch (err) { 
+          console.error(err);
+          alert("Error al exportar: " + err.message); 
+        } finally { 
+          document.getElementById('exportingOverlay').classList.remove('activo'); 
+        }
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", initGaleria);
+  </script>
+</body>
+</html>

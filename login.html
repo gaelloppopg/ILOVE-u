@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-body">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-lock">🔐</div>
+      <h1>Bienvenido</h1>
+      <p class="login-sub">Ingresa a su espacio.</p>
+
+      <form id="formLogin">
+        <div id="pasoCredenciales">
+          <input type="email" id="email" placeholder="Correo electrónico" required style="width:100%; padding:16px; margin-bottom:10px; border-radius:14px; border:2px solid var(--rosa-suave);" />
+          <input type="password" id="password" placeholder="Contraseña" required style="width:100%; padding:16px; margin-bottom:10px; border-radius:14px; border:2px solid var(--rosa-suave);" />
+          <button type="button" class="btn btn-primary" id="btnSiguiente" style="width:100%;">Siguiente →</button>
+        </div>
+
+        <div id="pasoFecha" style="display:none;">
+          <p style="font-size:0.9rem; margin-bottom:10px;">💬 ¿Qué fecha empezaron a hablar? (DD/MM/YYYY)</p>
+          <input type="text" id="fechaLogin" placeholder="DD/MM/YYYY" maxlength="10" required style="width:100%; padding:16px; margin-bottom:10px; border-radius:14px; border:2px solid var(--rosa-suave); font-family: inherit;" />
+          <button type="submit" class="btn btn-primary" id="btnLogin" style="width:100%;">Entrar 💕</button>
+        </div>
+      </form>
+
+      <p class="login-error" id="errorMsg" style="color:red; margin-top:10px; font-weight: bold; font-size: 0.85rem;"></p>
+      
+      <!-- 🛑 ENLACE CORREGIDO A REGISTRO 🛑 -->
+      <p style="margin-top: 20px; font-size: 0.9rem;">¿No tienes cuenta? <a href="registro.html">Crea una aquí</a></p>
+      
+      <p style="margin-top: 10px; font-size: 0.9rem; font-weight: bold; color: #a874e8;">
+        ¿Eres la pareja? <a href="unirse.html" style="color: #f28ca6; text-decoration: underline;">Únete con tu código aquí</a>
+      </p>
+      <!-- En login.html, dentro del pasoCredenciales, después del input de contraseña -->
+<div style="text-align: right; margin-bottom: 15px;">
+  <a href="recuperar.html" style="font-size: 0.8rem; color: #a874e8; text-decoration: none;">¿Olvidaste tu contraseña?</a>
+</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+
+    const form = document.getElementById('formLogin');
+    const pasoCred = document.getElementById('pasoCredenciales');
+    const pasoFecha = document.getElementById('pasoFecha');
+    const errorMsg = document.getElementById('errorMsg');
+    let emailG = "", passG = "";
+
+    document.getElementById('fechaLogin').addEventListener('input', function (e) {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+      if (v.length >= 5) v = v.slice(0,2) + '/' + v.slice(2,4) + '/' + v.slice(4);
+      else if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+      e.target.value = v;
+    });
+
+    document.getElementById('btnSiguiente').addEventListener('click', () => {
+      emailG = document.getElementById('email').value.trim();
+      passG = document.getElementById('password').value.trim();
+      
+      if (!emailG || !passG) return errorMsg.textContent = "Llena los campos.";
+      errorMsg.textContent = "";
+
+      if (emailG === 'admin@gmail.com') {
+        iniciarSesionSuperAdmin(emailG, passG);
+        return;
+      }
+
+      pasoCred.style.display = 'none';
+      pasoFecha.style.display = 'block';
+    });
+
+    async function iniciarSesionSuperAdmin(email, password) {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) errorMsg.textContent = "Error SuperAdmin: " + error.message;
+      else window.location.href = 'master-panel.html';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnLogin');
+      btn.disabled = true; btn.textContent = 'Verificando...';
+      errorMsg.textContent = ""; 
+      
+      let fechaIngresada = document.getElementById('fechaLogin').value;
+
+      if (!fechaIngresada || fechaIngresada.length < 10) {
+        errorMsg.textContent = "Ingresa la fecha completa (DD/MM/YYYY).";
+        btn.disabled = false; btn.textContent = 'Entrar 💕';
+        return;
+      }
+
+      const [d, m, y] = fechaIngresada.split('/');
+      const fechaFormateadaBD = `${y}-${m}-${d}`;
+
+      try {
+        const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email: emailG, password: passG });
+        
+        if (authError) {
+          if (authError.message.includes("Invalid login credentials")) {
+            throw new Error("Credenciales incorrectas. Verifica tu correo y contraseña.");
+          }
+          throw new Error("Error: " + authError.message);
+        }
+
+        const { data: couple, error: coupleError } = await supabase
+          .from('couples')
+          .select('*')
+          .or(`owner_id.eq.${authData.user.id},partner_id.eq.${authData.user.id}`)
+          .maybeSingle();
+
+        if (coupleError || !couple) {
+          await supabase.auth.signOut();
+          throw new Error("No se encontró una pareja asociada a este usuario.");
+        }
+
+        if (couple.fecha_inicio !== fechaFormateadaBD) {
+          await supabase.auth.signOut();
+          throw new Error(`La fecha no coincide. (En BD dice: ${couple.fecha_inicio})`);
+        }
+
+        window.location.href = 'index.html';
+
+      } catch (err) {
+        console.error("Error login:", err);
+        errorMsg.textContent = err.message;
+        btn.disabled = false; btn.textContent = 'Entrar 💕';
+        pasoCred.style.display = 'block'; 
+        pasoFecha.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+/* =========================================
+   SISTEMA DE DISEÑO Y TEXTURAS HIPERREALISTAS
+   ESTILO PINTEREST - CON IMÁGENES DE FONDO
+   ========================================= */
+
+/* =========================================
+   1. VARIABLES BASE Y RESET
+   ========================================= */
+:root {
+  /* UI Global */
+  --est-bg-base: #f4f4f5;
+  --est-panel: rgba(255, 255, 255, 0.85);
+  --est-texto: #18181b;
+  --est-texto-suave: #52525b;
+  --est-borde: rgba(0, 0, 0, 0.1);
+  --est-acento: #18181b;
+  --est-bg-pattern: none;
+  --est-bg-size: auto;
+  --est-bg-blend: normal;
+  
+  /* Imagen de Fondo */
+  --est-bg-image: none;
+  --bg-overlay-color: 1;
+  --bg-blur: 4px; /* Desenfoque suave */
+  
+  /* Libro 3D */
+  --tapa-libro: #121212;
+  --lomo-libro: #050505;
+  --papel-pagina: #ffffff;
+  --sombra-libro: 0 20px 50px rgba(0,0,0,0.3);
+  --texto-tapa: #c9a050;
+  --texto-pagina: #333;
+  --estampa-borde: #eaeaea;
+  
+  /* Tipografías Dinámicas */
+  --fuente-titulo: 'Playfair Display', serif;
+  --fuente-texto: 'Inter', sans-serif;
+  --fuente-tapa: 'Playfair Display', serif;
+  --fuente-pagina: 'Caveat', cursive;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Fondo principal y efecto de desenfoque controlado */
+body.album-body {
+  background-color: var(--est-bg-base);
+  color: var(--est-texto);
+  font-family: var(--fuente-texto);
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: color 0.5s ease;
+}
+
+/* La imagen de fondo con desenfoque leve */
+body.album-body::before {
+  content: "";
+  position: fixed;
+  inset: -10px;
+  background-image: var(--est-bg-image);
+  background-size: cover;
+  background-position: center;
+  filter: blur(var(--bg-blur)) brightness(var(--bg-overlay-color));
+  z-index: -2;
+  transition: background-image 0.8s ease, filter 0.8s ease;
+}
+
+/* Capa de color para mejorar el contraste y texturas */
+body.album-body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--est-bg-pattern);
+  background-size: var(--est-bg-size);
+  background-blend-mode: var(--est-bg-blend);
+  z-index: -1;
+  pointer-events: none;
+}
+
+body.album-body:not(.cargado) { opacity: 0; }
+body.album-body.cargado { animation: fadeInPage 0.8s ease forwards; }
+@keyframes fadeInPage { from { opacity: 0; } to { opacity: 1; } }
+
+.fondo-galeria-decorativo { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+/* =========================================
+   2. UI GLOBAL (NAV, HEADER, BOTONES)
+   ========================================= */
+.album-nav { position: relative; z-index: 10; padding: 30px 40px; }
+.album-nav a { display: inline-flex; align-items: center; gap: 8px; color: var(--est-texto-suave); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: color 0.3s ease; text-shadow: 0 1px 2px rgba(255,255,255,0.2); }
+.album-nav a:hover { color: var(--est-texto); }
+.album-nav a svg { transition: transform 0.3s ease; }
+.album-nav a:hover svg { transform: translateX(-4px); }
+
+.album-header { position: relative; z-index: 10; text-align: center; padding: 20px 20px 20px; }
+.header-content { display: flex; flex-direction: column; align-items: center; }
+.header-badge { display: inline-block; padding: 6px 16px; background: var(--est-panel); border-radius: 50px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; color: var(--est-texto-suave); margin-bottom: 20px; border: 1px solid var(--est-borde); backdrop-filter: blur(10px); }
+.album-header h1 { font-family: var(--fuente-titulo); font-size: clamp(2.5rem, 6vw, 4rem); color: var(--est-texto); margin-bottom: 12px; letter-spacing: -1px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.album-header p { color: var(--est-texto-suave); font-size: 1.05rem; max-width: 400px; line-height: 1.5; margin-bottom: 30px; }
+
+.header-acciones { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.btn-crear-obra { display: inline-flex; align-items: center; gap: 10px; background: var(--est-acento); color: #fff; border: none; padding: 14px 28px; border-radius: 50px; font-family: var(--fuente-texto); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+.btn-crear-obra:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+
+.btn-menu-temas { display: flex; align-items: center; gap: 10px; padding: 14px 28px; border-radius: 50px; border: 1px solid var(--est-borde); background: var(--est-panel); color: var(--est-texto); font-family: var(--fuente-texto); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+.btn-menu-temas:hover { border-color: var(--est-acento); transform: translateY(-2px); }
+.color-preview { width: 18px; height: 18px; border-radius: 50%; background: var(--est-bg-base); border: 1px solid var(--est-borde); transition: background 0.5s ease; }
+
+/* =========================================
+   3. PANEL LATERAL DE TEMAS (DRAWER)
+   ========================================= */
+.panel-temas-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+.panel-temas-overlay.activo { opacity: 1; visibility: visible; }
+
+.panel-temas-drawer { position: fixed; top: 0; right: -400px; width: 100%; max-width: 400px; height: 100vh; background: var(--est-panel); color: var(--est-texto); z-index: 10000; box-shadow: -10px 0 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.5s ease; backdrop-filter: blur(20px); }
+.panel-temas-drawer.activo { right: 0; }
+
+.drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 30px; border-bottom: 1px solid var(--est-borde); }
+.drawer-header h2 { font-family: var(--fuente-titulo); font-size: 1.8rem; margin: 0; }
+.drawer-cerrar { background: transparent; border: none; color: var(--est-texto-suave); cursor: pointer; transition: 0.3s; }
+.drawer-cerrar:hover { color: var(--est-texto); transform: rotate(90deg); }
+
+.drawer-body { padding: 30px; flex: 1; overflow-y: auto; }
+.drawer-desc { color: var(--est-texto-suave); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.5; }
+
+.temas-lista { display: flex; flex-direction: column; gap: 12px; }
+.tema-card { display: flex; align-items: center; gap: 15px; background: rgba(128,128,128,0.1); border: 2px solid transparent; padding: 15px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; width: 100%; text-align: left; }
+.tema-card:hover { border-color: var(--est-acento); transform: translateX(-5px); }
+.tema-card.activo { border-color: var(--est-acento); background: rgba(128,128,128,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+.tema-card-preview { width: 50px; height: 50px; border-radius: 8px; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+.tema-card-info { display: flex; flex-direction: column; flex: 1; }
+.tema-card-nombre { font-weight: 700; font-size: 1rem; color: var(--est-texto); }
+.tema-card-desc { font-size: 0.8rem; color: var(--est-texto-suave); margin-top: 2px; }
+
+.tema-check { width: 24px; height: 24px; border-radius: 50%; background: var(--est-acento); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; opacity: 0; transform: scale(0.5); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.tema-card.activo .tema-check { opacity: 1; transform: scale(1); }
+
+/* =========================================
+   4. ESCENARIO DEL LIBRO (FÍSICA 3D)
+   ========================================= */
+.libro-escenario { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 40px 20px 100px; perspective: 2500px; z-index: 10; }
+
+.btn-flotante-cerrar { position: absolute; top: -20px; right: 20px; background: var(--est-panel); border: 1px solid var(--est-borde); width: 44px; height: 44px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s ease; z-index: 200; color: var(--est-texto); backdrop-filter: blur(10px); }
+.btn-flotante-cerrar:hover { background: #d96666; color: #fff; }
+.libro-wrapper.abierto + .libro-controles + .btn-flotante-cerrar { display: flex; }
+
+.libro-wrapper { position: relative; width: 900px; height: 600px; transform-style: preserve-3d; transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1); }
+.libro-sombra-suelo { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); width: 80%; height: 40px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.4) 0%, transparent 70%); filter: blur(10px); transition: all 1.2s ease; z-index: -1; }
+.libro { position: absolute; top: 0; left: 50%; width: 450px; height: 100%; transform-style: preserve-3d; transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1); }
+.libro-wrapper:not(.abierto) { transform: translateX(-225px); }
+.libro-wrapper.abierto { transform: translateX(0); }
+
+/* LOMO Y PORTADA */
+.libro-lomo { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--lomo-libro); border-radius: 4px 0 0 4px; box-shadow: inset -10px 0 30px rgba(0,0,0,0.8); transform: translateZ(-2px) rotateY(180deg); transform-origin: left center; opacity: 0; transition: opacity 0.5s ease 0.3s, background 0.5s ease; border-left: 5px solid #000; }
+.libro-wrapper.abierto .libro-lomo { opacity: 1; }
+.lomo-textura { position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, transparent 0, transparent 4px, rgba(255,255,255,0.02) 5px, rgba(255,255,255,0.02) 6px); }
+
+.libro-portada { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-style: preserve-3d; transform-origin: left center; transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1); z-index: 100; cursor: pointer; }
+.libro-wrapper.abierto .libro-portada { transform: rotateY(-180deg); }
+.portada-frente { position: absolute; inset: 0; background: var(--tapa-libro); border-radius: 4px 16px 16px 4px; box-shadow: inset 2px 0 5px rgba(255,255,255,0.1), var(--sombra-libro); display: flex; flex-direction: column; align-items: center; justify-content: center; backface-visibility: hidden; border: 1px solid rgba(0,0,0,0.2); border-left: 35px solid var(--lomo-libro); overflow: hidden; }
+.portada-marco-dorado { position: absolute; inset: 25px; border: 1px solid rgba(201, 160, 80, 0.4); border-radius: 2px; pointer-events: none; }
+.portada-titulo { font-family: var(--fuente-tapa); font-size: 3rem; color: var(--texto-tapa); margin: 0; letter-spacing: 3px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); z-index: 2; }
+.portada-subtitulo { font-family: var(--fuente-texto); font-size: 0.75rem; color: #aaa; letter-spacing: 8px; text-transform: uppercase; margin-top: 15px; z-index: 2; }
+.portada-sello { position: absolute; bottom: 50px; font-size: 1.5rem; color: var(--texto-tapa); opacity: 0.5; }
+.portada-cosido { position: absolute; left: -18px; top: 10%; height: 80%; width: 2px; background-image: linear-gradient(to bottom, transparent 50%, #444 50%); background-size: 2px 15px; opacity: 0.6; }
+.portada-dorso { position: absolute; inset: 0; background: #2a2a2a; border-radius: 16px 4px 4px 16px; transform: rotateY(180deg); backface-visibility: hidden; box-shadow: inset -10px 0 30px rgba(0,0,0,0.8); border-right: 5px solid #111; }
+.dorso-textura { position: absolute; inset: 0; background-image: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.8) 0%, transparent 70%); opacity: 0.5; }
+
+/* PÁGINAS INTERNAS */
+.libro-paginas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-style: preserve-3d; }
+.hoja { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: left center; transform-style: preserve-3d; transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1), z-index 0s; z-index: 1; }
+.hoja.volteada { transform: rotateY(-180deg); }
+.hoja-cara { position: absolute; inset: 0; background: var(--papel-pagina); backface-visibility: hidden; padding: 40px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 30px; border-radius: 0 16px 16px 0; box-shadow: inset 20px 0 30px -20px rgba(0,0,0,0.1), 2px 2px 8px rgba(0,0,0,0.05); }
+.hoja-cara.trasera { transform: rotateY(180deg); border-radius: 16px 0 0 16px; box-shadow: inset -20px 0 30px -20px rgba(0,0,0,0.1), -2px 2px 8px rgba(0,0,0,0.05); }
+.sombra-pagina { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(0,0,0,0.5) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.3) 100%); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 50; }
+.libro-wrapper.girando .sombra-pagina { opacity: 1; }
+
+/* ESTAMPAS */
+.estampa-obra { background: #fff; padding: 12px 12px 45px 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); position: relative; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid var(--estampa-borde); display: flex; flex-direction: column; transform: rotate(-1.5deg); }
+.estampa-obra::before { content: ""; position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-3deg); width: 80px; height: 28px; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(2px); border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 6px rgba(0,0,0,0.1); z-index: 2; }
+.estampa-obra:nth-child(even) { transform: rotate(1.5deg); }
+.estampa-obra:nth-child(3) { transform: rotate(2.5deg); }
+.estampa-obra:hover { transform: scale(1.1) rotate(0deg) !important; z-index: 20; box-shadow: 0 20px 40px rgba(0,0,0,0.35); }
+.estampa-obra img { width: 100%; height: 100%; object-fit: cover; background: #fafafa; border: 1px solid #f0f0f0; }
+.estampa-obra h4 { font-family: var(--fuente-pagina); font-size: 1.5rem; color: var(--texto-pagina); margin: 0; text-align: center; position: absolute; bottom: 10px; left: 0; width: 100%; }
+
+/* CONTROLES DEL LIBRO */
+.libro-controles { display: none; align-items: center; justify-content: center; gap: 40px; margin-top: 60px; z-index: 50; }
+.libro-controles.activo { display: flex; animation: fadeInUp 0.5s ease; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.btn-pagina { display: flex; align-items: center; gap: 10px; background: var(--est-panel); color: var(--est-texto); border: 1px solid var(--est-borde); padding: 14px 28px; border-radius: 50px; font-family: inherit; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(10px); }
+.btn-pagina:hover:not(:disabled) { background: var(--est-acento); color: #fff; transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+.btn-pagina:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+.indicador-paginas { background: var(--est-panel); padding: 12px 28px; border-radius: 50px; font-family: var(--fuente-titulo); font-size: 1.1rem; color: var(--est-texto); font-style: italic; display: flex; align-items: center; gap: 10px; backdrop-filter: blur(10px); border: 1px solid var(--est-borde); }
+
+/* MUSEO Y ESTUDIO */
+.museo-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 10000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.4s ease; }
+.museo-overlay.activo { display: flex; opacity: 1; }
+.museo-sala { position: relative; display: flex; flex-direction: column; align-items: center; max-width: 900px; width: 100%; padding: 40px; animation: zoomInSala 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes zoomInSala { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.museo-cerrar { position: absolute; top: 10px; right: 10px; background: var(--est-panel); color: var(--est-texto); border: 1px solid var(--est-borde); width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+.museo-cerrar:hover { background: #d96666; color: #fff; transform: rotate(90deg); }
+.museo-cuadro-marco { position: relative; background: #fff; padding: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.5); border: 1px solid var(--est-borde); }
+.museo-obra-img { max-width: 100%; max-height: 65vh; display: block; }
+.museo-placa { margin-top: 40px; text-align: center; background: var(--est-panel); padding: 25px 40px; border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 600px; border: 1px solid var(--est-borde); backdrop-filter: blur(10px); }
+.museo-placa h3 { font-family: var(--fuente-titulo); font-size: 2rem; margin: 0 0 5px; color: var(--est-texto); }
+.museo-placa span { font-size: 0.8rem; color: var(--est-texto-suave); text-transform: uppercase; letter-spacing: 2px; }
+.museo-placa-linea { height: 1px; background: var(--est-borde); margin: 25px 0; }
+.museo-acciones { display: flex; justify-content: center; gap: 15px; }
+.btn-museo { padding: 14px 28px; border: none; border-radius: 50px; font-family: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s; }
+.btn-museo.borrar { background: #ffe5e5; color: #d96666; }
+.btn-museo.borrar:hover { background: #d96666; color: #fff; }
+.btn-museo.descargar { background: var(--est-acento); color: #fff; }
+.btn-museo.descargar:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+.estudio-overlay { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); opacity: 0; transition: opacity 0.4s; }
+.estudio-overlay.activo { display: flex; opacity: 1; }
+.estudio { background-color: var(--est-bg-base); background-image: var(--est-bg-image); background-size: cover; background-position: center; color: var(--est-texto); width: 98%; max-width: 1400px; height: 96vh; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 30px 100px rgba(0,0,0,0.8); border: 1px solid var(--est-borde); overflow: hidden; position: relative; }
+.estudio::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: -1; backdrop-filter: blur(10px); }
+.estudio-topbar { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; z-index: 100; position: relative; }
+.estudio-titulo-app { display: flex; align-items: center; gap: 10px; font-family: var(--fuente-titulo); font-size: 1.2rem; font-weight: 700; color: var(--est-texto); white-space: nowrap; }
+#tituloObra { flex: 1; padding: 12px 20px; border-radius: 50px; border: 1px solid var(--est-borde); background: var(--est-panel); color: var(--est-texto); font-family: var(--fuente-titulo); font-size: 1rem; outline: none; backdrop-filter: blur(10px); }
+#tituloObra:focus { border-color: var(--est-acento); box-shadow: 0 0 0 3px rgba(0,0,0,0.1); }
+.estudio-cerrar { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--est-borde); background: var(--est-panel); color: var(--est-texto); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0; backdrop-filter: blur(10px); }
+.estudio-cerrar:hover { background: #d96666; color: #fff; border-color: #d96666; }
+.estudio-toolbar { display: flex; gap: 25px; flex-wrap: wrap; align-items: center; background: var(--est-panel); padding: 12px 20px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--est-borde); flex-shrink: 0; z-index: 90; backdrop-filter: blur(10px); }
+.tool-group { display: flex; align-items: center; gap: 12px; }
+.tool-label { font-size: 0.7rem; color: var(--est-texto-suave); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.tool-btn { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--est-borde); background: var(--est-bg-base); color: var(--est-texto); font-family: var(--fuente-texto); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.tool-btn:hover { border-color: var(--est-acento); }
+.tool-btn.active { background: var(--est-acento); color: #fff; border-color: var(--est-acento); box-shadow: 0 0 15px var(--est-acento); }
+.grosor-control { display: flex; align-items: center; gap: 10px; }
+input[type="range"] { -webkit-appearance: none; width: 100px; height: 6px; border-radius: 3px; background: var(--est-borde); outline: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--est-acento); cursor: pointer; box-shadow: 0 0 10px var(--est-acento); }
+.grosor-badge { background: var(--est-borde); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; color: var(--est-texto); min-width: 30px; text-align: center; }
+.colores-grid { display: flex; gap: 8px; }
+.color-btn { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--est-borde); background: var(--c); cursor: pointer; padding: 0; transition: transform 0.2s ease; }
+.color-btn:hover { transform: scale(1.2); }
+.color-btn.active { border: 2px solid var(--est-acento); transform: scale(1.2); box-shadow: 0 0 10px var(--est-acento); }
+.color-custom { margin-left: 10px; }
+input[type="color"] { -webkit-appearance: none; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; padding: 0; background: transparent; }
+input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"]::-webkit-color-swatch { border: 2px solid var(--est-borde); border-radius: 50%; }
+.estudio-canvas-wrapper { flex: 1; background: rgba(0,0,0,0.2); border-radius: 12px; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px solid var(--est-borde); position: relative; z-index: 10; }
+.canvas-stack { position: relative; width: 100%; height: 100%; max-width: 900px; max-height: 600px; aspect-ratio: 900 / 600; border-radius: 4px; overflow: hidden; background: #fff; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+.canvas-stack canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#lienzoFondo { z-index: 1; }
+#lienzo { z-index: 2; cursor: crosshair; }
+.estudio-footer { display: flex; justify-content: space-between; align-items: center; background: var(--est-panel); padding: 12px 20px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--est-borde); flex-shrink: 0; z-index: 90; backdrop-filter: blur(10px); }
+.footer-left, .footer-right { display: flex; gap: 15px; align-items: center; }
+.footer-label { font-size: 0.75rem; font-weight: 600; color: var(--est-texto-suave); }
+.fondo-controles { display: flex; align-items: center; gap: 10px; }
+.fondo-color-input { width: 28px !important; height: 28px !important; }
+.btn-footer-icon { background: var(--est-bg-base); border: 1px solid var(--est-borde); color: var(--est-texto); padding: 8px 16px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.btn-footer-icon:hover { border-color: var(--est-acento); }
+.btn-footer-icon.borrar { color: #d96666; border-color: rgba(217, 102, 102, 0.3); }
+.btn-footer-icon.borrar:hover { background: #d96666; color: #fff; }
+.btn-accion { padding: 12px 24px; border-radius: 8px; border: none; font-family: var(--fuente-texto); font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.btn-accion.secundario { background: transparent; color: var(--est-texto); border: 1px solid var(--est-borde); }
+.btn-accion.secundario:hover { background: rgba(128,128,128,0.2); }
+.btn-accion.primario { background: var(--est-acento); color: #fff; box-shadow: 0 0 20px var(--est-acento); }
+.btn-accion.primario:hover { transform: scale(1.05); }
+
+/* =========================================
+   5. DISEÑO DE TEXTURAS Y TIPOGRAFÍAS POR TEMA
+   ========================================= */
+
+/* TEMA 1: MINIMALISTA */
+body[data-tema="minimalista"] {
+  --est-bg-image: url('https://i.pinimg.com/1200x/ee/af/07/eeaf07550f8a7f451d77d33adce7d6a3.jpg');
+  --bg-overlay-color: 1.1;
+  --bg-blur: 6px;
+  --est-bg-pattern: rgba(255,255,255,0.2);
+  --est-bg-base: #f4f4f5; --est-panel: rgba(255,255,255,0.85); --est-texto: #18181b; --est-texto-suave: #52525b; --est-borde: rgba(0,0,0,0.1); --est-acento: #18181b;
+  --tapa-libro: #121212; --lomo-libro: #050505; --papel-pagina: #ffffff; --sombra-libro: 0 20px 50px rgba(0,0,0,0.3); --texto-tapa: #c9a050; --texto-pagina: #333;
+  --fuente-titulo: 'Playfair Display', serif; --fuente-texto: 'Inter', sans-serif; --fuente-tapa: 'Playfair Display', serif; --fuente-pagina: 'Caveat', cursive;
+}
+
+/* TEMA 2: VINILO */
+body[data-tema="vinilo"] {
+  --est-bg-image: url('https://i.pinimg.com/736x/44/f1/8a/44f18a4e26e5cbc960be5ded586696cb.jpg');
+  --bg-overlay-color: 0.6;
+  --bg-blur: 4px;
+  --est-bg-pattern: rgba(0,0,0,0.3);
+  --est-bg-base: #050505; --est-panel: rgba(18,18,18,0.85); --est-texto: #ffffff; --est-texto-suave: #b3b3b3; --est-borde: rgba(255,255,255,0.1); --est-acento: #1db954;
+  --tapa-libro: #000000; --lomo-libro: #000000; --papel-pagina: #1a1a1a; --sombra-libro: 0 20px 50px rgba(29,185,84,0.3); --texto-tapa: #1db954; --texto-pagina: #fff; --estampa-borde: #333;
+  --fuente-titulo: 'Playfair Display', serif; --fuente-texto: 'Inter', sans-serif; --fuente-tapa: 'Playfair Display', serif; --fuente-pagina: 'Caveat', cursive;
+}
+body[data-tema="vinilo"] .portada-frente { border: 2px solid #1db954; }
+
+/* TEMA 3: METAL LÍQUIDO */
+body[data-tema="liquido"] {
+  --est-bg-image: url('https://i.pinimg.com/736x/1c/13/3a/1c133a2ddc4c17a3784d3b602c2b37ad.jpg');
+  --bg-overlay-color: 0.5;
+  --bg-blur: 3px;
+  --est-bg-pattern: rgba(0,0,0,0.2);
+  --est-bg-base: #000000; --est-panel: rgba(20,20,20,0.85); --est-texto: #e5e5e5; --est-texto-suave: #a1a1aa; --est-borde: rgba(255,255,255,0.1); --est-acento: #d4d4d8;
+  --tapa-libro: #222222; --lomo-libro: #111111; --papel-pagina: #e0e0e0; --sombra-libro: 0 20px 50px rgba(255,255,255,0.2); --texto-tapa: #ffffff; --texto-pagina: #111; --estampa-borde: #ccc;
+  --fuente-titulo: 'Playfair Display', serif; --fuente-texto: 'Inter', sans-serif; --fuente-tapa: 'Playfair Display', serif; --fuente-pagina: 'Caveat', cursive;
+}
+body[data-tema="liquido"] .portada-frente { box-shadow: inset 0 0 50px rgba(255,255,255,0.3), 0 20px 50px rgba(0,0,0,0.8); }
+
+/* TEMA 4: IRIDISCENTE */
+body[data-tema="iridiscente"] {
+  --est-bg-image: url('https://i.pinimg.com/736x/e0/9d/4b/e09d4b5d2f897b1e366d59e722c95cf2.jpg');
+  --bg-overlay-color: 0.6;
+  --bg-blur: 4px;
+  --est-bg-pattern: rgba(0,0,0,0.2);
+  --est-bg-base: #050505; --est-panel: rgba(20, 20, 20, 0.85); --est-texto: #ffffff; --est-texto-suave: #d4d4d8; --est-borde: rgba(255,255,255,0.15); --est-acento: #d946ef;
+  --tapa-libro: #1a0b2e; --lomo-libro: #0a0512; --papel-pagina: #f4e6ff; --sombra-libro: 0 20px 50px rgba(217,70,239,0.5); --texto-tapa: #ffffff; --texto-pagina: #111; --estampa-borde: #d946ef;
+  --fuente-titulo: 'Playfair Display', serif; --fuente-texto: 'Inter', sans-serif; --fuente-tapa: 'Playfair Display', serif; --fuente-pagina: 'Caveat', cursive;
+}
+body[data-tema="iridiscente"] .portada-frente { box-shadow: inset 0 0 50px rgba(217,70,239,0.5), 0 20px 50px rgba(0,0,0,0.8); }
+
+/* TEMA 5: NOCHE ESTRELLADA */
+body[data-tema="noche"] {
+  --est-bg-image: url('https://i.pinimg.com/1200x/f1/ed/af/f1edaf89fa6320fca25e16efa20d9525.jpg');
+  --bg-overlay-color: 0.7;
+  --bg-blur: 5px;
+  --est-bg-pattern: rgba(10, 17, 40, 0.3);
+  --est-bg-base: #0a1128; --est-panel: rgba(17, 28, 68, 0.85); --est-texto: #f8fafc; --est-texto-suave: #cbd5e1; --est-borde: rgba(255,255,255,0.1); --est-acento: #fbbf24;
+  --tapa-libro: #020813; --lomo-libro: #000000; --papel-pagina: #dfe6f5; --sombra-libro: 0 20px 50px rgba(251,191,36,0.3); --texto-tapa: #fbbf24; --texto-pagina: #111; --estampa-borde: #94a3b8;
+  --fuente-titulo: 'Playfair Display', serif; --fuente-texto: 'Inter', sans-serif; --fuente-tapa: 'Playfair Display', serif; --fuente-pagina: 'Caveat', cursive;
+}
+body[data-tema="noche"] .portada-frente { border: 1px solid #fbbf24; }
+
+/* TEMA 6: GRAFITI */
+body[data-tema="grafiti"] {
+  --est-bg-image: url('https://i.pinimg.com/736x/50/53/c9/5053c97b9c3dd9309b5bb3029d8cf8c2.jpg');
+  --bg-overlay-color: 0.7;
+  --bg-blur: 4px;
+  --est-bg-pattern: rgba(17, 17, 17, 0.4);
+  --est-bg-base: #111111; --est-panel: rgba(30, 30, 30, 0.9); --est-texto: #ffffff; --est-texto-suave: #d4d4d8; --est-borde: rgba(255,255,255,0.1); --est-acento: #f43f5e;
+  --tapa-libro: #2a2a2a; --lomo-libro: #111111; --papel-pagina: #f0f0f0; --sombra-libro: 0 20px 50px rgba(244,63,94,0.5); --texto-tapa: #f43f5e; --texto-pagina: #111; --estampa-borde: #f43f5e;
+  --fuente-titulo: 'Caveat', cursive; --fuente-texto: 'Inter', sans-serif; --fuente-tapa: 'Caveat', cursive; --fuente-pagina: 'Caveat', cursive;
+}
+body[data-tema="grafiti"] .portada-frente { border: 2px dashed #f43f5e; }
+body[data-tema="grafiti"] .portada-titulo { font-size: 4rem; }
+
+/* TEMA 7: CIBERPUNK TV */
+body[data-tema="tv"] {
+  --est-bg-image: url('https://i.pinimg.com/736x/df/3f/dc/df3fdcfd752d168682e97c9fb4c260d4.jpg');
+  --bg-overlay-color: 0.5;
+  --bg-blur: 5px;
+  --est-bg-pattern: repeating-linear-gradient(0deg, rgba(0,0,0,0.7) 0, rgba(0,0,0,0.7) 1px, transparent 1px, transparent 3px);
+  --est-bg-size: 100% 3px;
+  --est-bg-base: #000000; --est-panel: rgba(17, 17, 17, 0.9); --est-texto: #eeeeee; --est-texto-suave: #a1a1aa; --est-borde: rgba(255,255,255,0.1); --est-acento: #00ffcc;
+  --tapa-libro: #111111; --lomo-libro: #000000; --papel-pagina: #1a1a1a; --sombra-libro: 0 20px 50px rgba(0,255,204,0.3); --texto-tapa: #00ffcc; --texto-pagina: #fff; --estampa-borde: #00ffcc;
+  --fuente-titulo: 'Playfair Display', serif; --fuente-texto: 'Inter', sans-serif; --fuente-tapa: 'Playfair Display', serif; --fuente-pagina: 'Caveat', cursive;
+}
+body[data-tema="tv"] .portada-frente { border: 1px solid #00ffcc; box-shadow: inset 0 0 20px rgba(0,255,204,0.4); }
+
+/* Efectos específicos para el TEMA NOCHE (Estrellas) */
+body[data-tema="noche"] .fondo-galeria-decorativo { display: block; background-image: none; }
+body[data-tema="noche"] .fondo-galeria-decorativo::before {
+  content: ""; position: absolute; inset: 0;
+  box-shadow: 
+    10vw 20vh 0 0 #fff, 30vw 50vh 0 0 #fff, 60vw 30vh 0 0 #fff, 80vw 80vh 0 0 #fff, 90vw 10vh 0 0 #fff, 40vw 90vh 0 0 #fff,
+    15vw 60vh 0 0 #fff, 50vw 10vh 0 0 #fff, 70vw 60vh 0 0 #fff, 85vw 40vh 0 0 #fff, 25vw 80vh 0 0 #fff, 95vw 90vh 0 0 #fff,
+    5vw 50vh 0 1px #fff, 20vw 10vh 0 1px #fff, 45vw 40vh 0 1px #fff, 65vw 80vh 0 1px #fff, 75vw 20vh 0 1px #fff, 35vw 70vh 0 1px #fff;
+  animation: twinkle 4s infinite alternate;
+}
+@keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .estudio-toolbar { flex-direction: column; align-items: flex-start; }
+  .tool-group { width: 100%; justify-content: space-between; margin-bottom: 10px; }
+  .estudio-footer { flex-direction: column; gap: 15px; }
+  .footer-left, .footer-right { width: 100%; justify-content: center; }
+  .colores-grid { flex-wrap: wrap; }
+  .libro-wrapper { transform: scale(0.7); }
+  .libro-controles { margin-top: 20px; }
+  .header-acciones { flex-direction: column; width: 100%; }
+  .btn-menu-temas { width: 100%; justify-content: center; }
+  .panel-temas-drawer { max-width: 100%; }
+}

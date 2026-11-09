@@ -1,0 +1,867 @@
+/* ==========================================================================
+   CALENDARIO FORMAL Y ELEGANTE - HOJA DE ESTILOS
+   ========================================================================== */
+
+/* ==========================================================================
+   1. VARIABLES DE DISEÑO (Estilo Agenda de Lujo)
+   ========================================================================== */
+:root {
+  /* Colores Base (Marfil, Papel y Tinta) */
+  --c-fondo: #fcfbfa; /* Blanco marfil muy limpio */
+  --c-fondo-tarjeta: #ffffff;
+  --c-texto-principal: #1c1c1c; /* Casi negro para contraste formal */
+  --c-texto-secundario: #5c5c5c;
+  --c-texto-suave: #999999;
+  
+  /* Acentos (Burdeos y Oro) */
+  --c-primario: #7b2d41; /* Burdeos/Vino profundo */
+  --c-primario-hover: #5c1f2e;
+  --c-primario-suave: #f7f1f3;
+  --c-oro: #b8974a;
+  --c-oro-suave: #fcf9f2;
+  
+  /* Colores de Tipos de Fechas (Tonos joya, elegantes) */
+  --c-aniversario: #7b2d41; /* Burdeos */
+  --c-cumpleanos: #2d4a3e;  /* Verde Bosque */
+  --c-cita: #a3612b;        /* Ámbar Oscuro */
+  --c-especial: #3b3a52;    /* Azul Noche */
+
+  /* Bordes */
+  --b-borde: #e5e0d8; /* Borde color pergamino */
+  --b-radio-sm: 4px;  /* Radios pequeños para un look más cuadrado/clásico */
+  --b-radio-md: 8px;
+  --b-radio-lg: 12px;
+
+  /* Sombras Suaves (Mínimas, solo para dar profundidad de papel) */
+  --s-sutil: 0 2px 4px rgba(0, 0, 0, 0.02);
+  --s-media: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --s-profunda: 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  /* Transiciones Suaves (Sin rebotes) */
+  --t-suave: all 0.2s ease-in-out;
+}
+
+/* ==========================================================================
+   2. ESTILOS GENERALES
+   ========================================================================== */
+body.calendario-body {
+  background-color: var(--c-fondo);
+  color: var(--c-texto-principal);
+  font-family: 'Inter', -apple-system, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', serif;
+  margin: 0;
+  font-weight: 400; /* Menos grueso, más elegante */
+  color: var(--c-texto-principal);
+}
+
+/* ==========================================================================
+   3. CABECERA (Header)
+   ========================================================================== */
+.cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 48px;
+  background: var(--c-fondo-tarjeta);
+  border-bottom: 1px solid var(--b-borde);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.cal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.cal-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--c-texto-secundario);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: var(--t-suave);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cal-back:hover {
+  color: var(--c-primario);
+}
+
+.cal-header h1 {
+  font-size: 1.8rem;
+  color: var(--c-texto-principal);
+  letter-spacing: 1px;
+}
+
+.cal-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  border-radius: var(--b-radio-sm);
+  background: var(--c-primario);
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: var(--t-suave);
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+
+.cal-add-btn:hover {
+  background: var(--c-primario-hover);
+}
+
+/* ==========================================================================
+   4. ESTRUCTURA PRINCIPAL
+   ========================================================================== */
+.cal-main {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 48px;
+  padding: 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   5. CALENDARIO
+   ========================================================================== */
+.cal-calendar-section {
+  min-width: 0;
+}
+
+.cal-calendar {
+  background: var(--c-fondo-tarjeta);
+  border-radius: var(--b-radio-md);
+  padding: 40px;
+  box-shadow: var(--s-media);
+  border: 1px solid var(--b-borde);
+}
+
+.cal-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.cal-nav h2 {
+  font-size: 1.6rem;
+  color: var(--c-texto-principal);
+  text-transform: capitalize;
+  font-style: italic; /* Toque clásico */
+}
+
+.cal-nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--b-radio-sm);
+  background: transparent;
+  border: 1px solid var(--b-borde);
+  color: var(--c-texto-secundario);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--t-suave);
+  cursor: pointer;
+}
+
+.cal-nav-btn:hover {
+  background: var(--c-primario-suave);
+  color: var(--c-primario);
+  border-color: var(--c-primario);
+}
+
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.cal-weekdays span {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--c-oro);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: var(--b-radio-sm);
+  background: var(--c-fondo);
+  border: 1px solid transparent;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 80px;
+  transition: var(--t-suave);
+  cursor: default;
+  position: relative;
+}
+
+.cal-day-num {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--c-texto-principal);
+}
+
+.cal-day-empty {
+  background: transparent;
+}
+
+.cal-day-hoy {
+  background: var(--c-oro-suave);
+  border-color: var(--c-oro);
+}
+
+.cal-day-hoy .cal-day-num {
+  color: var(--c-oro);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   6. DISEÑO DE FECHAS MARCADAS (Contorno Finos)
+   ========================================================================== */
+.cal-day-con-evento {
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid transparent; /* El JS aplica el color */
+  box-shadow: var(--s-sutil);
+  transition: var(--t-suave);
+}
+
+.cal-day-con-evento:hover {
+  background: var(--c-fondo);
+  box-shadow: var(--s-media);
+  z-index: 10;
+}
+
+/* Etiqueta de la fecha (Sin fondos llamativos) */
+.cal-day-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--c-texto-secundario);
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: var(--t-suave);
+  text-align: center;
+}
+
+.cal-day-con-evento:hover .cal-day-tag {
+  color: var(--c-texto-principal);
+}
+
+.cal-day-more {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--c-texto-suave);
+}
+
+/* ==========================================================================
+   7. SIDEBAR (Próximas Fechas)
+   ========================================================================== */
+.cal-sidebar {
+  background: var(--c-fondo-tarjeta);
+  border-radius: var(--b-radio-md);
+  padding: 32px;
+  box-shadow: var(--s-media);
+  border: 1px solid var(--b-borde);
+  height: fit-content;
+  max-height: calc(100vh - 140px);
+  position: sticky;
+  top: 104px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cal-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--b-borde);
+}
+
+.cal-sidebar-header h3 {
+  font-size: 1.2rem;
+  color: var(--c-texto-principal);
+  font-style: italic;
+}
+
+.cal-counter {
+  background: var(--c-primario-suave);
+  color: var(--c-primario);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: var(--b-radio-sm);
+}
+
+.cal-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.cal-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--c-texto-suave);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cal-empty svg {
+  width: 32px;
+  height: 32px;
+  color: var(--c-oro);
+  opacity: 0.5;
+  margin-bottom: 16px;
+}
+
+.cal-empty p {
+  font-size: 0.85rem;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ==========================================================================
+   8. TARJETA DE FECHA GUARDADA (Diseño de Lista de Agenda)
+   ========================================================================== */
+.cal-item {
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  border-radius: var(--b-radio-sm);
+  background: var(--c-fondo);
+  border: 1px solid var(--b-borde);
+  cursor: pointer;
+  transition: var(--t-suave);
+  position: relative;
+  overflow: hidden;
+  min-height: 70px;
+}
+
+.cal-item:hover {
+  background: #ffffff;
+  border-color: var(--c-primario);
+  box-shadow: var(--s-sutil);
+}
+
+/* Barra lateral fina */
+.cal-item-bar {
+  width: 4px;
+  flex-shrink: 0;
+  transition: var(--t-suave);
+}
+
+/* Contenido */
+.cal-item-content {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.cal-item-content h4 {
+  font-family: 'Inter', sans-serif; /* Más formal en listas */
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--c-texto-principal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cal-item-content p {
+  font-size: 0.8rem;
+  color: var(--c-texto-secundario);
+  text-transform: capitalize;
+}
+
+/* Etiqueta de "Días faltantes" */
+.cal-item-dias {
+  align-self: center;
+  margin-right: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--b-radio-sm);
+  background: #ffffff;
+  color: var(--c-texto-secundario);
+  border: 1px solid var(--b-borde);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cal-item:hover .cal-item-dias {
+  background: var(--c-primario);
+  color: #ffffff;
+  border-color: var(--c-primario);
+}
+
+.cal-item-dias.hoy {
+  background: var(--c-oro);
+  color: #ffffff;
+  border-color: var(--c-oro);
+}
+
+/* ==========================================================================
+   9. MODALES (Estilo Ventana de Papel)
+   ========================================================================== */
+.cal-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 28, 28, 0.6); /* Fondo oscuro formal */
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cal-modal.activo {
+  display: flex;
+  opacity: 1;
+}
+
+.cal-modal-box {
+  background: var(--c-fondo-tarjeta);
+  border-radius: var(--b-radio-sm);
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--s-profunda);
+  position: relative;
+  transform: translateY(10px);
+  transition: var(--t-suave);
+  border: 1px solid var(--b-borde);
+}
+
+.cal-modal.activo .cal-modal-box {
+  transform: translateY(0);
+}
+
+.cal-modal-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--b-radio-sm);
+  background: transparent;
+  color: var(--c-texto-suave);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--t-suave);
+  border: none;
+  cursor: pointer;
+}
+
+.cal-modal-close:hover {
+  background: var(--c-primario-suave);
+  color: var(--c-primario);
+}
+
+.cal-modal-box h2 {
+  font-size: 1.6rem;
+  color: var(--c-texto-principal);
+  margin-bottom: 8px;
+}
+
+.cal-modal-sub {
+  font-size: 0.9rem;
+  color: var(--c-texto-secundario);
+  margin-bottom: 32px;
+}
+
+/* ==========================================================================
+   10. FORMULARIO
+   ========================================================================== */
+.cal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cal-form-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--c-texto-principal);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cal-form-group input[type="text"],
+.cal-form-group input[type="date"],
+.cal-form-group textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--b-borde);
+  border-radius: var(--b-radio-sm);
+  background: var(--c-fondo);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--c-texto-principal);
+  outline: none;
+  transition: var(--t-suave);
+}
+
+.cal-form-group input:focus,
+.cal-form-group textarea:focus {
+  border-color: var(--c-primario);
+  background: #ffffff;
+}
+
+.cal-form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Selector de Tipos */
+.cal-tipo-selector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.cal-tipo-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 1px solid var(--b-borde);
+  border-radius: var(--b-radio-sm);
+  background: var(--c-fondo);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--c-texto-secundario);
+  transition: var(--t-suave);
+  cursor: pointer;
+}
+
+.cal-tipo-btn:hover {
+  background: #ffffff;
+  border-color: var(--c-texto-secundario);
+}
+
+.cal-tipo-btn.activo {
+  background: var(--c-primario-suave);
+  border-color: var(--c-primario);
+  color: var(--c-primario);
+}
+
+/* Checkbox */
+.cal-checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem !important;
+  color: var(--c-texto-principal) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  cursor: pointer;
+  font-weight: 500 !important;
+  padding: 8px 0;
+}
+
+.cal-checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--c-primario);
+  cursor: pointer;
+}
+
+/* Botones */
+.cal-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cal-btn-cancel,
+.cal-btn-save {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--b-radio-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--t-suave);
+  border: 1px solid transparent;
+}
+
+.cal-btn-cancel {
+  background: transparent;
+  color: var(--c-texto-secundario);
+  border-color: var(--b-borde);
+}
+
+.cal-btn-cancel:hover {
+  background: var(--c-fondo);
+  color: var(--c-texto-principal);
+}
+
+.cal-btn-save {
+  background: var(--c-primario);
+  color: #fff;
+}
+
+.cal-btn-save:hover {
+  background: var(--c-primario-hover);
+}
+
+/* ==========================================================================
+   11. DETALLE DE LA FECHA
+   ========================================================================== */
+.cal-modal-detalle {
+  max-width: 460px;
+}
+
+.cal-detalle-item {
+  margin-bottom: 24px;
+  background: #fff;
+  padding: 32px;
+  border-radius: var(--b-radio-sm);
+  border: 1px solid var(--b-borde);
+  text-align: center;
+}
+
+.cal-detalle-tipo {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--b-radio-sm);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
+  background: var(--c-fondo);
+}
+
+.cal-detalle-item h3 {
+  font-size: 1.8rem;
+  margin-bottom: 16px;
+  line-height: 1.3;
+  color: var(--c-texto-principal);
+}
+
+.cal-detalle-fecha {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--c-texto-secundario);
+  font-weight: 500;
+  text-transform: capitalize;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--b-borde);
+}
+
+.cal-detalle-notas {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--c-texto-principal);
+  text-align: left;
+  padding: 16px;
+  background: var(--c-fondo);
+  border-left: 2px solid var(--c-primario);
+  font-style: italic;
+}
+
+.cal-detalle-acciones {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.cal-btn-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--b-radio-sm);
+  border: 1px solid var(--b-borde);
+  background: transparent;
+  color: var(--c-texto-secundario);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--t-suave);
+}
+
+.cal-btn-delete:hover {
+  border-color: #dc2626;
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+/* ==========================================================================
+   12. TOAST (Notificaciones)
+   ========================================================================== */
+.cal-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 12px 24px;
+  border-radius: var(--b-radio-sm);
+  background: var(--c-texto-principal);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  box-shadow: var(--s-profunda);
+  z-index: 100000;
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--t-suave);
+}
+
+.cal-toast.activo {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.cal-toast.success {
+  background: var(--c-cumpleanos);
+}
+
+.cal-toast.error {
+  background: var(--c-aniversario);
+}
+
+/* ==========================================================================
+   13. RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .cal-main {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 24px;
+  }
+
+  .cal-sidebar {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .cal-header {
+    padding: 16px 24px;
+  }
+
+  .cal-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .cal-add-btn span {
+    display: none;
+  }
+
+  .cal-calendar {
+    padding: 24px;
+  }
+
+  .cal-nav h2 {
+    font-size: 1.3rem;
+  }
+
+  .cal-day {
+    min-height: 60px;
+    padding: 4px;
+  }
+
+  .cal-day-num {
+    font-size: 0.85rem;
+  }
+
+  .cal-day-tag {
+    display: none; /* Ocultar texto en móvil para no saturar */
+  }
+
+  .cal-day-con-evento::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--c-primario);
+  }
+
+  .cal-modal-box {
+    padding: 24px;
+  }
+
+  .cal-tipo-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .cal-form-actions {
+    flex-direction: column-reverse;
+  }
+}

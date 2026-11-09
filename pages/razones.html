@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Razones 💜</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#e9d5ff" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>" />
+
+<script type="module">
+  import { protegerRuta } from '../js/proteger.js';
+  document.documentElement.style.visibility = "hidden";
+  protegerRuta().then((datos) => {
+    if (datos) document.documentElement.style.visibility = "visible";
+  });
+</script>
+
+  <style>
+    /* ============================================
+       RAZONES — EXPERIENCIA PREMIUM
+       ============================================ */
+    html, body.razones-page { margin: 0; padding: 0; min-height: 100vh; }
+    body.razones-page { background: #faf3ff; color: #3a2145; font-family: 'Inter', sans-serif; position: relative; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    .aurora-canvas { position: fixed; inset: 0; z-index: -3; pointer-events: none; }
+    .particulas-canvas { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
+    body.razones-page::after { content: ""; position: fixed; inset: 0; background-image: radial-gradient(circle at 8% 22%, rgba(201, 156, 240, 0.35) 1px, transparent 1.5px), radial-gradient(circle at 78% 18%, rgba(240, 170, 200, 0.4) 1px, transparent 1.5px), radial-gradient(circle at 44% 76%, rgba(201, 156, 240, 0.3) 1px, transparent 1.5px), radial-gradient(circle at 92% 60%, rgba(240, 170, 200, 0.35) 1px, transparent 1.5px); z-index: -1; pointer-events: none; animation: titilarEstrellas 6s ease-in-out infinite alternate; }
+    @keyframes titilarEstrellas { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+    body.razones-page .nav-back { position: sticky; top: 0; padding: 16px 30px; background: rgba(255, 250, 255, 0.65); border-bottom: 1px solid rgba(180, 130, 240, 0.12); backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); z-index: 100; }
+    body.razones-page .nav-back a { color: #6a4780; font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; transition: color 0.3s ease; text-decoration: none; }
+    body.razones-page .nav-back a:hover { color: #a874e8; }
+    .razones-hero { max-width: 960px; margin: 0 auto; padding: 90px 24px 30px; text-align: center; position: relative; z-index: 2; }
+    .razones-hero-badge { display: inline-flex; align-items: center; gap: 14px; font-family: 'Inter', sans-serif; font-size: 0.62rem; letter-spacing: 8px; text-transform: uppercase; color: #a874e8; font-weight: 600; margin-bottom: 26px; opacity: 0; animation: fadeInRazones 1.2s ease 0.2s forwards; }
+    .razones-hero-badge::before, .razones-hero-badge::after { content: ""; width: 32px; height: 1px; background: linear-gradient(to right, transparent, #c99cf0, transparent); }
+    .razones-hero h1 { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(2rem, 5.5vw, 3.6rem); font-weight: 400; line-height: 1.08; letter-spacing: -0.02em; color: #3a2145; margin-bottom: 24px; opacity: 0; animation: fadeInRazones 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; }
+    .razones-hero h1 em { color: #a874e8; font-style: italic; text-shadow: 0 0 40px rgba(201, 156, 240, 0.5); position: relative; display: inline-block; }
+    .razones-hero h1 em::after { content: ""; position: absolute; left: 0; right: 0; bottom: -8px; height: 1px; background: linear-gradient(to right, transparent, #c99cf0, transparent); animation: lineaHero 1.6s cubic-bezier(0.16, 1, 0.3, 1) 1.2s both; transform-origin: center; }
+    @keyframes lineaHero { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
+    .razones-hero p { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.05rem, 1.6vw, 1.25rem); font-style: italic; font-weight: 300; color: #7a5c8c; line-height: 1.7; max-width: 560px; margin: 0 auto; opacity: 0; animation: fadeInRazones 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards; }
+    @keyframes fadeInRazones { from { opacity: 0; transform: translateY(20px); filter: blur(8px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+    .razones-controles { max-width: 1000px; margin: 50px auto 0; padding: 0 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; opacity: 0; animation: fadeInRazones 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards; }
+    .razones-contador { display: inline-flex; align-items: center; gap: 12px; padding: 12px 22px; background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(180, 130, 240, 0.22); border-radius: 50px; backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); box-shadow: 0 8px 24px rgba(160, 100, 220, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9); font-family: 'Inter', sans-serif; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: #6a4780; font-weight: 600; white-space: nowrap; }
+    .razones-contador-num { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-style: italic; color: #a874e8; font-variant-numeric: tabular-nums; letter-spacing: 0; text-transform: none; font-weight: 500; }
+    .razones-buscador-wrap { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+    #buscadorRazones { width: 100%; min-height: 48px; padding: 12px 20px 12px 46px; background: rgba(255, 255, 255, 0.75); border: 1px solid rgba(180, 130, 240, 0.22); border-radius: 50px; font-family: inherit; font-size: 0.88rem; color: #4a2a5a; outline: none; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); backdrop-filter: blur(12px) saturate(150%); -webkit-backdrop-filter: blur(12px) saturate(150%); box-shadow: 0 8px 24px rgba(160, 100, 220, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9); }
+    #buscadorRazones::placeholder { color: #a08bb8; font-style: italic; font-family: 'Cormorant Garamond', serif; font-size: 1rem; }
+    #buscadorRazones:focus { border-color: rgba(180, 130, 240, 0.55); background: rgba(255, 255, 255, 0.95); box-shadow: 0 12px 32px rgba(160, 100, 220, 0.22), inset 0 1px 0 rgba(255, 255, 255, 1), 0 0 0 4px rgba(201, 156, 240, 0.15); }
+    .razones-buscador-wrap::before { content: ""; position: absolute; left: 18px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; border: 1.5px solid #c99cf0; border-radius: 50%; pointer-events: none; }
+    .razones-buscador-wrap::after { content: ""; position: absolute; left: 30px; top: 60%; width: 8px; height: 1.5px; background: #c99cf0; transform: rotate(45deg); transform-origin: left; pointer-events: none; border-radius: 2px; }
+    .btn-azar, .btn-nueva-razon { display: inline-flex; align-items: center; gap: 10px; padding: 12px 26px; background: linear-gradient(135deg, #c99cf0 0%, #a874e8 50%, #8a5fd0 100%); color: #fff; border: none; border-radius: 50px; font-family: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 10px 28px rgba(160, 100, 220, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3); position: relative; overflow: hidden; white-space: nowrap; }
+    .btn-azar::before, .btn-nueva-razon::before { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.4) 50%, transparent 70%); transform: translateX(-100%); transition: transform 0.8s ease; }
+    .btn-azar:hover::before, .btn-nueva-razon:hover::before { transform: translateX(100%); }
+    .btn-azar:hover, .btn-nueva-razon:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 16px 38px rgba(160, 100, 220, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.4); }
+    .btn-nueva-razon { background: linear-gradient(135deg, #a874e8 0%, #f28ca6 100%); }
+    .btn-nueva-razon::after { content: "✨"; margin-left: 4px; }
+    .razones-grid { max-width: 1320px; margin: 30px auto 0; padding: 10px 24px 120px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; position: relative; z-index: 2; }
+    .petalo { position: relative; padding: 32px 28px 30px; border-radius: 4px 24px 4px 24px; background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(252, 244, 255, 0.95) 55%, rgba(255, 248, 252, 0.98) 100%); border: 1px solid rgba(200, 160, 240, 0.3); box-shadow: 0 14px 38px rgba(160, 100, 220, 0.12), 0 4px 12px rgba(200, 160, 240, 0.1), inset 0 1px 0 rgba(255, 255, 255, 1); cursor: pointer; transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease, border-color 0.3s ease; opacity: 0; transform: translateY(30px) scale(0.96); overflow: hidden; isolation: isolate; will-change: transform; }
+    .petalo::before { content: ""; position: absolute; top: -30%; left: -20%; width: 120%; height: 120%; background: radial-gradient(ellipse at 30% 20%, rgba(220, 180, 255, 0.45) 0%, transparent 55%); pointer-events: none; z-index: 0; opacity: 0.6; transition: opacity 0.6s ease, transform 0.8s ease; }
+    .petalo::after { content: ""; position: absolute; top: 14px; right: 14px; width: 22px; height: 22px; border-top: 1px solid rgba(201, 156, 240, 0.5); border-right: 1px solid rgba(201, 156, 240, 0.5); border-radius: 0 8px 0 0; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); z-index: 1; }
+    .petalo.visible { opacity: 1; transform: translateY(0) scale(1); }
+    .petalo:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(201, 156, 240, 0.65); box-shadow: 0 24px 60px rgba(160, 100, 220, 0.25), 0 8px 24px rgba(200, 160, 240, 0.2), inset 0 1px 0 rgba(255, 255, 255, 1); }
+    .petalo:hover::before { opacity: 1; transform: scale(1.15); }
+    .petalo:hover::after { top: 10px; right: 10px; width: 30px; height: 30px; border-color: rgba(201, 156, 240, 1); border-radius: 0 12px 0 0; }
+    .petalo.destacado { border-color: rgba(201, 156, 240, 0.8); box-shadow: 0 24px 60px rgba(160, 100, 220, 0.35), 0 0 0 4px rgba(201, 156, 240, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1); }
+    .petalo-num { display: inline-flex; align-items: baseline; gap: 6px; font-family: 'Inter', sans-serif; font-size: 0.6rem; letter-spacing: 4px; text-transform: uppercase; color: #a874e8; font-weight: 600; margin-bottom: 18px; position: relative; z-index: 2; opacity: 0.85; }
+    .petalo-num strong { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; font-weight: 500; color: #a874e8; letter-spacing: 0; text-transform: none; }
+    .petalo-texto { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 400; line-height: 1.5; color: #4a2a5a; position: relative; z-index: 2; letter-spacing: 0.003em; margin: 0; }
+    .petalo-desc { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; font-style: italic; color: #8a7aa8; margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(201, 156, 240, 0.4); position: relative; z-index: 2; }
+    .petalo-delete { position: absolute; top: 14px; right: 42px; width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(217, 102, 102, 0.15); color: #d96666; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 5; }
+    .petalo:hover .petalo-delete { opacity: 2; }
+    .petalo-delete:hover { background: #d96666; color: #fff; transform: scale(1.15); }
+    .razones-vacio { grid-column: 1 / -1; text-align: center; padding: 80px 30px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2rem; color: #a08bb8; line-height: 1.6; }
+    .razones-vacio::before { content: "❦"; display: block; font-size: 2.4rem; color: #c99cf0; margin-bottom: 16px; opacity: 0.6; }
+    .razon-modal { position: fixed; inset: 0; z-index: 9999; background: rgba(60, 30, 90, 0.55); display: flex; align-items: center; justify-content: center; padding: 30px 20px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; backdrop-filter: blur(20px) saturate(130%); -webkit-backdrop-filter: blur(20px) saturate(130%); }
+    .razon-modal.activo { opacity: 1; pointer-events: auto; }
+    .razon-marco { position: relative; max-width: 620px; width: 100%; padding: 4px; background: linear-gradient(135deg, rgba(201, 156, 240, 0.9), rgba(240, 200, 230, 0.7), rgba(201, 156, 240, 0.9)); border-radius: 40px; transform: scale(0.85) rotateX(10deg); opacity: 0; transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s ease; box-shadow: 0 40px 120px rgba(120, 60, 180, 0.4), 0 0 100px rgba(200, 160, 240, 0.5); z-index: 2; }
+    .razon-modal.activo .razon-marco { transform: scale(1) rotateX(0); opacity: 1; }
+    .razon-petalo-grande { position: relative; padding: 60px 50px 55px; background: linear-gradient(150deg, rgba(255, 253, 255, 1) 0%, rgba(252, 244, 255, 0.98) 55%, rgba(255, 248, 252, 1) 100%); border-radius: 36px; text-align: center; overflow: hidden; }
+    .razon-petalo-grande::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 18% 12%, rgba(220, 180, 255, 0.4), transparent 45%), radial-gradient(circle at 88% 88%, rgba(255, 200, 230, 0.35), transparent 45%); pointer-events: none; }
+    .razon-petalo-grande::after { content: "❦"; position: absolute; top: 26px; left: 50%; transform: translateX(-50%); color: #c99cf0; font-size: 1.4rem; opacity: 0.8; text-shadow: 0 0 25px rgba(201, 156, 240, 0.6); }
+    .razon-modal-num { display: inline-block; font-family: 'Inter', sans-serif; font-size: 0.7rem; letter-spacing: 8px; text-transform: uppercase; color: #a874e8; font-weight: 600; margin-bottom: 25px; margin-top: 25px; position: relative; z-index: 2; padding: 8px 20px; border: 1px solid rgba(201, 156, 240, 0.4); border-radius: 50px; background: rgba(201, 156, 240, 0.08); }
+    .razon-modal-texto { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.4rem, 3.8vw, 2rem); font-weight: 400; line-height: 1.35; color: #3a2145; position: relative; z-index: 2; letter-spacing: -0.012em; }
+    .razon-modal-texto::first-letter { color: #a874e8; font-size: 1.15em; }
+    .razon-modal-desc { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.05rem; color: #7a5c8c; margin-top: 22px; padding-top: 20px; border-top: 1px dashed rgba(201, 156, 240, 0.5); position: relative; z-index: 2; }
+    .razon-modal-cerrar { position: absolute; top: 22px; right: 22px; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(180, 130, 240, 0.4); background: rgba(255, 255, 255, 0.95); color: #a874e8; font-size: 1.15rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); z-index: 5; box-shadow: 0 8px 22px rgba(180, 130, 240, 0.25); }
+    .razon-modal-cerrar:hover { background: #a874e8; color: #fff; transform: rotate(90deg) scale(1.08); }
+    .nueva-modal { position: fixed; inset: 0; z-index: 9999; background: rgba(60, 30, 90, 0.55); display: flex; align-items: center; justify-content: center; padding: 30px 20px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+    .nueva-modal.activo { opacity: 1; pointer-events: auto; }
+    .nueva-marco { position: relative; max-width: 560px; width: 100%; padding: 4px; background: linear-gradient(135deg, rgba(201, 156, 240, 0.9), rgba(240, 200, 230, 0.7), rgba(201, 156, 240, 0.9)); border-radius: 40px; transform: scale(0.85); opacity: 0; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease; box-shadow: 0 40px 120px rgba(120, 60, 180, 0.4); }
+    .nueva-modal.activo .nueva-marco { transform: scale(1); opacity: 1; }
+    .nueva-inner { padding: 45px 40px 40px; background: linear-gradient(150deg, rgba(255, 253, 255, 1), rgba(252, 244, 255, 0.98), rgba(255, 248, 252, 1)); border-radius: 36px; position: relative; }
+    .nueva-inner h2 { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.7rem; color: #3a2145; text-align: center; margin-bottom: 8px; }
+    .nueva-num-auto { text-align: center; font-family: 'Inter', sans-serif; font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; color: #a874e8; font-weight: 700; margin-bottom: 28px; }
+    .nueva-campo { margin-bottom: 18px; }
+    .nueva-label { display: block; font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #8a7aa8; margin-bottom: 8px; }
+    .nueva-textarea { width: 100%; padding: 14px 18px; border: 1.5px solid rgba(180, 130, 240, 0.3); border-radius: 14px; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; color: #3a2145; outline: none; transition: all 0.3s ease; background: rgba(255, 255, 255, 0.85); box-sizing: border-box; resize: vertical; min-height: 90px; line-height: 1.5; }
+    .nueva-textarea:focus { border-color: #a874e8; background: #fff; box-shadow: 0 0 0 4px rgba(168, 116, 232, 0.15); }
+    .nueva-acciones { display: flex; gap: 10px; margin-top: 25px; }
+    .nueva-btn { flex: 1; padding: 14px 20px; border-radius: 50px; border: none; font-family: inherit; font-size: 0.82rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    .nueva-btn.primario { background: linear-gradient(135deg, #c99cf0, #a874e8); color: #fff; box-shadow: 0 10px 26px rgba(160, 100, 220, 0.4); }
+    .nueva-btn.primario:hover { transform: translateY(-2px); }
+    .nueva-btn.neutro { background: rgba(255, 255, 255, 0.9); color: #7a5c8c; border: 1.5px solid rgba(180, 130, 240, 0.3); }
+    .nueva-btn.neutro:hover { background: #f5f0fa; }
+    body.razones-page .footer { border-top: 1px solid rgba(180, 130, 240, 0.15); color: #7a5c8c; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; padding: 50px 20px; text-align: center; position: relative; z-index: 2; }
+    body.razones-page .footer a { color: #a874e8; text-decoration: none; }
+    @media (max-width: 768px) {
+      .razones-hero { padding: 60px 20px 20px; }
+      .razones-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; padding: 10px 16px 80px; margin-top: 20px; }
+      .petalo { padding: 26px 22px; }
+      .petalo-texto { font-size: 1.02rem; }
+      .razon-petalo-grande, .nueva-inner { padding: 45px 30px 40px; }
+      .razon-modal-cerrar { top: 16px; right: 16px; width: 40px; height: 40px; font-size: 1rem; }
+    }
+    @media (max-width: 480px) {
+      .razones-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; padding: 10px 16px 60px; }
+      .razones-controles { flex-direction: column; align-items: stretch; }
+      .razones-contador, .btn-azar, .btn-nueva-razon { justify-content: center; }
+    }
+  </style>
+</head>
+<body class="page-inner razones-page" data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti 💕">
+
+  <nav class="nav-back"><a href="../index.html">← Volver al inicio</a></nav>
+  <canvas class="aurora-canvas" id="auroraCanvas"></canvas>
+  <canvas class="particulas-canvas" id="particulasCanvas"></canvas>
+
+  <header class="razones-hero">
+    <span class="razones-hero-badge">Pequeños motivos, inmensos</span>
+    <h1>Mil razones por las que <em>me enamoré de ti</em></h1>
+    <p>No sé si son mil, ni si algún día lo serán.<br>Pero cada vez que pienso en ti, aparece una nueva.</p>
+    <div class="razones-controles">
+      <div class="razones-contador"><span class="razones-contador-num" id="contadorRazones">0</span><span>razones</span></div>
+      <div class="razones-buscador-wrap"><input type="text" id="buscadorRazones" placeholder="Buscar una razón..." /></div>
+      <button class="btn-nueva-razon" id="btnNuevaRazon">Nueva razón</button>
+      <button class="btn-azar" id="btnAzar"><span>Razón al azar</span></button>
+    </div>
+  </header>
+
+  <section class="razones-grid" id="razonesGrid"></section>
+  <footer class="footer"><p>Ahora → <a href="juego.html">Vamos a jugar</a></p></footer>
+
+  <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
+  <script src="../js/script.js"></script>
+ 
+  <script src="../js/confeti.js"></script>
+  <script src="../js/pwa.js"></script>
+  <script type="module" src="../js/razones.js"></script>
+
+  <div class="razon-modal" id="razonModal">
+    <button class="razon-modal-cerrar" id="razonModalCerrar" aria-label="Cerrar">✕</button>
+    <div class="razon-marco"><div class="razon-petalo-grande"><div class="razon-modal-num" id="razonModalNum"></div><div class="razon-modal-texto" id="razonModalTexto"></div><div class="razon-modal-desc" id="razonModalDesc" style="display: none;"></div></div></div>
+  </div>
+
+  <div class="nueva-modal" id="nuevaModal">
+    <div class="nueva-marco">
+      <button class="razon-modal-cerrar" id="nuevaModalCerrar" aria-label="Cerrar">✕</button>
+      <div class="nueva-inner">
+        <h2>Nueva razón</h2>
+        <p class="nueva-num-auto" id="nuevaNumAuto">Se guardará como RAZÓN 021</p>
+        <div class="nueva-campo"><label class="nueva-label">La razón</label><textarea id="nuevaTextoInput" class="nueva-textarea" placeholder="Escribí la razón..." maxlength="300"></textarea></div>
+        <div class="nueva-campo"><label class="nueva-label">Descripción (opcional)</label><textarea id="nuevaDescInput" class="nueva-textarea" placeholder="Algo más para agregar..." maxlength="300" style="min-height: 70px;"></textarea></div>
+        <div class="nueva-acciones"><button class="nueva-btn primario" id="btnGuardarNueva">Guardar</button><button class="nueva-btn neutro" id="btnCancelarNueva">Cancelar</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+      const JSONBIN_MASTER_KEY = "$2a$10$o5/KkktxRiEfoxN33ZQQieN0iUvv/pkvIG8riNohEo5N4I7NCGU2q";
+      const JSONBIN_BIN_ID = "6aa58aecffd5d16053fef5c0";
+      const JSONBIN_URL = "https://api.jsonbin.io/v3/b/" + JSONBIN_BIN_ID;
+      const RAZONES_DEFAULT = ["Por esos ojazos", "Por tu risa", "Amo tu forma de escuchar", "Amo tu mirada.", "Porque amo tu forma de ser.", "Por tus abrazos.", "Porque contigo el silencio también es una forma de hablar.", "Por tu manera de cuidarme sin que me dé cuenta.", "Porque me haces querer ser mejor persona, sin exigírmelo.", "Por tu risa.", "Porque eres mi lugar seguro muchas veces.", "Por cómo te emocionas con las cosas pequeñas.", "Porque incluso en tus días difíciles, eliges quedarte.", "Por cómo hueles cuando te abrazo.", "Por tus mensajes.", "Porque me entiendes sin que tenga que explicarte.", "Por tu compañia.", "Por tu ternura.", "Porque contigo todo se siente como llegar a casa.", "Porque eres, simplemente, tú. Y eso ya es suficiente."];
+      let razones = []; let filtroTexto = "";
+      function numeroRazon(n) { return String(n).padStart(3, "0"); }
+      
+      async function cargarRazones() {
+        let razonesUsuario = [];
+        try {
+          const res = await fetch(JSONBIN_URL + "/latest", { headers: { "X-Master-Key": JSONBIN_MASTER_KEY, "X-Bin-Meta": "false" } });
+          if (res.ok) { const data = await res.json(); razonesUsuario = data.razones || []; }
+        } catch (err) { console.warn("No se pudieron cargar las razones del usuario:", err); }
+        const defaultObj = RAZONES_DEFAULT.map((texto, i) => ({ id: "default-" + (i + 1), texto, descripcion: "", numero: i + 1, esDefault: true }));
+        const usuarioObj = razonesUsuario.map((r, i) => ({ ...r, numero: RAZONES_DEFAULT.length + i + 1 }));
+        razones = [...defaultObj, ...usuarioObj];
+      }
+
+      async function guardarRazonEnBin(razon) {
+        const res = await fetch(JSONBIN_URL + "/latest", { headers: { "X-Master-Key": JSONBIN_MASTER_KEY, "X-Bin-Meta": "false" } });
+        if (!res.ok) throw new Error("Error leyendo JSONBin");
+        const data = await res.json();
+        const nuevoContenido = { entradas: data.entradas || [], suscripciones: data.suscripciones || [], recuerdos: data.recuerdos || [], razones: data.razones || [], albums: data.albums || [] };
+        nuevoContenido.razones.push(razon);
+        const putRes = await fetch(JSONBIN_URL, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_MASTER_KEY }, body: JSON.stringify(nuevoContenido) });
+        if (!putRes.ok) throw new Error("Error guardando en JSONBin");
+        return true;
+      }
+
+      async function eliminarRazonEnBin(razonId) {
+        const res = await fetch(JSONBIN_URL + "/latest", { headers: { "X-Master-Key": JSONBIN_MASTER_KEY, "X-Bin-Meta": "false" } });
+        if (!res.ok) throw new Error("Error leyendo JSONBin");
+        const data = await res.json();
+        const nuevoContenido = { entradas: data.entradas || [], suscripciones: data.suscripciones || [], recuerdos: data.recuerdos || [], razones: (data.razones || []).filter(r => r.id !== razonId), albums: data.albums || [] };
+        const putRes = await fetch(JSONBIN_URL, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_MASTER_KEY }, body: JSON.stringify(nuevoContenido) });
+        if (!putRes.ok) throw new Error("Error guardando en JSONBin");
+        return true;
+      }
+
+      (function auroraFondo() {
+        const canvas = document.getElementById("auroraCanvas"); if (!canvas) return;
+        const ctx = canvas.getContext("2d"); let w, h;
+        function resize() { w = canvas.width = window.innerWidth * devicePixelRatio; h = canvas.height = window.innerHeight * devicePixelRatio; canvas.style.width = window.innerWidth + "px"; canvas.style.height = window.innerHeight + "px"; }
+        resize(); window.addEventListener("resize", resize);
+        const blobs = [{ x: 0.2, y: 0.3, r: 0.55, color: [233, 213, 255], speed: 0.00010, fase: 0 }, { x: 0.8, y: 0.7, r: 0.5, color: [255, 214, 232], speed: 0.00013, fase: Math.PI }, { x: 0.5, y: 0.5, r: 0.45, color: [240, 220, 255], speed: 0.00008, fase: Math.PI * 1.4 }, { x: 0.15, y: 0.8, r: 0.4, color: [255, 235, 245], speed: 0.00011, fase: Math.PI * 0.6 }];
+        const start = performance.now();
+        function render(now) {
+          const t = now - start; ctx.clearRect(0, 0, w, h);
+          blobs.forEach(b => {
+            const cx = (b.x + Math.sin(t * b.speed + b.fase) * 0.12) * w; const cy = (b.y + Math.cos(t * b.speed * 1.3 + b.fase) * 0.12) * h; const r = b.r * Math.min(w, h);
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+            gradient.addColorStop(0, `rgba(${b.color[0]}, ${b.color[1]}, ${b.color[2]}, 0.55)`); gradient.addColorStop(0.5, `rgba(${b.color[0]}, ${b.color[1]}, ${b.color[2]}, 0.2)`); gradient.addColorStop(1, `rgba(${b.color[0]}, ${b.color[1]}, ${b.color[2]}, 0)`);
+            ctx.fillStyle = gradient; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+          });
+          requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+      })();
+
+      (function polvoDorado() {
+        const canvas = document.getElementById("particulasCanvas"); if (!canvas) return;
+        const ctx = canvas.getContext("2d"); let w, h;
+        function resize() { w = canvas.width = window.innerWidth * devicePixelRatio; h = canvas.height = window.innerHeight * devicePixelRatio; canvas.style.width = window.innerWidth + "px"; canvas.style.height = window.innerHeight + "px"; }
+        resize(); window.addEventListener("resize", resize);
+        const N = Math.min(70, Math.floor(window.innerWidth / 22)); const parts = [];
+        for (let i = 0; i < N; i++) { parts.push({ x: Math.random() * w, y: Math.random() * h, r: (Math.random() * 1.5 + 0.4) * devicePixelRatio, vx: (Math.random() - 0.5) * 0.15 * devicePixelRatio, vy: (Math.random() - 0.5) * 0.15 * devicePixelRatio, a: Math.random() * 0.5 + 0.2, fase: Math.random() * Math.PI * 2, tipo: Math.random() < 0.6 ? "lav" : "dor" }); }
+        let mouseX = -9999, mouseY = -9999;
+        window.addEventListener("mousemove", (e) => { mouseX = e.clientX * devicePixelRatio; mouseY = e.clientY * devicePixelRatio; });
+        function render() {
+          ctx.clearRect(0, 0, w, h);
+          parts.forEach(p => {
+            p.x += p.vx; p.y += p.vy; p.fase += 0.01;
+            const dx = mouseX - p.x, dy = mouseY - p.y; const dist = Math.hypot(dx, dy);
+            if (dist < 200 * devicePixelRatio && dist > 1) { const fuerza = (200 * devicePixelRatio - dist) / (200 * devicePixelRatio); p.x += (dx / dist) * fuerza * 0.4 * devicePixelRatio; p.y += (dy / dist) * fuerza * 0.4 * devicePixelRatio; }
+            if (p.x < -20) p.x = w + 20; if (p.x > w + 20) p.x = -20; if (p.y < -20) p.y = h + 20; if (p.y > h + 20) p.y = -20;
+            const alpha = p.a * (0.7 + 0.3 * Math.sin(p.fase)); const color = p.tipo === "lav" ? `rgba(201, 156, 240, ${alpha})` : `rgba(212, 163, 115, ${alpha})`;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = color; ctx.shadowBlur = 12 * devicePixelRatio; ctx.shadowColor = color; ctx.fill();
+          });
+          requestAnimationFrame(render);
+        }
+        render();
+      })();
+
+      const grid = document.getElementById("razonesGrid"); const contadorEl = document.getElementById("contadorRazones"); const buscador = document.getElementById("buscadorRazones"); const btnAzar = document.getElementById("btnAzar");
+      function renderRazones(filtro = "") {
+        if (!grid) return;
+        const filtroLower = filtro.trim().toLowerCase();
+        const lista = filtroLower ? razones.filter(r => (r.texto || "").toLowerCase().includes(filtroLower) || (r.descripcion || "").toLowerCase().includes(filtroLower)) : razones;
+        if (lista.length === 0) { grid.innerHTML = `<div class="razones-vacio">No encontré esa razón... pero estoy seguro de que existe.</div>`; document.getElementById("contadorRazones").textContent = razones.length; return; }
+        grid.innerHTML = lista.map((r, i) => `
+          <article class="petalo" data-id="${r.id}" data-numero="${r.numero}" style="transition-delay: ${Math.min(i * 40, 600)}ms">
+            ${!r.esDefault ? `<button class="petalo-delete" onclick="event.stopPropagation(); eliminarRazon('${r.id}')" title="Eliminar">🗑️</button>` : ""}
+            <span class="petalo-num">Razón <strong>${numeroRazon(r.numero)}</strong></span>
+            <p class="petalo-texto">${r.texto}</p>
+            ${r.descripcion ? `<p class="petalo-desc">${r.descripcion}</p>` : ""}
+          </article>
+        `).join("");
+        animarContador(razones.length);
+        grid.querySelectorAll(".petalo").forEach(p => {
+          p.addEventListener("click", () => { const id = p.dataset.id; const razon = razones.find(x => x.id === id); if (razon) abrirRazon(razon, p); });
+          p.addEventListener("mousemove", (e) => { const rect = p.getBoundingClientRect(); const x = (e.clientX - rect.left) / rect.width - 0.5; const y = (e.clientY - rect.top) / rect.height - 0.5; p.style.transform = `translateY(-8px) scale(1.02) rotateX(${-y * 6}deg) rotateY(${x * 6}deg)`; });
+          p.addEventListener("mouseleave", () => { p.style.transform = ""; });
+        });
+        observarReveals();
+      }
+      function animarContador(total) {
+        if (!contadorEl) return; const duracion = 800; const inicio = performance.now(); const desde = parseInt(contadorEl.textContent) || 0;
+        function paso(now) { const t = Math.min((now - inicio) / duracion, 1); const ease = 1 - Math.pow(1 - t, 3); contadorEl.textContent = Math.round(desde + (total - desde) * ease); if (t < 1) requestAnimationFrame(paso); }
+        requestAnimationFrame(paso);
+      }
+      let io = null;
+      function observarReveals() {
+        if (io) io.disconnect();
+        io = new IntersectionObserver((entries) => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); } }); }, { threshold: 0.1 });
+        grid.querySelectorAll(".petalo:not(.visible)").forEach(el => io.observe(el));
+      }
+      let debounceTimer;
+      if (buscador) { buscador.addEventListener("input", (e) => { clearTimeout(debounceTimer); debounceTimer = setTimeout(() => { filtroTexto = e.target.value; renderRazones(filtroTexto); }, 120); }); }
+
+      const modal = document.getElementById("razonModal"); const modalCerrar = document.getElementById("razonModalCerrar"); const modalNum = document.getElementById("razonModalNum"); const modalTexto = document.getElementById("razonModalTexto"); const modalDesc = document.getElementById("razonModalDesc");
+      function abrirRazon(razon, elemento) {
+        if (elemento && window.lanzarConfeti) window.lanzarConfeti(600);
+        modalNum.textContent = `Razón ${numeroRazon(razon.numero)}`; modalTexto.textContent = razon.texto;
+        if (razon.descripcion) { modalDesc.textContent = razon.descripcion; modalDesc.style.display = "block"; } else { modalDesc.style.display = "none"; }
+        modal.classList.add("activo"); document.body.style.overflow = "hidden";
+      }
+      function cerrarRazon() { modal.classList.remove("activo"); document.body.style.overflow = ""; }
+      modalCerrar.addEventListener("click", cerrarRazon); modal.addEventListener("click", (e) => { if (e.target === modal) cerrarRazon(); });
+
+      window.eliminarRazon = async function (razonId) {
+        if (razonId.startsWith("default-")) { alert("No podés eliminar las razones originales 💜"); return; }
+        if (!confirm("¿Eliminar esta razón? No se puede recuperar 💜")) return;
+        try { await eliminarRazonEnBin(razonId); await cargarRazones(); renderRazones(filtroTexto); if (window.lanzarConfeti) window.lanzarConfeti(600); } catch (err) { alert("❌ Error: " + err.message); }
+      };
+
+      const nuevaModal = document.getElementById("nuevaModal"); const btnNueva = document.getElementById("btnNuevaRazon"); const nuevaModalCerrar = document.getElementById("nuevaModalCerrar"); const btnCancelarNueva = document.getElementById("btnCancelarNueva"); const btnGuardarNueva = document.getElementById("btnGuardarNueva"); const nuevaTextoInput = document.getElementById("nuevaTextoInput"); const nuevaDescInput = document.getElementById("nuevaDescInput"); const nuevaNumAuto = document.getElementById("nuevaNumAuto");
+      function abrirNuevaModal() { const siguiente = razones.length + 1; nuevaNumAuto.textContent = `Se guardará como RAZÓN ${numeroRazon(siguiente)}`; nuevaTextoInput.value = ""; nuevaDescInput.value = ""; nuevaModal.classList.add("activo"); document.body.style.overflow = "hidden"; setTimeout(() => nuevaTextoInput.focus(), 400); }
+      function cerrarNuevaModal() { nuevaModal.classList.remove("activo"); document.body.style.overflow = ""; }
+      if (btnNueva) btnNueva.addEventListener("click", abrirNuevaModal);
+      if (nuevaModalCerrar) nuevaModalCerrar.addEventListener("click", cerrarNuevaModal);
+      if (btnCancelarNueva) btnCancelarNueva.addEventListener("click", cerrarNuevaModal);
+      nuevaModal.addEventListener("click", (e) => { if (e.target === nuevaModal) cerrarNuevaModal(); });
+      if (btnGuardarNueva) {
+        btnGuardarNueva.addEventListener("click", async () => {
+          const texto = nuevaTextoInput.value.trim(); const descripcion = nuevaDescInput.value.trim();
+          if (!texto) { alert("Escribí la razón 💜"); return; }
+          const nuevaRazon = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), texto, descripcion, fecha: new Date().toISOString(), numero: razones.length + 1 };
+          try { await guardarRazonEnBin(nuevaRazon); razones.push(nuevaRazon); if (window.lanzarConfeti) window.lanzarConfeti(1500); cerrarNuevaModal(); renderRazones(filtroTexto); } catch (err) { alert("❌ Error: " + err.message); }
+        });
+      }
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") { if (modal.classList.contains("activo")) cerrarRazon(); if (nuevaModal.classList.contains("activo")) cerrarNuevaModal(); } });
+
+      if (btnAzar) {
+        btnAzar.addEventListener("click", () => {
+          if (btnAzar.disabled) return; btnAzar.disabled = true;
+          const ultima = parseInt(btnAzar.dataset.ultima || "-1", 10); let ganadora = Math.floor(Math.random() * razones.length);
+          if (ganadora === ultima && razones.length > 1) { ganadora = (ganadora + 1 + Math.floor(Math.random() * (razones.length - 1))) % razones.length; }
+          btnAzar.dataset.ultima = ganadora;
+          const todos = [...grid.querySelectorAll(".petalo")]; let vueltas = 0; const totalVueltas = 14; let delay = 60;
+          function destacarAleatorio() {
+            todos.forEach(p => p.classList.remove("destacado"));
+            const random = todos[Math.floor(Math.random() * todos.length)];
+            if (random) { random.classList.add("destacado"); random.scrollIntoView({ behavior: "smooth", block: "center" }); }
+            vueltas++;
+            if (vueltas < totalVueltas) { delay *= 1.14; setTimeout(destacarAleatorio, delay); } 
+            else {
+              todos.forEach(p => p.classList.remove("destacado")); const ganadorEl = todos[ganadora];
+              if (ganadorEl) { ganadorEl.classList.add("destacado"); ganadorEl.scrollIntoView({ behavior: "smooth", block: "center" }); }
+              setTimeout(() => {
+                if (ganadorEl) { const id = ganadorEl.dataset.id; const razon = razones.find(x => x.id === id); if (razon) abrirRazon(razon, ganadorEl); }
+                btnAzar.disabled = false;
+              }, 600);
+            }
+          }
+          destacarAleatorio();
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", async () => { await cargarRazones(); renderRazones(); });
+    })();
+  </script>
+</body>
+</html>

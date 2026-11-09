@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuponera 🎟️</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#f28ca6" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>" />
+
+<script type="module">
+  import { protegerRuta } from '../js/proteger.js';
+  document.documentElement.style.visibility = "hidden";
+  protegerRuta().then((datos) => {
+    if (datos) document.documentElement.style.visibility = "visible";
+  });
+</script>
+</head>
+<body class="page-inner" data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti 💕">
+
+  <nav class="nav-back"><a href="../index.html">← Volver</a></nav>
+
+  <header class="page-header">
+    <h1>Cuponera de Amor</h1>
+    <p>Canjea tus puntos por premios especiales 🎁</p>
+  </header>
+
+  <div class="cuponera-saldo">
+    <div class="saldo-card">
+      <span>💗 Saldo disponible</span>
+      <strong id="saldoPuntos">0</strong>
+      <small>puntos</small>
+    </div>
+    <a href="juego.html" class="btn btn-primary">🎮 Ganar más puntos</a>
+  </div>
+
+  <section class="cupones-grid" id="cuponesGrid"></section>
+
+  <footer class="footer"><p>Hecho con 💖 para ti</p></footer>
+
+  <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
+  <script src="../js/script.js"></script>
+  <script src="../js/cuponera.js"></script>
+ 
+  <script src="../js/confeti.js"></script>
+  <script src="../js/pwa.js"></script>
+</body>
+</html>

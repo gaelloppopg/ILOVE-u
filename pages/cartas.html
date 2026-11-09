@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartas 💜</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/animations.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Caveat:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#e9d5ff" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>" />
+
+  <!-- VALIDACIÓN DE SESIÓN -->
+  <script type="module">
+    import { protegerRuta } from '../js/proteger.js';
+    document.documentElement.style.visibility = "hidden";
+    protegerRuta().then((datos) => {
+      if (datos) document.documentElement.style.visibility = "visible";
+    });
+  </script>
+
+  <style>
+    html, body.cartas-page { margin: 0; padding: 0; min-height: 100vh; }
+    body.cartas-page { background: #f7ecff; color: #3a2145; font-family: 'Inter', sans-serif; position: relative; overflow-x: hidden; overflow-y: auto; }
+    body.cartas-page::before { content: ""; position: fixed; inset: 0; background: radial-gradient(ellipse at 15% 15%, rgba(233, 213, 255, 0.9), transparent 55%), radial-gradient(ellipse at 85% 20%, rgba(255, 214, 232, 0.85), transparent 55%), radial-gradient(ellipse at 20% 85%, rgba(255, 230, 240, 0.9), transparent 55%), radial-gradient(ellipse at 85% 85%, rgba(240, 220, 255, 0.9), transparent 55%), linear-gradient(180deg, #fbf5ff 0%, #f5e8ff 50%, #fbeef7 100%); z-index: -2; pointer-events: none; }
+    body.cartas-page::after { content: ""; position: fixed; inset: 0; background-image: radial-gradient(circle at 12% 22%, rgba(201, 156, 240, 0.35) 1.5px, transparent 2px), radial-gradient(circle at 76% 18%, rgba(240, 170, 200, 0.4) 1.5px, transparent 2px), radial-gradient(circle at 44% 76%, rgba(201, 156, 240, 0.3) 1.5px, transparent 2px), radial-gradient(circle at 88% 60%, rgba(240, 170, 200, 0.35) 1.5px, transparent 2px), radial-gradient(circle at 22% 58%, rgba(220, 180, 250, 0.35) 1.5px, transparent 2px), radial-gradient(circle at 65% 40%, rgba(255, 200, 220, 0.3) 1.5px, transparent 2px); z-index: -1; pointer-events: none; animation: titilarEstrellas 7s ease-in-out infinite alternate; }
+    @keyframes titilarEstrellas { 0% { opacity: 0.5; } 100% { opacity: 0.9; } }
+    body.cartas-page .nav-back { position: fixed; top: 0; left: 0; right: 0; padding: 16px 30px; background: rgba(255, 250, 255, 0.65); border-bottom: 1px solid rgba(180, 130, 240, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 100; }
+    body.cartas-page .nav-back a { color: #6a4780; font-size: 0.75rem; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; transition: color 0.3s ease; text-decoration: none; }
+    body.cartas-page .nav-back a:hover { color: #a874e8; }
+    .cartas-header { position: relative; z-index: 5; max-width: 1000px; margin: 0 auto; padding: 100px 24px 20px; text-align: center; pointer-events: none; }
+    .cartas-hero-badge { display: inline-block; font-family: 'Inter', sans-serif; font-size: 0.62rem; letter-spacing: 8px; text-transform: uppercase; color: #a874e8; font-weight: 500; margin-bottom: 18px; position: relative; padding: 0 22px; opacity: 0.85; animation: fadeInCartas 1.2s ease 0.2s both; }
+    .cartas-hero-badge::before, .cartas-hero-badge::after { content: ""; position: absolute; top: 50%; width: 24px; height: 1px; background: #c99cf0; opacity: 0.6; }
+    .cartas-hero-badge::before { left: -12px; } .cartas-hero-badge::after { right: -12px; }
+    .cartas-header h1 { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.8rem, 4.5vw, 3rem); font-weight: 400; line-height: 1.1; letter-spacing: -0.015em; color: #3a2145; margin-bottom: 14px; animation: fadeInCartas 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both; }
+    .cartas-header h1 em { color: #a874e8; font-style: italic; }
+    .cartas-header p { font-family: 'Cormorant Garamond', serif; font-size: clamp(0.98rem, 1.4vw, 1.15rem); font-style: italic; font-weight: 300; color: #7a5c8c; line-height: 1.6; max-width: 520px; margin: 0 auto; animation: fadeInCartas 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both; }
+    @keyframes fadeInCartas { from { opacity: 0; transform: translateY(18px); filter: blur(6px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+    .cartas-contador-pill { display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 9px 20px; background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(180, 130, 240, 0.2); border-radius: 50px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 6px 20px rgba(160, 100, 220, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5); font-family: 'Inter', sans-serif; font-size: 0.72rem; letter-spacing: 1px; color: #6a4780; font-weight: 500; pointer-events: auto; animation: fadeInCartas 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both; }
+    .cartas-contador-pill::before { content: "✦"; color: #c99cf0; font-size: 0.9rem; }
+    .cartas-contador-pill #proximaCarta { font-variant-numeric: tabular-nums; color: #a874e8; font-weight: 600; letter-spacing: 1.5px; }
+    .burbujas-escenario { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 3; overflow: hidden; pointer-events: none; }
+    .burbuja-carta { position: absolute; width: 190px; height: 190px; border-radius: 50%; cursor: grab; pointer-events: auto; user-select: none; -webkit-tap-highlight-color: transparent; will-change: transform; top: 0; left: 0; touch-action: none; }
+    .burbuja-carta:active { cursor: grabbing; }
+    .burbuja-glass { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0%, rgba(245, 230, 255, 0.7) 18%, rgba(228, 205, 255, 0.55) 40%, rgba(240, 200, 230, 0.5) 60%, rgba(200, 160, 240, 0.4) 85%, rgba(180, 140, 230, 0.35) 100%); border: 1px solid rgba(255, 255, 255, 0.85); box-shadow: 0 15px 40px rgba(180, 130, 240, 0.25), 0 5px 15px rgba(200, 160, 240, 0.2), 0 0 40px rgba(220, 180, 255, 0.4), inset 0 0 30px rgba(255, 255, 255, 0.5), inset 0 -20px 40px rgba(200, 160, 240, 0.25); transition: box-shadow 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .burbuja-glass::before { content: ""; position: absolute; top: 10%; left: 16%; width: 42%; height: 24%; background: radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.5) 40%, transparent 75%); border-radius: 50%; filter: blur(4px); pointer-events: none; }
+    .burbuja-glass::after { content: ""; position: absolute; bottom: 16%; right: 20%; width: 16%; height: 10%; background: radial-gradient(ellipse at center, rgba(255, 220, 240, 0.9), transparent 75%); border-radius: 50%; filter: blur(3px); pointer-events: none; }
+    .burbuja-carta:hover .burbuja-glass { box-shadow: 0 20px 60px rgba(160, 100, 220, 0.4), 0 0 70px rgba(220, 180, 255, 0.55), inset 0 0 40px rgba(255, 255, 255, 0.7), inset 0 -25px 50px rgba(200, 160, 240, 0.35); transform: scale(1.06); }
+    .burbuja-contenido { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 18px; z-index: 3; pointer-events: none; }
+    .burbuja-corazon { font-size: 1.9rem; color: #a874e8; text-shadow: 0 0 15px rgba(201, 156, 240, 0.8), 0 0 30px rgba(180, 130, 240, 0.5); margin-bottom: 12px; animation: latirCorazon 3s ease-in-out infinite; filter: drop-shadow(0 2px 4px rgba(160, 100, 220, 0.3)); }
+    @keyframes latirCorazon { 0%, 100% { transform: scale(1); } 25% { transform: scale(1.15); } 50% { transform: scale(1); } 75% { transform: scale(1.1); } }
+    .burbuja-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.92rem; color: #4a2a5a; line-height: 1.3; max-width: 140px; opacity: 0.95; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6); }
+    .burbuja-hint { font-family: 'Inter', sans-serif; font-size: 0.52rem; letter-spacing: 4px; text-transform: uppercase; color: #a874e8; margin-top: 10px; opacity: 0; transition: opacity 0.4s ease; font-weight: 600; }
+    .burbuja-carta:hover .burbuja-hint { opacity: 1; }
+    .burbuja-carta.bloqueada { cursor: not-allowed; filter: saturate(0.4); }
+    .burbuja-carta.bloqueada .burbuja-glass { background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.8) 0%, rgba(230, 220, 240, 0.6) 20%, rgba(200, 190, 220, 0.5) 45%, rgba(180, 170, 200, 0.45) 75%, rgba(160, 150, 180, 0.4) 100%); border-color: rgba(255, 255, 255, 0.7); box-shadow: 0 12px 30px rgba(150, 140, 170, 0.2), inset 0 0 30px rgba(255, 255, 255, 0.4); }
+    .burbuja-carta.bloqueada .burbuja-corazon { animation: none; opacity: 0.55; color: #8a7a9a; font-size: 1.4rem; }
+    .burbuja-carta.bloqueada .burbuja-titulo { color: #6a5a7a; font-style: normal; font-size: 0.8rem; opacity: 0.75; }
+    .burbuja-carta.bloqueada:hover .burbuja-glass { transform: none; }
+    .burbuja-lock-tiempo { font-family: 'Inter', sans-serif; font-size: 0.68rem; letter-spacing: 1.5px; color: #8a7a9a; font-variant-numeric: tabular-nums; margin-top: 8px; font-weight: 500; }
+    .burbuja-carta.abriendo .burbuja-glass { animation: abrirBurbuja 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes abrirBurbuja { 0% { transform: scale(1); } 35% { transform: scale(1.25); filter: brightness(1.3); } 100% { transform: scale(0.6); opacity: 0; } }
+    .burbuja-particulas { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+    .burbuja-particula { position: absolute; top: 50%; left: 50%; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle, #ffffff, rgba(201, 156, 240, 0.8)); box-shadow: 0 0 10px rgba(201, 156, 240, 0.9); transform: translate(-50%, -50%); opacity: 0; }
+    .burbuja-carta.abriendo .burbuja-particula { animation: salirParticula 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes salirParticula { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); } 100% { opacity: 0; transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(1.6); } }
+    .carta-modal { position: fixed; inset: 0; z-index: 9999; background: rgba(60, 30, 90, 0.55); display: flex; align-items: center; justify-content: center; padding: 30px 20px; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .carta-modal.activo { opacity: 1; pointer-events: auto; }
+    .carta-papel { position: relative; max-width: 700px; width: 100%; max-height: 86vh; overflow-y: auto; padding: 55px 50px 50px; background: linear-gradient(160deg, #fff9fc 0%, #fdf2f8 50%, #f8ecff 100%); border: 1px solid rgba(200, 160, 240, 0.4); border-radius: 10px; box-shadow: 0 40px 100px rgba(120, 60, 180, 0.35), 0 0 100px rgba(200, 160, 240, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.9); transform: scale(0.85) rotateX(8deg); opacity: 0; transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s ease; z-index: 2; scrollbar-width: thin; scrollbar-color: rgba(180, 130, 240, 0.5) transparent; }
+    .carta-papel::-webkit-scrollbar { width: 6px; } .carta-papel::-webkit-scrollbar-thumb { background: rgba(180, 130, 240, 0.4); border-radius: 50px; }
+    .carta-modal.activo .carta-papel { transform: scale(1) rotateX(0); opacity: 1; }
+    .carta-papel::before, .carta-papel::after { content: ""; position: absolute; left: 8%; right: 8%; height: 1px; background: linear-gradient(to right, transparent, rgba(200, 160, 240, 0.6), transparent); pointer-events: none; }
+    .carta-papel::before { top: 20px; } .carta-papel::after { bottom: 20px; }
+    .carta-modal-cerrar { position: absolute; top: 22px; right: 22px; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(180, 130, 240, 0.4); background: rgba(255, 255, 255, 0.9); color: #a874e8; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 5; font-family: 'Inter', sans-serif; box-shadow: 0 6px 20px rgba(180, 130, 240, 0.25); }
+    .carta-modal-cerrar:hover { background: #a874e8; color: #fff; transform: rotate(90deg) scale(1.05); box-shadow: 0 10px 30px rgba(180, 130, 240, 0.5); }
+    .carta-modal-fecha { font-family: 'Inter', sans-serif; font-size: 0.62rem; letter-spacing: 6px; text-transform: uppercase; color: #a874e8; opacity: 0.85; margin-bottom: 18px; font-weight: 600; text-align: center; }
+    .carta-modal-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(1.35rem, 3vw, 1.9rem); font-weight: 400; color: #3a2145; text-align: center; margin-bottom: 32px; line-height: 1.25; letter-spacing: -0.01em; position: relative; padding-bottom: 22px; }
+    .carta-modal-titulo::after { content: "❦"; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); color: #c99cf0; font-size: 1.1rem; }
+    .carta-modal-cuerpo { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.05rem, 1.5vw, 1.2rem); font-weight: 400; line-height: 1.85; color: #4a2a5a; letter-spacing: 0.005em; text-align: left; white-space: pre-wrap; }
+    .carta-modal-cuerpo::first-letter { font-family: 'Playfair Display', serif; font-size: 3.4rem; font-weight: 400; font-style: italic; color: #a874e8; float: left; line-height: 0.9; padding: 6px 14px 0 0; }
+    .carta-modal-firma { margin-top: 38px; text-align: right; font-family: 'Caveat', cursive; font-size: 1.6rem; color: #a874e8; font-weight: 700; transform: rotate(-2deg); }
+    body.cartas-page .footer { position: relative; z-index: 5; border-top: 1px solid rgba(180, 130, 240, 0.15); color: #7a5c8c; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; padding: 40px 20px; text-align: center; margin-top: 500px; }
+    body.cartas-page .footer a { color: #a874e8; transition: color 0.3s ease; }
+    body.cartas-page .footer a:hover { color: #6a4780; }
+    @media (max-width: 768px) {
+      .cartas-header { padding: 90px 20px 15px; }
+      .burbuja-carta { width: 140px; height: 140px; }
+      .burbuja-corazon { font-size: 1.5rem; margin-bottom: 8px; }
+      .burbuja-titulo { font-size: 0.8rem; max-width: 110px; }
+      .burbuja-hint { font-size: 0.48rem; letter-spacing: 3px; }
+      .carta-papel { padding: 40px 28px 35px; }
+      .carta-modal-cerrar { top: 14px; right: 14px; width: 42px; height: 42px; font-size: 1.1rem; }
+      body.cartas-page .footer { margin-top: 400px; }
+    }
+    @media (max-width: 480px) {
+      .burbuja-carta { width: 120px; height: 120px; }
+      .carta-papel { padding: 36px 22px 32px; }
+      .carta-modal-cuerpo::first-letter { font-size: 2.6rem; padding: 4px 10px 0 0; }
+    }
+  </style>
+</head>
+<body class="page-inner cartas-page" data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti 💕">
+
+  <nav class="nav-back"><a href="../index.html">← Volver al inicio</a></nav>
+
+  <header class="cartas-header">
+    <span class="cartas-hero-badge">Cartas que guardé para ti</span>
+    <h1>Cartas <em>para ti</em></h1>
+    <p>Toca una burbuja para abrir la carta que hay dentro.</p>
+  </header>
+
+  <div class="burbujas-escenario" id="burbujasEscenario"></div>
+
+  <footer class="footer"><p>Ahora → <a href="razones.html">Mil razones</a></p></footer>
+
+  <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
+  <script src="../js/script.js"></script>
+ 
+  <script src="../js/confeti.js"></script>
+  <script src="../js/pwa.js"></script>
+
+  <div class="carta-modal" id="cartaModal">
+    <button class="carta-modal-cerrar" id="cartaModalCerrar" aria-label="Cerrar">✕</button>
+    <div class="carta-papel">
+      <div class="carta-modal-fecha" id="cartaModalFecha"></div>
+      <h2 class="carta-modal-titulo" id="cartaModalTitulo"></h2>
+      <div class="carta-modal-cuerpo" id="cartaModalCuerpo"></div>
+      <div class="carta-modal-firma" id="cartaModalFirma">— Con todo mi amor.</div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from '../js/supabase.js';
+
+    (function () {
+      let CARTAS = [];
+      let coupleId = null;
+
+      // Clase Burbuja (física)
+      class Burbuja {
+        constructor(elemento, index) {
+          this.el = elemento; this.index = index;
+          this.w = elemento.offsetWidth || 190; this.h = elemento.offsetHeight || 190;
+          this.x = Math.random() * Math.max(1, window.innerWidth - this.w);
+          this.y = Math.random() * Math.max(1, window.innerHeight - this.h);
+          const vel = 1.6 + Math.random() * 0.8;
+          const angulo = Math.random() * Math.PI * 2;
+          this.vx = Math.cos(angulo) * vel; this.vy = Math.sin(angulo) * vel;
+          this.fase = Math.random() * Math.PI * 2;
+          this.pausada = false; this.arrastrando = false;
+          this.render();
+        }
+        update() {
+          if (this.pausada || this.arrastrando) { this.render(); return; }
+          this.fase += 0.025;
+          const flotarX = Math.sin(this.fase) * 0.15;
+          const flotarY = Math.cos(this.fase * 0.8) * 0.15;
+          this.x += this.vx + flotarX; this.y += this.vy + flotarY;
+          const centroX = (window.innerWidth - this.w) / 2; const centroY = (window.innerHeight - this.h) / 2;
+          this.vx += (centroX - this.x) * 0.00004; this.vy += (centroY - this.y) * 0.00004;
+          const velMax = 2.2; const vel = Math.hypot(this.vx, this.vy);
+          if (vel > velMax) { this.vx = (this.vx / vel) * velMax; this.vy = (this.vy / vel) * velMax; }
+          if (this.x <= 0) { this.x = 0; this.vx = Math.abs(this.vx) * 1.02 + 0.1; }
+          if (this.x + this.w >= window.innerWidth) { this.x = window.innerWidth - this.w; this.vx = -Math.abs(this.vx) * 1.02 - 0.1; }
+          if (this.y <= 0) { this.y = 0; this.vy = Math.abs(this.vy) * 1.02 + 0.1; }
+          if (this.y + this.h >= window.innerHeight) { this.y = window.innerHeight - this.h; this.vy = -Math.abs(this.vy) * 1.02 - 0.1; }
+          this.render();
+        }
+        render() { this.el.style.transform = `translate3d(${this.x}px, ${this.y}px, 0)`; }
+        colisionar(otra) {
+          if (this === otra) return;
+          const dx = (this.x + this.w / 2) - (otra.x + otra.w / 2);
+          const dy = (this.y + this.h / 2) - (otra.y + otra.h / 2);
+          const dist = Math.hypot(dx, dy); const minDist = (this.w + otra.w) / 2;
+          if (dist < minDist && dist > 0.01) {
+            const nx = dx / dist; const ny = dy / dist;
+            const overlap = (minDist - dist) / 2;
+            this.x += nx * overlap; this.y += ny * overlap;
+            otra.x -= nx * overlap; otra.y -= ny * overlap;
+            const p = (this.vx - otra.vx) * nx + (this.vy - otra.vy) * ny;
+            if (p > 0) { this.vx -= p * nx * 1.05; this.vy -= p * ny * 1.05; otra.vx += p * nx * 1.05; otra.vy += p * ny * 1.05; }
+          }
+        }
+      }
+
+      let burbujas = []; let offsetX = 0, offsetY = 0;
+
+      function crearBurbujas() {
+        const escenario = document.getElementById("burbujasEscenario");
+        if (!escenario) return;
+        
+        // Si no hay cartas creadas en el panel
+        if (CARTAS.length === 0) {
+          escenario.innerHTML = '<div style="text-align:center;padding:50px;color:#888;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;">Aún no hay cartas creadas.</div>';
+          return;
+        }
+
+        const desbloqueadas = CARTAS.length; // Mostramos todas las que estén creadas
+
+        CARTAS.forEach((carta, i) => {
+          const abierta = true; // Para simplificar, todas las cartas creadas se pueden abrir
+
+          const burbuja = document.createElement("div");
+          burbuja.className = `burbuja-carta ${abierta ? "" : "bloqueada"}`;
+          burbuja.dataset.index = i;
+          burbuja.innerHTML = `
+            <div class="burbuja-glass"></div>
+            <div class="burbuja-contenido">
+              <div class="burbuja-corazon">${abierta ? "❦" : "🔒"}</div>
+              <div class="burbuja-titulo">${carta.titulo}</div>
+              ${abierta ? `<div class="burbuja-hint">Abrir carta</div>` : ``}
+            </div>
+            <div class="burbuja-particulas"></div>
+          `;
+          escenario.appendChild(burbuja);
+          const b = new Burbuja(burbuja, i);
+          burbujas.push(b);
+          
+          burbuja.addEventListener("click", (e) => {
+            if (burbuja.classList.contains("abriendo")) return;
+            e.stopPropagation(); abrirBurbuja(b, carta);
+          });
+          burbuja.addEventListener("pointerdown", (e) => {
+            b.arrastrando = true;
+            const rect = burbuja.getBoundingClientRect();
+            offsetX = e.clientX - rect.left; offsetY = e.clientY - rect.top;
+            burbuja.setPointerCapture(e.pointerId); e.stopPropagation();
+          });
+          burbuja.addEventListener("pointermove", (e) => {
+            if (!b.arrastrando) return;
+            b.x = e.clientX - offsetX; b.y = e.clientY - offsetY;
+            b.vx = 0; b.vy = 0; b.render();
+          });
+          const soltar = () => {
+            if (b.arrastrando) {
+              b.arrastrando = false;
+              b.vx = (Math.random() - 0.5) * 2.5; b.vy = (Math.random() - 0.5) * 2.5;
+            }
+          };
+          burbuja.addEventListener("pointerup", soltar);
+          burbuja.addEventListener("pointercancel", soltar);
+          burbuja.addEventListener("pointerleave", soltar);
+        });
+      }
+
+      function abrirBurbuja(b, carta) {
+        const burbujaEl = b.el; b.pausada = true;
+        const particulasCont = burbujaEl.querySelector(".burbuja-particulas");
+        particulasCont.innerHTML = ""; const total = 18;
+        for (let i = 0; i < total; i++) {
+          const p = document.createElement("div"); p.className = "burbuja-particula";
+          const angulo = (Math.PI * 2 * i) / total; const dist = 90 + Math.random() * 70;
+          p.style.setProperty("--dx", (Math.cos(angulo) * dist) + "px");
+          p.style.setProperty("--dy", (Math.sin(angulo) * dist) + "px");
+          p.style.animationDelay = (Math.random() * 0.15) + "s";
+          particulasCont.appendChild(p);
+        }
+        burbujaEl.classList.add("abriendo");
+        if (window.lanzarConfeti) window.lanzarConfeti(1000);
+        setTimeout(() => {
+          abrirModal(carta);
+          burbujaEl.classList.remove("abriendo");
+          b.pausada = false;
+          b.vx = (Math.random() - 0.5) * 2.5; b.vy = (Math.random() - 0.5) * 2.5;
+        }, 850);
+      }
+
+      const modal = document.getElementById("cartaModal");
+      const modalCerrar = document.getElementById("cartaModalCerrar");
+      const modalFecha = document.getElementById("cartaModalFecha");
+      const modalTitulo = document.getElementById("cartaModalTitulo");
+      const modalCuerpo = document.getElementById("cartaModalCuerpo");
+      const modalFirma = document.getElementById("cartaModalFirma");
+
+      function abrirModal(carta) {
+        modalFecha.textContent = "Carta"; 
+        modalTitulo.textContent = carta.titulo;
+        modalCuerpo.textContent = carta.contenido; 
+        modalFirma.textContent = carta.firma || "— Con todo mi amor.";
+        modal.classList.add("activo"); document.body.style.overflow = "hidden";
+      }
+      function cerrarModal() { modal.classList.remove("activo"); document.body.style.overflow = ""; }
+      modalCerrar.addEventListener("click", cerrarModal);
+      modal.addEventListener("click", (e) => { if (e.target === modal) cerrarModal(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarModal(); });
+
+      function animar() {
+        burbujas.forEach(b => b.update());
+        for (let i = 0; i < burbujas.length; i++) { for (let j = i + 1; j < burbujas.length; j++) { burbujas[i].colisionar(burbujas[j]); } }
+        requestAnimationFrame(animar);
+      }
+
+      async function init() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: couple } = await supabase.from('couples').select('id').or(`owner_id.eq.${user.id},partner_id.eq.${user.id}`).maybeSingle();
+        if (!couple) return;
+        coupleId = couple.id;
+
+        const { data, error } = await supabase.from('cartas').select('*').eq('couple_id', coupleId).order('created_at', { ascending: true });
+        
+        if (!error && data) {
+          CARTAS = data;
+        }
+
+        crearBurbujas(); 
+        animar();
+        document.getElementById("proximaCarta").style.display = "none"; // Ocultamos el contador porque ahora no hay bloqueo por tiempo
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    })();
+  </script>
+</body>
+</html>
