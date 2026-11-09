@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/animations.css" />
   <link rel="stylesheet" href="css/responsive.css" />
-  <!-- 🛑 CSS DEL MODO CINE 🛑 -->
   <link rel="stylesheet" href="css/modo-cine.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;600&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="manifest" href="manifest.json" />
@@ -125,6 +124,7 @@
     .btn-recuerdo-flotante { position: fixed; bottom: 20px; right: 20px; z-index: 9998; width: 56px; height: 56px; border-radius: 50%; background: #fff; border: 1px solid rgba(242, 140, 166, 0.2); color: var(--rosa-profundo); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.1); transition: all 0.3s ease; font-size: 1.5rem; }
     .btn-recuerdo-flotante:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 15px 35px rgba(0,0,0,0.15); background: #fdfafb; }
 
+    /* El único botón de Modo Cine (Cámara) */
     .btn-modo-cine { position: fixed; top: 80px; right: 20px; z-index: 9997; width: 50px; height: 50px; border-radius: 50%; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: all 0.3s ease; }
     .btn-modo-cine:hover { transform: scale(1.1); background: var(--dorado-suave); color: #1a1a1a; }
     .btn-modo-cine svg { width: 22px; height: 22px; fill: currentColor; }
@@ -180,14 +180,16 @@
     <div class="scroll-hint">↓</div>
   </section>
 
-  <!-- 2. EL SOBRE SECRETO -->
+  <!-- 2. EL SOBRE SECRETO (CON TOOLTIP DIDÁCTICO) -->
   <section class="sobre-section" id="seccionSobre">
     <h2 class="sobre-titulo">Un mensaje para ti</h2>
     <p class="sobre-sub">Presiona el sobre para descubrir lo que guardé hoy.</p>
     <div class="sobre-btn" id="btnAbrirSobre"></div>
     <div class="mensaje-sobre" id="mensajeSobre">
-      <p>"Eres mi persona favorita en el mundo entero."</p>
+      <p id="textoCartaSecreta">"Eres mi persona favorita en el mundo entero."</p>
+      <small id="autorCartaSecreta" style="display:block; margin-top: 15px; font-family: 'Poppins'; font-size: 0.8rem; color: #888;"></small>
     </div>
+    <!-- Tooltip -->
     <div class="tooltip" id="tooltipSobre" style="top: 20px; left: 50%; transform: translateX(-50%);">¡Haz clic aquí para abrir tu carta diaria! ✨</div>
   </section>
 
@@ -283,14 +285,14 @@
   <!-- 🛑 CONTENEDOR DEL MODO CINE (Se llena dinámicamente) 🛑 -->
   <div class="cine-container" id="cineContainer"></div>
 
-  <!-- 🛑 ÚNICO BOTÓN DEL MODO CINE (Flotante) 🛑 -->
+  <!-- Botón Flotante Recuerdo del Día (Se mantiene) -->
+  <button class="btn-recuerdo-flotante" id="btnVerRecuerdo" title="Recuerdo del Día">📸</button>
+  
+  <!-- 🛑 ÚNICO BOTÓN DEL MODO CINE (Cámara - Flotante) 🛑 -->
   <button class="btn-modo-cine" id="btnModoCine" title="Modo Cine" style="display: none;">
     <svg viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
   </button>
 
-  <!-- Botón Flotante Recuerdo del Día -->
-  <button class="btn-recuerdo-flotante" id="btnVerRecuerdo" title="Recuerdo del Día">📸</button>
-  
   <!-- Modal Recuerdo del Día -->
   <div class="modal-recuerdo" id="modalRecuerdo">
     <div class="recuerdo-card-modal">
@@ -308,15 +310,20 @@
     import { supabase } from './js/supabase.js';
     import { iniciarRealtimeGlobal } from './js/realtime.js';
 
+    // 🛑 LÓGICA DIDÁCTICA: ONBOARDING BÁSICO
     function iniciarOnboarding() {
       if (localStorage.getItem('onboarding_hecho')) return;
+      
       const tooltipSobre = document.getElementById('tooltipSobre');
       if (tooltipSobre) {
         setTimeout(() => {
           tooltipSobre.classList.add('visible');
-          setTimeout(() => { tooltipSobre.classList.remove('visible'); }, 6000);
+          setTimeout(() => {
+            tooltipSobre.classList.remove('visible');
+          }, 6000);
         }, 2000);
       }
+      
       localStorage.setItem('onboarding_hecho', 'true');
     }
 
@@ -365,66 +372,58 @@
       `;
     }
 
-    // 🛑 LÓGICA DEL MODO CINE (Cinta Infinita y Cierre Total) 🛑
-    function abrirModoCine(fondos) {
-      const container = document.getElementById('cineContainer');
-      const body = document.body;
+    // 🛑 FUNCIÓN PARA DETECTAR EL MOMENTO DEL DÍA 🛑
+    function obtenerMomentoDelDia() {
+      const hora = new Date().getHours();
+      if (hora >= 6 && hora < 12) return 'manana';
+      if (hora >= 12 && hora < 19) return 'tarde';
+      return 'noche';
+    }
 
-      if (!fondos || fondos.length === 0) return;
+    // 🛑 LÓGICA PARA CARGAR Y MOSTRAR LA CARTA SECRETA 🛑
+    async function configurarCartaSecreta(coupleId) {
+      const hoyStr = new Date().toISOString().split('T')[0];
+      const momentoActual = obtenerMomentoDelDia();
 
-      // 1. Duplicar las fotos para que la cinta no tenga huecos
-      let fotosRepetidas = [];
-      const repeticiones = Math.max(6, Math.ceil(20 / fondos.length)); 
-      for (let i = 0; i < repeticiones; i++) {
-        fotosRepetidas = fotosRepetidas.concat(fondos);
+      // 1. Buscar si hay una carta específica para HOY
+      const { data: cartaFecha } = await supabase.from('cartas_secretas')
+        .select('*')
+        .eq('couple_id', coupleId)
+        .eq('fecha_especifica', hoyStr)
+        .maybeSingle();
+
+      if (cartaFecha) {
+        mostrarCarta(cartaFecha.contenido, cartaFecha.autor);
+        return;
       }
 
-      // 2. Inyectar el HTML
-      container.innerHTML = `
-        <div class="cine-sala-oscura"></div>
-        <div class="cine-proyector-luz"></div>
-        <div class="cine-grano"></div>
-        <div class="cine-rayas"></div>
-        
-        <div class="cine-barra-superior"></div>
-        <div class="cine-barra-inferior"></div>
+      // 2. Buscar si hay cartas para el momento actual (mañana, tarde, noche)
+      const { data: cartasMomento } = await supabase.from('cartas_secretas')
+        .select('*')
+        .eq('couple_id', coupleId)
+        .eq('momento', momentoActual);
 
-        <div class="cine-cinta-wrapper">
-          <div class="cine-cinta-agujeros"></div>
-          <!-- La duración se calcula según la cantidad de fotos para mantener la velocidad -->
-          <div class="cine-carrusel" id="cineCarrusel" style="animation-duration: ${fotosRepetidas.length * 10}s;">
-            ${fotosRepetidas.map(foto => `
-              <div class="cine-fotograma">
-                <img src="${foto}" alt="Recuerdo" loading="lazy">
-                <div class="cine-fotograma-flicker"></div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
+      if (cartasMomento && cartasMomento.length > 0) {
+        // Elegir una al azar entre las de este momento
+        const cartaAleatoria = cartasMomento[Math.floor(Math.random() * cartasMomento.length)];
+        mostrarCarta(cartaAleatoria.contenido, cartaAleatoria.autor);
+        return;
+      }
 
-        <div class="cine-texto">
-          <h2>Nuestros Momentos</h2>
-          <p>Haz clic en cualquier lugar para salir</p>
-        </div>
-      `;
+      // 3. Si no hay nada programado, usar el fallback (predeterminadas)
+      const cartaFallback = "Eres mi persona favorita en el mundo entero. Incluso en los días grises, mi lugar seguro eres tú.";
+      mostrarCarta(cartaFallback, "Con amor, siempre.");
+    }
 
-      body.classList.add('modo-cine-activo');
-
-      // 3. Función para cerrar
-      const cerrarCine = () => {
-        body.classList.remove('modo-cine-activo');
-        setTimeout(() => { container.innerHTML = ''; }, 1000); 
-        document.removeEventListener('keydown', escucharEsc);
-      };
-
-      // Cualquier clic en el contenedor cierra el modo cine
-      container.addEventListener('click', cerrarCine);
-
-      // Salir con ESC
-      const escucharEsc = (e) => {
-        if (e.key === 'Escape') cerrarCine();
-      };
-      document.addEventListener('keydown', escucharEsc);
+    function mostrarCarta(contenido, autor) {
+      document.getElementById('textoCartaSecreta').textContent = `"${contenido}"`;
+      const autorEl = document.getElementById('autorCartaSecreta');
+      if (autor) {
+        autorEl.textContent = `— ${autor}`;
+        autorEl.style.display = 'block';
+      } else {
+        autorEl.style.display = 'none';
+      }
     }
 
     async function initIndex() {
@@ -436,15 +435,6 @@
         if (!datos) return;
 
         iniciarOnboarding();
-
-        if (datos.couple && datos.couple.portada_url) {
-          const portadaImg = document.getElementById('portadaImg');
-          if (portadaImg) {
-            portadaImg.src = datos.couple.portada_url;
-            portadaImg.style.display = 'block';
-            portadaImg.style.opacity = '0.35';
-          }
-        }
 
         if (datos.couple && datos.couple.fecha_inicio) {
           const dateObj = new Date(datos.couple.fecha_inicio + 'T00:00:00');
@@ -463,16 +453,23 @@
           if (btnInvitar) btnInvitar.remove();
         }
 
-        // 🛑 CONFIGURAR BOTÓN DE MODO CINE 🛑
-        const btnModoCine = document.getElementById('btnModoCine');
-        if (datos.couple && datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
-          if (btnModoCine) {
-            btnModoCine.style.display = 'flex';
-            btnModoCine.onclick = () => abrirModoCine(datos.couple.fondos_modo_cine);
+        // 🛑 CARGAR PORTADA PERSONALIZADA 🛑
+        if (datos.couple && datos.couple.portada_url) {
+          const portadaImg = document.getElementById('portadaImg');
+          if (portadaImg) {
+            portadaImg.src = datos.couple.portada_url;
+            portadaImg.style.display = 'block';
+            portadaImg.style.opacity = '0.35';
           }
-        } else {
-          if (btnModoCine) btnModoCine.style.display = 'none';
         }
+
+        // 🛑 MODO NOCHE AUTOMÁTICO 🛑
+        if (obtenerMomentoDelDia() === 'noche') {
+          document.body.classList.add('modo-noche');
+        }
+
+        // 🛑 CARGAR LA CARTA SECRETA 🛑
+        await configurarCartaSecreta(datos.couple.id);
 
         const musicCard = document.getElementById('musicCard');
         if (musicCard) {
@@ -504,6 +501,17 @@
         if (datos.couple) {
           cargarRecuerdoDelDia(datos.couple.id);
           iniciarRealtimeGlobal(datos.couple.id);
+
+          // 🛑 CONFIGURAR BOTÓN DE MODO CINE (Solo la cámara) 🛑
+          const btnModoCine = document.getElementById('btnModoCine');
+          if (datos.couple && datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
+            if (btnModoCine) {
+              btnModoCine.style.display = 'flex';
+              btnModoCine.onclick = () => abrirModoCine(datos.couple.fondos_modo_cine);
+            }
+          } else {
+            if (btnModoCine) btnModoCine.style.display = 'none';
+          }
 
           window.addEventListener('supabase-cambio', (e) => {
             if (e.detail.tabla === 'recuerdos' || e.detail.tabla === 'mapa_recuerdos') {
@@ -573,6 +581,67 @@
         modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('activo'); });
       }
     });
+
+    // 🛑 LÓGICA DEL MODO CINE (Cinta Infinita y Cierre Total) 🛑
+    function abrirModoCine(fondos) {
+      const container = document.getElementById('cineContainer');
+      const body = document.body;
+
+      if (!fondos || fondos.length === 0) return;
+
+      // 1. Duplicar las fotos para que la cinta no tenga huecos
+      let fotosRepetidas = [];
+      const repeticiones = Math.max(6, Math.ceil(20 / fondos.length)); 
+      for (let i = 0; i < repeticiones; i++) {
+        fotosRepetidas = fotosRepetidas.concat(fondos);
+      }
+
+      // 2. Inyectar el HTML
+      container.innerHTML = `
+        <div class="cine-sala-oscura"></div>
+        <div class="cine-proyector-luz"></div>
+        <div class="cine-grano"></div>
+        <div class="cine-rayas"></div>
+        
+        <div class="cine-barra-superior"></div>
+        <div class="cine-barra-inferior"></div>
+
+        <div class="cine-cinta-wrapper">
+          <div class="cine-cinta-agujeros"></div>
+          <div class="cine-carrusel" id="cineCarrusel" style="animation-duration: ${fotosRepetidas.length * 10}s;">
+            ${fotosRepetidas.map(foto => `
+              <div class="cine-fotograma">
+                <img src="${foto}" alt="Recuerdo" loading="lazy">
+                <div class="cine-fotograma-flicker"></div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="cine-texto">
+          <h2>Nuestros Momentos</h2>
+          <p>Haz clic en cualquier lugar para salir</p>
+        </div>
+      `;
+
+      body.classList.add('modo-cine-activo');
+
+      // 3. Función para cerrar
+      const cerrarCine = () => {
+        body.classList.remove('modo-cine-activo');
+        setTimeout(() => { container.innerHTML = ''; }, 1000); 
+        document.removeEventListener('keydown', escucharEsc);
+      };
+
+      // Cualquier clic en el contenedor cierra el modo cine
+      container.addEventListener('click', cerrarCine);
+
+      // Salir con ESC
+      const escucharEsc = (e) => {
+        if (e.key === 'Escape') cerrarCine();
+      };
+      document.addEventListener('keydown', escucharEsc);
+    }
   </script>
 
   <script>

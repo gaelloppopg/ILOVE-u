@@ -2092,3 +2092,55 @@ input[type="file"] {
     height: 80px;
   }
 }
+/* MODO NOCHE (Se activa automáticamente de noche) */
+body.modo-noche {
+  background-color: #0f0c10 !important;
+  color: #e0d8dc !important;
+}
+
+body.modo-noche .hero-overlay {
+  background: linear-gradient(180deg, rgba(15, 12, 16, 0.85), rgba(15, 12, 16, 0.95)) !important;
+}
+
+body.modo-noche .hero-title,
+body.modo-noche .sobre-titulo,
+body.modo-noche .section-title,
+body.modo-noche .music-section::before {
+  color: #f0e6eb !important;
+}
+
+body.modo-noche .hero-subtitle,
+body.modo-noche .sobre-sub,
+body.modo-noche .section-sub,
+body.modo-noche .contador-label {
+  color: #b0a0a8 !important;
+}
+
+body.modo-noche .card {
+  background: #1a161b !important;
+  border-color: rgba(255,255,255,0.05) !important;
+}
+
+body.modo-noche .card h3 {
+  color: #f0e6eb !important;
+}
+
+body.modo-noche .sobre-section {
+  background: linear-gradient(180deg, #0f0c10 0%, #151016 100%) !important;
+  border-color: rgba(255,255,255,0.05) !important;
+}
+
+body.modo-noche .mensaje-sobre {
+  background: #1a161b !important;
+  color: #f0e6eb !important;
+  border-color: rgba(255,255,255,0.1) !important;
+}
+
+body.modo-noche .music-section {
+  background: #0f0c10 !important;
+}
+
+body.modo-noche .music-card {
+  background: #1a161b !important;
+  border-color: rgba(255,255,255,0.05) !important;
+}

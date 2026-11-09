@@ -18,7 +18,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 
   <style>
-    /* ===== ESTUDIO PRO (adaptado de recuerdos.html para admin, formato banner 8:3) ===== */
+    /* ===== ESTUDIO PRO ===== */
     #modalLienzo.estudio-overlay { position: fixed; inset: 0; z-index: 99999; background: #121214; display: none; flex-direction: column; font-family: 'Inter', system-ui, sans-serif; color: #e4e4e7; font-size: 13px; overflow: hidden; }
     #modalLienzo.estudio-overlay[style*="flex"] { display: flex; }
     .estudio-topbar { height: 52px; background: #1e1e21; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; gap: 10px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 100; }
@@ -43,7 +43,6 @@
     .canvas-area::-webkit-scrollbar { width: 10px; height: 10px; }
     .canvas-area::-webkit-scrollbar-track { background: #18181b; }
     .canvas-area::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 5px; }
-    /* LIENZO EN FORMATO BANNER 8:3 (1600x600) */
     .svg-stage { position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 0 1px #444; background: #fff; flex-shrink: 0; transform-origin: center center; aspect-ratio: 8 / 3; border-radius: 2px; }
     #svgCanvas { display: block; touch-action: none; user-select: none; width: 100%; height: 100%; }
     #selectionOverlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
@@ -156,6 +155,9 @@
         <button class="menu-btn" onclick="cambiarTab('cartas', this)">
           <svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Cartas
         </button>
+        <button class="menu-btn" onclick="cambiarTab('cartas-secretas', this)">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg> Cartas Secretas
+        </button>
         <button class="menu-btn" onclick="cambiarTab('juego', this)">
           <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Juego
         </button>
@@ -224,7 +226,7 @@
         <div id="listaRazonesAdmin" style="margin-top: 32px;"></div>
       </div>
 
-      <!-- 3. CARTAS -->
+      <!-- 3. CARTAS (NORMALES) -->
       <div id="tab-cartas" class="tab-pane">
         <h2 id="cartaTituloForm">Nueva Carta</h2>
         <input type="hidden" id="cartaId" value="">
@@ -235,7 +237,44 @@
         <div id="listaCartasAdmin" style="margin-top: 32px;"></div>
       </div>
 
-      <!-- 4. JUEGO -->
+      <!-- 4. CARTAS SECRETAS (NUEVO) -->
+      <div id="tab-cartas-secretas" class="tab-pane">
+        <h2>Cartas Secretas</h2>
+        <p style="color: var(--texto-suave); margin-bottom: 24px; font-size: 0.95rem;">Escribe un mensaje. Si no asignas una fecha específica, se mostrará aleatoriamente en el momento del día que elijas.</p>
+        
+        <div class="form-group">
+          <label>Contenido de la Carta</label>
+          <textarea id="csContenido" class="form-control" rows="4" placeholder="Escribe algo bonito aquí..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Firma (opcional)</label>
+          <input type="text" id="csAutor" class="form-control" placeholder="Ej: Con amor, tú.">
+        </div>
+
+        <div class="form-group">
+          <label>Momento del día</label>
+          <select id="csMomento" class="form-control">
+            <option value="siempre">Cualquier momento (Aleatoria)</option>
+            <option value="manana">Mañana</option>
+            <option value="tarde">Tarde</option>
+            <option value="noche">Noche</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha específica (Opcional)</label>
+          <input type="date" id="csFecha" class="form-control">
+          <small style="color: var(--texto-suave); font-size: 0.8rem;">Si eliges una fecha, esta carta se mostrará ese día exacto sin importar el momento.</small>
+        </div>
+
+        <button class="btn-primary" onclick="guardarCartaSecreta()">Guardar Carta Secreta</button>
+
+        <h3 style="font-size: 1rem; margin: 32px 0 16px;">Cartas Guardadas</h3>
+        <div id="listaCartasSecretas"></div>
+      </div>
+
+      <!-- 5. JUEGO -->
       <div id="tab-juego" class="tab-pane">
         <h2 id="juegoTituloForm">Nueva Pregunta</h2>
         <input type="hidden" id="juegoId" value="">
@@ -249,7 +288,7 @@
         <div id="listaJuegoAdmin" style="margin-top: 32px;"></div>
       </div>
 
-      <!-- 5. CUPONES -->
+      <!-- 6. CUPONES -->
       <div id="tab-cupones" class="tab-pane">
         <h2 id="cuponTituloForm">Nuevo Cupón</h2>
         <input type="hidden" id="cuponId" value="">
@@ -260,7 +299,7 @@
         <div id="listaCuponesAdmin" style="margin-top: 32px;"></div>
       </div>
 
-      <!-- 6. CANCIÓN -->
+      <!-- 7. CANCIÓN -->
       <div id="tab-cancion" class="tab-pane">
         <h2>Música de la Pareja</h2>
         <div style="display: flex; gap: 12px; margin-bottom: 24px;">
@@ -295,7 +334,7 @@
         </div>
       </div>
 
-      <!-- 7. PORTADA -->
+      <!-- 8. PORTADA -->
       <div id="tab-portada" class="tab-pane">
         <h2>Portada de la Página Principal</h2>
         <p style="color: var(--texto-suave); margin-bottom: 24px; font-size: 0.95rem;">Sube la imagen que quieres que aparezca de fondo en la portada principal.</p>
@@ -312,7 +351,7 @@
         <div id="portadaActualAdmin"><p style="color: var(--texto-suave);">Cargando...</p></div>
       </div>
 
-      <!-- 8. FONDOS CINE -->
+      <!-- 9. FONDOS CINE -->
       <div id="tab-fondos" class="tab-pane">
         <h2>Fondos de Pantalla (Modo Cine)</h2>
         <p style="color: var(--texto-suave); margin-bottom: 24px; font-size: 0.95rem;">Sube fotos y haz clic en una para seleccionarla como fondo del Modo Cine en el inicio.</p>
@@ -329,7 +368,7 @@
         <div class="galeria-fondos" id="galeriaFondosAdmin"><p style="color: var(--texto-suave);">Cargando galería...</p></div>
       </div>
 
-      <!-- 9. PAREJA -->
+      <!-- 10. PAREJA -->
       <div id="tab-pareja" class="tab-pane">
         <h2>Gestión de la Pareja</h2>
         <div class="config-card">
@@ -343,7 +382,7 @@
         </div>
       </div>
 
-      <!-- 10. CONFIGURACIÓN -->
+      <!-- 11. CONFIGURACIÓN -->
       <div id="tab-configuracion" class="tab-pane">
         <h2>Configuración General</h2>
         <div class="config-card">
@@ -374,7 +413,7 @@
         </div>
       </div>
 
-      <!-- 11. BACKUP -->
+      <!-- 12. BACKUP -->
       <div id="tab-backup" class="tab-pane">
         <h2>Respaldo de Datos</h2>
         <p style="color: var(--texto-suave); margin-bottom: 24px; font-size: 0.95rem;">Descarga un archivo JSON con todos los datos de tu pareja y un ZIP con la multimedia. Guárdalo en un lugar seguro.</p>
@@ -414,7 +453,7 @@
         </div>
       </div>
 
-      <!-- 12. IDIOMA -->
+      <!-- 13. IDIOMA -->
       <div id="tab-idioma" class="tab-pane">
         <h2>Idioma del Sistema</h2>
         <div class="config-card">
@@ -520,12 +559,10 @@
       <h3 style="font-family: var(--fuente-titulo); font-style: italic; margin: 0; color: var(--texto-principal);">Recorta y aplica un filtro</h3>
       
       <div style="flex: 1; overflow: hidden; display: flex; gap: 20px;">
-        <!-- Contenedor del recorte -->
         <div style="flex: 2; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
           <img id="imagenRecorteFiltro" src="" style="max-width: 100%; max-height: 50vh; display: block;" />
         </div>
         
-        <!-- Panel de filtros -->
         <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
           <h4 style="margin: 0; font-family: var(--fuente-ui); font-size: 0.9rem; color: var(--texto-suave);">Filtros</h4>
           <div id="filtrosRecorteGrid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; overflow-y: auto; max-height: 50vh; padding: 5px;"></div>
@@ -539,7 +576,7 @@
     </div>
   </div>
 
-  <!-- Modal de Lienzo de Dibujo (Estudio PRO v16, formato banner 8:3, copiado de recuerdos.html) -->
+  <!-- Modal de Lienzo de Dibujo (Estudio PRO) -->
   <div id="modalLienzo" class="estudio-overlay">
     <div class="estudio-topbar">
       <div class="titulo">
@@ -725,7 +762,7 @@
       { nombre: 'Invertido', css: 'invert(100%)' }
     ];
 
-    // Ejecución inmediata (los módulos ya esperan al DOM)
+    // Ejecución inmediata
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -736,6 +773,7 @@
       cargarHistoriaAdmin();
       cargarRazonesAdmin();
       cargarCartasAdmin();
+      cargarCartasSecretasAdmin(); // <-- NUEVO
       cargarJuegoAdmin();
       cargarCuponesAdmin();
       cargarCancionAdmin();
@@ -768,6 +806,7 @@
       if (tabId === 'configuracion') cargarConfiguracion();
       if (tabId === 'fondos') cargarFondosCine();
       if (tabId === 'portada') cargarPortada();
+      if (tabId === 'cartas-secretas') cargarCartasSecretasAdmin(); // <-- NUEVO
       if (tabId === 'backup') {
         const ultimo = localStorage.getItem('ultimo_backup');
         if (ultimo) document.getElementById('ultimoBackup').textContent = ultimo;
@@ -828,7 +867,7 @@
     };
     window.eliminarRazonAdmin = async function(id) { if(confirm("¿Eliminar?")) { await supabase.from('razones').delete().eq('id', id); cargarRazonesAdmin(); } };
 
-    // --- CARTAS ---
+    // --- CARTAS (NORMALES) ---
     async function cargarCartasAdmin() {
       const { data } = await supabase.from('cartas').select('*').eq('couple_id', coupleId);
       const lista = document.getElementById('listaCartasAdmin');
@@ -850,6 +889,60 @@
       document.getElementById('cartaTituloForm').textContent = 'Editando Carta'; document.getElementById('btnGuardarCarta').textContent = 'Guardar Cambios'; window.scrollTo(0, 0);
     };
     window.eliminarCartaAdmin = async function(id) { if(confirm("¿Eliminar?")) { await supabase.from('cartas').delete().eq('id', id); cargarCartasAdmin(); } };
+
+    // --- CARTAS SECRETAS ---
+    window.guardarCartaSecreta = async function() {
+      const contenido = document.getElementById('csContenido').value.trim();
+      const autor = document.getElementById('csAutor').value.trim();
+      const momento = document.getElementById('csMomento').value;
+      const fecha = document.getElementById('csFecha').value || null;
+
+      if (!contenido) return alert("Escribe el contenido de la carta.");
+
+      try {
+        const { error } = await supabase.from('cartas_secretas').insert([{
+          couple_id: coupleId,
+          contenido: contenido,
+          autor: autor,
+          momento: momento,
+          fecha_especifica: fecha
+        }]);
+        if (error) throw error;
+        alert("Carta secreta guardada con éxito.");
+        document.getElementById('csContenido').value = '';
+        document.getElementById('csAutor').value = '';
+        document.getElementById('csFecha').value = '';
+        cargarCartasSecretasAdmin();
+      } catch (err) {
+        alert("Error al guardar: " + err.message);
+      }
+    };
+
+    async function cargarCartasSecretasAdmin() {
+      const { data } = await supabase.from('cartas_secretas').select('*').eq('couple_id', coupleId).order('created_at', { ascending: false });
+      const lista = document.getElementById('listaCartasSecretas');
+      if (!data || data.length === 0) {
+        lista.innerHTML = '<p style="color:var(--texto-suave);">No hay cartas secretas guardadas.</p>';
+        return;
+      }
+      lista.innerHTML = data.map(c => `
+        <div class="item-lista" style="margin-bottom: 10px;">
+          <div class="item-info">
+            <span class="item-titulo">${c.contenido.substring(0, 50)}${c.contenido.length > 50 ? '...' : ''}</span>
+            <span class="item-sub">${c.momento} ${c.fecha_especifica ? ' | ' + c.fecha_especifica : ''}</span>
+          </div>
+          <div class="acciones">
+            <button class="btn-icon delete" onclick="eliminarCartaSecreta('${c.id}')"><svg class="icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.eliminarCartaSecreta = async function(id) {
+      if (!confirm("¿Eliminar esta carta secreta?")) return;
+      await supabase.from('cartas_secretas').delete().eq('id', id);
+      cargarCartasSecretasAdmin();
+    };
 
     // --- JUEGO ---
     async function cargarJuegoAdmin() {
@@ -987,17 +1080,13 @@
         const container = document.getElementById('portadaActualAdmin');
         container.innerHTML = '<p style="color: var(--acento-vino);">Subiendo imagen...</p>';
         try {
-          // 🛑 DETECTAR EXTENSIÓN REAL 🛑
           const originalName = file.name;
           const ext = originalName.split('.').pop().toLowerCase() || 'jpg';
           const mimeType = file.type || `image/${ext === 'jpg' ? 'jpeg' : ext}`;
-          
           const path = `portadas/${coupleId}/${Date.now()}.${ext}`;
           
-          // Subir con el tipo MIME correcto
           const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado, { contentType: mimeType });
           if (upErr) throw upErr;
-          
           const { data: pub } = supabase.storage.from('media').getPublicUrl(path);
           
           const { error: dbErr } = await supabase.from('couples').update({ portada_url: pub.publicUrl }).eq('id', coupleId);
@@ -1115,11 +1204,9 @@
         const galeria = document.getElementById('galeriaFondosAdmin');
         galeria.innerHTML = '<p style="color: var(--acento-vino); font-weight: bold; grid-column: 1/-1;">Subiendo imagen...</p>';
         try {
-          // 🛑 DETECTAR EXTENSIÓN REAL 🛑
           const originalName = file.name;
           const ext = originalName.split('.').pop().toLowerCase() || 'jpg';
           const mimeType = file.type || `image/${ext === 'jpg' ? 'jpeg' : ext}`;
-          
           const path = `fondos_cine/${coupleId}/${Date.now()}.${ext}`;
           
           const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado, { contentType: mimeType });
@@ -1156,7 +1243,7 @@
       btn.disabled = true; btn.textContent = 'Generando backup...';
 
       try {
-        const tablas = ['historia_capitulos','razones','cartas','juego_preguntas','cupones','recuerdos','mapa_recuerdos','notas_voz','diario_entries','arte_obras','albums','fechas_importantes','puntos','reacciones','audios_favoritos'];
+        const tablas = ['historia_capitulos','razones','cartas','cartas_secretas','juego_preguntas','cupones','recuerdos','mapa_recuerdos','notas_voz','diario_entries','arte_obras','albums','fechas_importantes','puntos','reacciones','audios_favoritos'];
         const backup = { fecha: new Date().toISOString(), couple_id: coupleId, couple: null, datos: {} };
 
         const { data: coupleData } = await supabase.from('couples').select('*').eq('id', coupleId).single();
@@ -1443,11 +1530,12 @@
       ctx.drawImage(img, 0, 0);
       canvas.toBlob((blob) => {
         if (!blob) return;
-        const file = new File([blob], archivoOriginal.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' });
+        const ext = archivoOriginal.name.split('.').pop().toLowerCase();
+        const file = new File([blob], archivoOriginal.name.replace(/\.[^/.]+$/, `.${ext}`), { type: blob.type });
         document.getElementById('modalFiltros').style.display = 'none';
         if (callbackSubida) callbackSubida(file);
         archivoOriginal = null; callbackSubida = null;
-      }, 'image/jpeg', 0.9);
+      }, archivoOriginal.type || 'image/jpeg', 0.9);
     };
 
     // Aplicar recorte
@@ -1455,12 +1543,13 @@
       if (!cropperInstance) return;
       cropperInstance.getCroppedCanvas({ maxWidth: 1920, maxHeight: 1920, imageSmoothingQuality: 'high' }).toBlob((blob) => {
         if (!blob) return;
-        const file = new File([blob], archivoOriginal.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' });
+        const ext = archivoOriginal.name.split('.').pop().toLowerCase();
+        const file = new File([blob], archivoOriginal.name.replace(/\.[^/.]+$/, `.${ext}`), { type: blob.type });
         document.getElementById('modalRecorte').style.display = 'none';
         cropperInstance.destroy(); cropperInstance = null;
         if (callbackSubida) callbackSubida(file);
         archivoOriginal = null; callbackSubida = null;
-      }, 'image/jpeg', 0.9);
+      }, archivoOriginal.type || 'image/jpeg', 0.9);
     };
 
     // Aplicar Recorte + Filtro
@@ -1476,15 +1565,16 @@
           ctx.filter = filtroRecorteActual;
           ctx.drawImage(imgTemp, 0, 0);
           canvas.toBlob((finalBlob) => {
-            const file = new File([finalBlob], archivoOriginal.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' });
+            const ext = archivoOriginal.name.split('.').pop().toLowerCase();
+            const file = new File([finalBlob], archivoOriginal.name.replace(/\.[^/.]+$/, `.${ext}`), { type: finalBlob.type });
             document.getElementById('modalRecorteFiltro').style.display = 'none';
             cropperInstance.destroy(); cropperInstance = null;
             if (callbackSubida) callbackSubida(file);
             archivoOriginal = null; callbackSubida = null;
-          }, 'image/jpeg', 0.9);
+          }, archivoOriginal.type || 'image/jpeg', 0.9);
         };
         imgTemp.src = URL.createObjectURL(croppedBlob);
-      }, 'image/jpeg', 0.9);
+      }, archivoOriginal.type || 'image/jpeg', 0.9);
     };
 
     // Aplicar Lienzo (subir el dibujo como imagen)
@@ -1510,7 +1600,6 @@
         this.quickActions = document.getElementById("quickActions");
         this.magnifierLens = document.getElementById("magnifierLens");
 
-        // 🛑 LIENZO EN FORMATO BANNER 8:3 (1600x600)
         this.VB_W = 1600; 
         this.VB_H = 600;
 
