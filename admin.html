@@ -1023,17 +1023,32 @@
     window.agregarSpotifyAdmin = async function(event) {
       const url = document.getElementById('inputSpotifyUrl').value.trim();
       if (!url || !url.includes('spotify.com')) return alert("Por favor, ingresa un link válido de Spotify.");
-      const btn = event.target; const originalText = btn.textContent; btn.disabled = true; btn.textContent = '...';
+      
+      const btn = event.target; 
+      const originalText = btn.textContent; 
+      btn.disabled = true; 
+      btn.textContent = '...';
+
       try {
-        let nombre = "Canción de Spotify"; let artista = "Artista desconocido"; let imagen = null;
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`; const response = await fetch(proxyUrl); const html = await response.text();
-        const titleMatch = html.match(/<meta property="og:title" content="([^"]+)"/); const descMatch = html.match(/<meta property="og:description" content="([^"]+)"/); const imageMatch = html.match(/<meta property="og:image" content="([^"]+)"/);
-        if (titleMatch) nombre = titleMatch[1]; if (descMatch) artista = descMatch[1].replace("Song · ", "").replace("Album · ", "").replace("Playlist · ", ""); if (imageMatch) imagen = imageMatch[1];
+        // 🛑 SOLUCIÓN: Ya no hacemos fetch a la página de Spotify (evita el error en móviles).
+        // Guardamos un nombre genérico. El reproductor cargará los datos reales en el index.
+        let nombre = "Canción de Spotify"; 
+        let artista = "Nuestra Música"; 
+        
         const { data: coupleData } = await supabase.from('couples').select('lista_spotify').eq('id', coupleId).single();
-        const nuevaLista = coupleData.lista_spotify || []; nuevaLista.push({ nombre, artista, imagen, url });
+        const nuevaLista = coupleData.lista_spotify || []; 
+        nuevaLista.push({ nombre, artista, url: url });
+        
         await supabase.from('couples').update({ lista_spotify: nuevaLista }).eq('id', coupleId);
-        document.getElementById('inputSpotifyUrl').value = ''; cargarCancionAdmin(); 
-      } catch (err) { alert("Error al obtener datos: " + err.message); } finally { btn.disabled = false; btn.textContent = originalText; }
+        
+        document.getElementById('inputSpotifyUrl').value = ''; 
+        cargarCancionAdmin(); 
+      } catch (err) { 
+        alert("Error al guardar: " + err.message); 
+      } finally { 
+        btn.disabled = false; 
+        btn.textContent = originalText; 
+      }
     };
     window.seleccionarSpotify = async function(url) { await supabase.from('couples').update({ cancion_spotify_url: url, cancion_mp3_url: null }).eq('id', coupleId); cargarCancionAdmin(); };
     window.eliminarSpotifyAdmin = async function(url) {
