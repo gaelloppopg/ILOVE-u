@@ -81,7 +81,8 @@
     }
 
     /* ESTILOS DE LA PÁGINA */
-    #btnAdmin { display: none !important; }
+    /* 🛑 BOTÓN DE ADMIN OCULTO POR DEFECTO 🛑 */
+    #btnAdmin { display: none; }
 
     /* 🛑 PORTADA ORIGINAL 🛑 */
     .hero { position: relative; padding: 120px 20px 80px; text-align: center; z-index: 2; }
@@ -158,12 +159,13 @@
     }
     .btn-recuerdo-flotante:hover { transform: translateY(-5px) scale(1.05); background: var(--rosa); color: #fff; }
 
-    /* 🛑 DISEÑO ESPECIAL PARA EL BOTÓN DE ADMIN 🛑 */
+    /* 🛑 DISEÑO ESPECIAL PARA EL BOTÓN DE ADMIN (CONSOLA) 🛑 */
     .admin-seccion {
       max-width: 800px;
       margin: 0 auto 80px auto;
       padding: 0 20px;
       text-align: center;
+      display: none; /* Oculto por defecto, JS lo muestra */
     }
     .btn-admin-consola {
       display: flex;
@@ -334,7 +336,7 @@
   </section>
 
   <!-- 🛑 SECCIÓN EXCLUSIVA DE ADMIN (Solo dueño) 🛑 -->
-  <section class="admin-seccion">
+  <section class="admin-seccion" id="seccionAdmin">
     <a href="admin.html" id="btnAdmin" class="btn-admin-consola">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
       Acceder a la <span>Consola de Administración</span>
@@ -485,13 +487,16 @@
           document.getElementById('fecha-inicio').textContent = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
+        // 🛑 MOSTRAR BOTÓN DE ADMIN SOLO SI ES EL DUEÑO 🛑
+        const seccionAdmin = document.getElementById('seccionAdmin');
         const btnAdmin = document.getElementById('btnAdmin');
         const esOwnerReal = datos.esOwner === true || (datos.couple && String(datos.couple.owner_id) === String(datos.user.id));
 
         if (esOwnerReal) {
+          if (seccionAdmin) seccionAdmin.style.display = 'block';
           if (btnAdmin) btnAdmin.style.display = 'flex';
         } else {
-          if (btnAdmin) btnAdmin.remove();
+          if (seccionAdmin) seccionAdmin.remove();
         }
 
         // 🛑 CARGAR CARTA SECRETA (Y recargar si cambia en admin) 🛑
