@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/animations.css" />
   <link rel="stylesheet" href="css/responsive.css" />
+  <!-- 🛑 INCLUIR EL CSS DEL MODO CINE 🛑 -->
+  <link rel="stylesheet" href="css/modo-cine.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&family=Caveat:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#f28ca6" />
@@ -23,7 +25,7 @@
     }
     .card:hover .card-icono svg { transform: scale(1.1); }
 
-    /* 🛑 BOTÓN FLOTANTE MODO CINE 🛑 */
+    /* 🛑 BOTÓN FLOTANTE MODO CINE (Diseño de Cámara) 🛑 */
     .btn-modo-cine {
       position: fixed; bottom: 210px; right: 20px; z-index: 9998;
       width: 56px; height: 56px; border-radius: 50%;
@@ -195,8 +197,13 @@
 
   <!-- 🛑 BOTONES FLOTANTES 🛑 -->
   <button class="btn-modo-cine" id="btnModoCine" title="Modo Cine" style="display: none;">
-    <svg viewBox="0 0 24 24"><path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
+    <!-- Icono de Cámara de Cine -->
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 7l-7 5 7 5V7z"></path>
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+    </svg>
   </button>
+  
   <button class="btn-recuerdo-flotante" id="btnVerRecuerdo" title="Recuerdo del Día">📸</button>
   
   <div class="modal-recuerdo" id="modalRecuerdo">
@@ -207,6 +214,9 @@
       </div>
     </div>
   </div>
+
+  <!-- 🛑 CONTENEDOR DEL MODO CINE (Se llena dinámicamente) 🛑 -->
+  <div class="cine-container" id="cineContainer"></div>
 
   <script src="js/script.js"></script>
   <script src="js/confeti.js"></script>
@@ -276,6 +286,65 @@
       `;
     }
 
+    // 🛑 LÓGICA PARA ABRIR EL MODO CINE 🛑
+    function abrirModoCine(fondos) {
+      const container = document.getElementById('cineContainer');
+      const body = document.body;
+
+      // 1. Inyectar el HTML de la cinta de cine
+      container.innerHTML = `
+        <div class="cine-sala-oscura"></div>
+        <div class="cine-proyector-luz"></div>
+        <div class="cine-grano"></div>
+        <div class="cine-rayas"></div>
+        
+        <div class="cine-barra-superior"></div>
+        <div class="cine-barra-inferior"></div>
+
+        <div class="cine-cinta-wrapper">
+          <div class="cine-cinta-agujeros"></div>
+          <div class="cine-carrusel" id="cineCarrusel">
+            ${fondos.map(foto => `
+              <div class="cine-fotograma">
+                <img src="${foto}" alt="Recuerdo" loading="lazy">
+                <div class="cine-fotograma-flicker"></div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="cine-texto">
+          <h2>Nuestros Momentos</h2>
+          <p>Un pedacito de nuestra historia juntos</p>
+        </div>
+
+        <button class="cine-exit-hint" id="btnSalirCine">Presiona ESC o haz clic aquí para salir</button>
+      `;
+
+      // 2. Aplicar la clase al body para activar el CSS
+      body.classList.add('modo-cine-activo');
+
+      // 3. Configurar cierre del modo cine
+      const cerrarCine = () => {
+        body.classList.remove('modo-cine-activo');
+        setTimeout(() => {
+          container.innerHTML = ''; // Limpiar el DOM
+        }, 1000); // Esperar a que termine la animación de CSS
+        document.removeEventListener('keydown', escucharEsc);
+      };
+
+      document.getElementById('btnSalirCine').addEventListener('click', cerrarCine);
+
+      // 4. Escuchar tecla ESC
+      const escucharEsc = (e) => {
+        if (e.key === 'Escape') cerrarCine();
+      };
+      document.addEventListener('keydown', escucharEsc);
+    }
+
+    // Exponer la función globalmente para que el botón la llame
+    window.abrirModoCine = abrirModoCine;
+
     async function initIndex() {
       document.documentElement.style.visibility = "hidden";
       
@@ -301,7 +370,7 @@
           if (btnInvitar) btnInvitar.remove();
         }
 
-        // 🛑 CARGAR PORTADA PERSONALIZADA 🛑
+        // Cargar Portada
         if (datos.couple && datos.couple.portada_url) {
           const heroImg = document.querySelector('.hero-img');
           if (heroImg) {
@@ -309,23 +378,15 @@
           }
         }
 
-        // 🛑 CARGAR BOTÓN DE MODO CINE 🛑
+        // Cargar Botón Modo Cine
         const btnModoCine = document.getElementById('btnModoCine');
         if (datos.couple && datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
           if (btnModoCine) {
             btnModoCine.style.display = 'flex'; // Mostrar botón
-            btnModoCine.onclick = () => {
-              // Abrir el modo cine pasando los fondos
-              if (typeof window.abrirModoCine === 'function') {
-                window.abrirModoCine(datos.couple.fondos_modo_cine);
-              } else {
-                alert("El visor de cine no está configurado en js/script.js");
-                console.log("Fondos de cine:", datos.couple.fondos_modo_cine);
-              }
-            };
+            btnModoCine.onclick = () => window.abrirModoCine(datos.couple.fondos_modo_cine);
           }
         } else {
-          if (btnModoCine) btnModoCine.style.display = 'none'; // Ocultar si no hay fondos
+          if (btnModoCine) btnModoCine.style.display = 'none';
         }
 
         const musicCard = document.getElementById('musicCard');
@@ -375,24 +436,16 @@
               cargarRecuerdoDelDia(datos.couple.id);
             }
             if (e.detail.tabla === 'couples') {
-              // Actualizar portada si cambia en tiempo real
               if (e.detail.data.portada_url) {
                 const heroImg = document.querySelector('.hero-img');
                 if (heroImg) heroImg.src = e.detail.data.portada_url;
               }
-              // Actualizar fondos de cine en tiempo real
               if (e.detail.data.fondos_modo_cine) {
                 const btnModoCine = document.getElementById('btnModoCine');
                 if (btnModoCine) {
                   if (e.detail.data.fondos_modo_cine.length > 0) {
                     btnModoCine.style.display = 'flex';
-                    btnModoCine.onclick = () => {
-                      if (typeof window.abrirModoCine === 'function') {
-                        window.abrirModoCine(e.detail.data.fondos_modo_cine);
-                      } else {
-                        alert("El visor de cine no está configurado en js/script.js");
-                      }
-                    };
+                    btnModoCine.onclick = () => window.abrirModoCine(e.detail.data.fondos_modo_cine);
                   } else {
                     btnModoCine.style.display = 'none';
                   }
