@@ -987,14 +987,19 @@
         const container = document.getElementById('portadaActualAdmin');
         container.innerHTML = '<p style="color: var(--acento-vino);">Subiendo imagen...</p>';
         try {
-          const ext = 'jpg';
+          // 🛑 DETECTAR EXTENSIÓN REAL 🛑
+          const originalName = file.name;
+          const ext = originalName.split('.').pop().toLowerCase() || 'jpg';
+          const mimeType = file.type || `image/${ext === 'jpg' ? 'jpeg' : ext}`;
+          
           const path = `portadas/${coupleId}/${Date.now()}.${ext}`;
-          // 🛑 CORRECCIÓN: Asegurarse de que se sube al bucket 'media'
-          const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado, { contentType: 'image/jpeg' });
+          
+          // Subir con el tipo MIME correcto
+          const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado, { contentType: mimeType });
           if (upErr) throw upErr;
+          
           const { data: pub } = supabase.storage.from('media').getPublicUrl(path);
           
-          // 🛑 CORRECCIÓN: Actualizar la columna correcta en couples
           const { error: dbErr } = await supabase.from('couples').update({ portada_url: pub.publicUrl }).eq('id', coupleId);
           if (dbErr) throw dbErr;
 
@@ -1110,12 +1115,17 @@
         const galeria = document.getElementById('galeriaFondosAdmin');
         galeria.innerHTML = '<p style="color: var(--acento-vino); font-weight: bold; grid-column: 1/-1;">Subiendo imagen...</p>';
         try {
-          const ext = 'jpg';
+          // 🛑 DETECTAR EXTENSIÓN REAL 🛑
+          const originalName = file.name;
+          const ext = originalName.split('.').pop().toLowerCase() || 'jpg';
+          const mimeType = file.type || `image/${ext === 'jpg' ? 'jpeg' : ext}`;
+          
           const path = `fondos_cine/${coupleId}/${Date.now()}.${ext}`;
-          const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado, { contentType: 'image/jpeg' });
+          
+          const { error: upErr } = await supabase.storage.from('media').upload(path, archivoEditado, { contentType: mimeType });
           if (upErr) throw upErr;
           
-          await cargarFondosCine(); // Recargar la galería (lee los archivos del storage)
+          await cargarFondosCine();
           alert("¡Foto subida! Haz clic en ella para añadirla al carrusel.");
         } catch (err) {
           alert("Error al subir: " + err.message);

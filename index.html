@@ -256,6 +256,25 @@
       `;
     }
 
+    // 🛑 NUEVA FUNCIÓN PARA INICIAR EL MODO CINE CON LOS FONDOS DE SUPABASE 🛑
+    function iniciarModoCineConFondos(fondos) {
+      if (!fondos || fondos.length === 0) {
+        alert("Aún no has seleccionado fotos para el Modo Cine en el panel de administración.");
+        return;
+      }
+      
+      // Si tienes una función en js/script.js que abre el modo cine, la llamamos aquí.
+      // Si no, podemos crear un modal sencillo para mostrarlas.
+      if (window.abrirModoCine && typeof window.abrirModoCine === 'function') {
+        window.abrirModoCine(fondos);
+      } else {
+        // Fallback: Si no hay función, mostramos un mensaje.
+        alert(`Cargando ${fondos.length} fotos para el Modo Cine...`);
+        console.log("Fondos del modo cine listos:", fondos);
+        // Aquí podrías implementar la apertura de un modal si no existe en script.js
+      }
+    }
+
     async function initIndex() {
       document.documentElement.style.visibility = "hidden";
       
@@ -281,7 +300,7 @@
           if (btnInvitar) btnInvitar.remove();
         }
 
-        // 🛑 NUEVO: CARGAR PORTADA PERSONALIZADA 🛑
+        // 🛑 CARGAR PORTADA PERSONALIZADA 🛑
         if (datos.couple && datos.couple.portada_url) {
           const heroImg = document.querySelector('.hero-img');
           if (heroImg) {
@@ -289,12 +308,13 @@
           }
         }
 
-        // 🛑 NUEVO: CARGAR FONDOS DE CINE 🛑
+        // 🛑 CARGAR FONDOS DE CINE 🛑
+        // Se los pasamos a la función que abre el modo cine
         if (datos.couple && datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
-          // Aquí debes conectar los fondos con la lógica del "Modo Cine" que tengas en tu script.js
-          // Por ejemplo, si tienes una variable global para el carrusel:
-          if (window.iniciarModoCine) {
-            window.iniciarModoCine(datos.couple.fondos_modo_cine);
+          // Escuchar el clic en el botón del modo cine (si existe)
+          const btnModoCine = document.getElementById('btnModoCine');
+          if (btnModoCine) {
+            btnModoCine.onclick = () => iniciarModoCineConFondos(datos.couple.fondos_modo_cine);
           }
         }
 
@@ -349,6 +369,14 @@
               if (e.detail.data.portada_url) {
                 const heroImg = document.querySelector('.hero-img');
                 if (heroImg) heroImg.src = e.detail.data.portada_url;
+              }
+              // Actualizar fondos de cine en tiempo real
+              if (e.detail.data.fondos_modo_cine) {
+                // Re-vincular el botón con los nuevos fondos
+                const btnModoCine = document.getElementById('btnModoCine');
+                if (btnModoCine) {
+                  btnModoCine.onclick = () => iniciarModoCineConFondos(e.detail.data.fondos_modo_cine);
+                }
               }
               // Actualizar música
               const spotifyUrl = e.detail.data.cancion_spotify_url;
