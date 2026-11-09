@@ -25,23 +25,6 @@
     }
     .card:hover .card-icono svg { transform: scale(1.1); }
 
-    /* 🛑 BOTÓN FLOTANTE MODO CINE (Diseño de Cámara) 🛑 */
-    .btn-modo-cine {
-      position: fixed; bottom: 210px; right: 20px; z-index: 9998;
-      width: 56px; height: 56px; border-radius: 50%;
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
-      border: 2px solid rgba(255,255,255,0.1); color: #e4e4e7; 
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-size: 1.5rem;
-    }
-    .btn-modo-cine:hover { 
-      transform: translateY(-5px) scale(1.05); 
-      box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4); 
-      color: #a78bfa;
-    }
-    .btn-modo-cine svg { width: 24px; height: 24px; fill: currentColor; }
-
     /* 🛑 MODAL RECUERDO DEL DÍA 🛑 */
     .modal-recuerdo {
       position: fixed; inset: 0; background: rgba(15, 10, 25, 0.85);
@@ -195,15 +178,7 @@
   <footer class="footer"><p>Hecho con amor solo para ti</p></footer>
   <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
 
-  <!-- 🛑 BOTONES FLOTANTES 🛑 -->
-  <button class="btn-modo-cine" id="btnModoCine" title="Modo Cine" style="display: none;">
-    <!-- Icono de Cámara de Cine -->
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M23 7l-7 5 7 5V7z"></path>
-      <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-    </svg>
-  </button>
-  
+  <!-- 🛑 BOTÓN DE RECUERDO DEL DÍA (Se mantiene) 🛑 -->
   <button class="btn-recuerdo-flotante" id="btnVerRecuerdo" title="Recuerdo del Día">📸</button>
   
   <div class="modal-recuerdo" id="modalRecuerdo">
@@ -286,10 +261,20 @@
       `;
     }
 
-    // 🛑 LÓGICA PARA ABRIR EL MODO CINE 🛑
+    // 🛑 LÓGICA PARA ABRIR EL MODO CINE (Cinta Infinita) 🛑
     function abrirModoCine(fondos) {
       const container = document.getElementById('cineContainer');
       const body = document.body;
+
+      if (!fondos || fondos.length === 0) return;
+
+      // Para que no queden espacios en blanco, duplicamos las fotos varias veces.
+      // Si hay 3 fotos, las repetimos 4 veces (12 fotos en total) para llenar la pantalla.
+      let fotosRepetidas = [];
+      const repeticiones = Math.max(4, Math.ceil(10 / fondos.length)); 
+      for (let i = 0; i < repeticiones; i++) {
+        fotosRepetidas = fotosRepetidas.concat(fondos);
+      }
 
       // 1. Inyectar el HTML de la cinta de cine
       container.innerHTML = `
@@ -303,8 +288,8 @@
 
         <div class="cine-cinta-wrapper">
           <div class="cine-cinta-agujeros"></div>
-          <div class="cine-carrusel" id="cineCarrusel">
-            ${fondos.map(foto => `
+          <div class="cine-carrusel" id="cineCarrusel" style="animation-duration: ${fotosRepetidas.length * 3}s;">
+            ${fotosRepetidas.map(foto => `
               <div class="cine-fotograma">
                 <img src="${foto}" alt="Recuerdo" loading="lazy">
                 <div class="cine-fotograma-flicker"></div>
@@ -315,16 +300,14 @@
 
         <div class="cine-texto">
           <h2>Nuestros Momentos</h2>
-          <p>Un pedacito de nuestra historia juntos</p>
+          <p>Haz clic en cualquier lugar para salir</p>
         </div>
-
-        <button class="cine-exit-hint" id="btnSalirCine">Presiona ESC o haz clic aquí para salir</button>
       `;
 
       // 2. Aplicar la clase al body para activar el CSS
       body.classList.add('modo-cine-activo');
 
-      // 3. Configurar cierre del modo cine
+      // 3. Configurar cierre del modo cine al hacer clic en cualquier parte
       const cerrarCine = () => {
         body.classList.remove('modo-cine-activo');
         setTimeout(() => {
@@ -333,7 +316,8 @@
         document.removeEventListener('keydown', escucharEsc);
       };
 
-      document.getElementById('btnSalirCine').addEventListener('click', cerrarCine);
+      // Al hacer clic en CUALQUIER parte del contenedor del cine, se cierra
+      container.addEventListener('click', cerrarCine);
 
       // 4. Escuchar tecla ESC
       const escucharEsc = (e) => {
@@ -342,7 +326,7 @@
       document.addEventListener('keydown', escucharEsc);
     }
 
-    // Exponer la función globalmente para que el botón la llame
+    // Exponer la función globalmente
     window.abrirModoCine = abrirModoCine;
 
     async function initIndex() {
@@ -378,16 +362,12 @@
           }
         }
 
-        // Cargar Botón Modo Cine
-        const btnModoCine = document.getElementById('btnModoCine');
-        if (datos.couple && datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
-          if (btnModoCine) {
-            btnModoCine.style.display = 'flex'; // Mostrar botón
-            btnModoCine.onclick = () => window.abrirModoCine(datos.couple.fondos_modo_cine);
-          }
-        } else {
-          if (btnModoCine) btnModoCine.style.display = 'none';
-        }
+        // Cargar lógica para activar el cine (sin botón, quizás con un botón en el menú o por código)
+        // El botón de la cámara ha sido eliminado.
+        // Si quieres un botón en el menú, puedes añadirlo al grid de "cards".
+        
+        // (Opcional) Si quieres que el modo cine se abra con alguna tecla o acción específica, puedes configurarlo aquí.
+        // Por ejemplo, si tienes un botón oculto o quieres que se abra al hacer clic en algún elemento del menú.
 
         const musicCard = document.getElementById('musicCard');
         if (musicCard) {
@@ -440,16 +420,9 @@
                 const heroImg = document.querySelector('.hero-img');
                 if (heroImg) heroImg.src = e.detail.data.portada_url;
               }
-              if (e.detail.data.fondos_modo_cine) {
-                const btnModoCine = document.getElementById('btnModoCine');
-                if (btnModoCine) {
-                  if (e.detail.data.fondos_modo_cine.length > 0) {
-                    btnModoCine.style.display = 'flex';
-                    btnModoCine.onclick = () => window.abrirModoCine(e.detail.data.fondos_modo_cine);
-                  } else {
-                    btnModoCine.style.display = 'none';
-                  }
-                }
+              // Aquí podrías actualizar los fondos de cine si se abren dinámicamente
+              if (e.detail.data.fondos_modo_cine && e.detail.data.fondos_modo_cine.length > 0) {
+                // window.abrirModoCine(e.detail.data.fondos_modo_cine);
               }
               // Actualizar música
               const spotifyUrl = e.detail.data.cancion_spotify_url;
