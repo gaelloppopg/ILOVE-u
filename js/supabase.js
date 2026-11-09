@@ -7,7 +7,10 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: false
+    detectSessionInUrl: true // 🛑 Cambiado a true por si usas login con OAuth
+  },
+  db: {
+    schema: 'public' // 🛑 Forzamos el esquema público
   }
 })
 
