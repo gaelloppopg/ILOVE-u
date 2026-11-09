@@ -13,355 +13,290 @@
   <meta name="theme-color" content="#f28ca6" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>" />
 
-  <!-- 🛑 LIBRERÍA PARA EL MOVIMIENTO 3D 🛑 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-
   <style>
     /* =========================================
-       VARIABLES Y ESTILOS BASE (MODO CLARO)
+       ESTILOS DIDÁCTICOS E INTERACTIVOS
        ========================================= */
     :root {
-      --bg-claro: #fdfafb;
-      --bg-tarjeta: rgba(255, 255, 255, 0.85);
-      --texto-principal: #2c1a24;
-      --texto-secundario: #7a5c8c;
-      --dorado: #c9a050;
-      --rosa: #d96c88;
-      --borde: rgba(242, 140, 166, 0.2);
-      --sombra: 0 15px 35px rgba(217, 108, 136, 0.1);
-      --nube-color: rgba(255, 255, 255, 0.9);
+      --dorado-suave: #c9a050;
+      --rosa-profundo: #d96c88;
+      --texto-elegante: #2c1a24;
+      --sombra-suave: 0 20px 40px rgba(0,0,0,0.05);
     }
 
-    /* 🛑 MODO OSCURO (Afecta a TODO el index) 🛑 */
-    body.modo-noche {
-      --bg-claro: #0b0e14;
-      --bg-tarjeta: rgba(26, 30, 42, 0.85);
-      --texto-principal: #e2e8f0;
-      --texto-secundario: #94a3b8;
-      --dorado: #fbbf24;
-      --rosa: #f472b6;
-      --borde: rgba(255, 255, 255, 0.08);
-      --sombra: 0 15px 35px rgba(0, 0, 0, 0.4);
-      --nube-color: rgba(255, 255, 255, 0.03);
-    }
-
-    body { 
-      background-color: var(--bg-claro); 
-      color: var(--texto-principal); 
-      font-family: 'Poppins', sans-serif;
-      transition: background-color 1s ease, color 1s ease;
-      overflow-x: hidden;
-      margin: 0;
-    }
-
-    /* 🛑 FONDO DE NUBES 🛑 */
-    .fondo-nubes {
-      position: fixed; inset: 0; z-index: -1; overflow: hidden;
-      background: linear-gradient(180deg, #fdfafb 0%, #fceef2 100%);
-      transition: background 1s ease;
-    }
-    body.modo-noche .fondo-nubes {
-      background: linear-gradient(180deg, #0b0e14 0%, #1a1f2e 100%);
-    }
-    .nube {
-      position: absolute; background: var(--nube-color); border-radius: 50%;
-      filter: blur(40px); opacity: 0.8; animation: flotarNubes 20s linear infinite;
-      transition: background 1s ease;
-    }
-    .nube:nth-child(1) { width: 300px; height: 100px; top: 10%; left: -10%; animation-duration: 25s; }
-    .nube:nth-child(2) { width: 400px; height: 150px; top: 40%; left: -20%; animation-duration: 35s; animation-delay: -5s; }
-    .nube:nth-child(3) { width: 250px; height: 80px; top: 70%; left: -15%; animation-duration: 22s; animation-delay: -10s; }
-    .nube:nth-child(4) { width: 350px; height: 120px; top: 20%; right: -15%; animation-duration: 28s; animation-delay: -2s; animation-direction: reverse; }
-    .nube:nth-child(5) { width: 200px; height: 60px; top: 80%; right: -10%; animation-duration: 20s; animation-delay: -15s; animation-direction: reverse; }
+    #btnAdmin, #btnInvitarPareja { display: none !important; }
+    .spotify-iframe { border-radius: 16px; margin-top: 15px; border: none; width: 100%; height: 152px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
     
-    @keyframes flotarNubes {
-      0% { transform: translateX(0) translateY(0); }
-      50% { transform: translateX(30vw) translateY(-20px); }
-      100% { transform: translateX(0) translateY(0); }
+    /* Tarjetas del menú más llamativas */
+    .card {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(242, 140, 166, 0.1);
     }
-
-    /* ESTILOS DE LA PÁGINA */
-    /* 🛑 BOTÓN DE ADMIN OCULTO POR DEFECTO 🛑 */
-    #btnAdmin { display: none; }
-
-    /* 🛑 PORTADA ORIGINAL 🛑 */
-    .hero { position: relative; padding: 120px 20px 80px; text-align: center; z-index: 2; }
-    .hero-title { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(2.5rem, 6vw, 4.5rem); margin: 10px 0 20px; color: var(--texto-principal); }
-    .hero-subtitle { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic; max-width: 600px; margin: 0 auto; color: var(--texto-secundario); }
-    .contador-item { background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra); }
-    .contador-item span { display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa); }
-    .contador-item small { font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario); }
-    .contador-label { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--texto-secundario); margin-top: 20px; }
-
-    /* 🛑 BENTO GRID (Tarjetas 3D) 🛑 */
-    .bento-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px; max-width: 1100px; margin: 0 auto; padding: 20px;
-      perspective: 1000px;
+    .card::before {
+      content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(242,140,166,0.08) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.4s ease; transform: scale(0.8);
     }
-    .bento-item {
-      background: var(--bg-tarjeta);
-      border: 1px solid var(--borde);
-      border-radius: 24px;
-      padding: 30px;
-      display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
-      text-decoration: none; color: var(--texto-principal);
-      box-shadow: var(--sombra);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.5s ease;
-      cursor: pointer;
-      transform-style: preserve-3d;
+    .card:hover::before { opacity: 1; transform: scale(1); }
+    .card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px rgba(242, 140, 166, 0.15); border-color: var(--rosa-suave); }
+    .card-icono svg { width: 48px; height: 48px; stroke: var(--rosa-profundo); fill: none; stroke-width: 1.2; margin-bottom: 15px; transition: transform 0.4s ease; }
+    .card:hover .card-icono svg { transform: scale(1.15) rotate(-5deg); color: var(--dorado-suave); stroke: var(--dorado-suave); }
+
+    /* Sección del Sobre - Carta Sellada Interactiva */
+    .sobre-section { 
+      padding: 120px 20px; 
+      text-align: center; 
+      background: linear-gradient(180deg, #fff 0%, #fdfafb 100%);
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid rgba(242, 140, 166, 0.1);
+      border-bottom: 1px solid rgba(242, 140, 166, 0.1);
     }
-    .bento-item:hover { border-color: var(--rosa); box-shadow: 0 25px 50px rgba(217, 108, 136, 0.25); }
-    .bento-item svg { width: 36px; height: 36px; stroke: var(--rosa); fill: none; stroke-width: 1.5; margin-bottom: 15px; transform: translateZ(30px); }
-    .bento-item h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0 0 8px 0; transform: translateZ(20px); color: var(--texto-principal); }
-    .bento-item p { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-style: italic; color: var(--texto-secundario); margin: 0; transform: translateZ(10px); }
+    .sobre-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.8rem; color: var(--texto-elegante); margin-bottom: 15px; font-weight: 400; }
+    .sobre-sub { color: #7a5c8c; font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic; margin-bottom: 50px; }
     
-    .bento-item.grande { grid-column: span 2; }
-    .bento-item.destacado { background: linear-gradient(135deg, rgba(217,108,136,0.1), rgba(201,160,80,0.1)); border-color: var(--dorado); }
-
-    @media (max-width: 768px) {
-      .bento-item.grande { grid-column: span 1; }
+    .sobre-btn { 
+      width: 180px; height: 110px; background: #fff; border: 1px solid rgba(242, 140, 166, 0.3); border-radius: 6px; 
+      position: relative; cursor: pointer; display: inline-block; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+      box-shadow: 0 15px 40px rgba(0,0,0,0.05); z-index: 1; 
+      animation: pulsoSobre 4s infinite alternate;
     }
-
-    /* Resto de estilos (Sobre, Música, etc.) */
-    .sobre-section, .music-section { padding: 80px 20px; text-align: center; z-index: 2; position: relative; }
-    .sobre-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.4rem; margin-bottom: 15px; color: var(--texto-principal); }
-    .sobre-btn { width: 160px; height: 100px; background: var(--bg-tarjeta); border: 1px solid var(--borde); border-radius: 6px; position: relative; cursor: pointer; display: inline-block; box-shadow: var(--sombra); margin: 20px 0; }
-    .sobre-btn::before { content: ''; position: absolute; top: 0; left: 0; border-left: 78px solid transparent; border-right: 78px solid transparent; border-top: 50px solid var(--borde); border-radius: 6px 6px 0 0; transition: border 0.5s ease; }
-    .sobre-btn::after { content: "❤"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; background: var(--dorado); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
-    .mensaje-sobre { max-width: 600px; margin: 0 auto; padding: 30px; background: var(--bg-tarjeta); border-radius: 12px; display: none; font-family: 'Caveat', cursive; font-size: 2rem; border-left: 4px solid var(--rosa); box-shadow: var(--sombra); color: var(--texto-principal); }
-    .mensaje-sobre.visible { display: block; animation: fadeInUp 0.5s ease; }
+    @keyframes pulsoSobre {
+      0% { transform: translateY(0) scale(1); box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+      100% { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px rgba(242, 140, 166, 0.15); }
+    }
+    .sobre-btn::before { 
+      content: ''; position: absolute; top: 0; left: 0; border-left: 88px solid transparent; border-right: 88px solid transparent; 
+      border-top: 55px solid #fbd5dd; border-radius: 6px 6px 0 0; transition: all 0.4s ease; 
+    }
+    .sobre-btn::after {
+      content: "❤"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 36px; height: 36px; background: var(--dorado-suave); color: #fff; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: 0.4s ease; z-index: 2;
+    }
+    .sobre-btn:hover { animation: none; transform: translateY(-12px) scale(1.05); box-shadow: 0 30px 60px rgba(242, 140, 166, 0.25); }
+    .sobre-btn:hover::before { border-top-color: var(--rosa-profundo); }
+    .sobre-btn:hover::after { transform: translate(-50%, -50%) scale(1.2) rotate(15deg); background: var(--rosa-profundo); }
     
-    .music-card { max-width: 600px; margin: 0 auto; background: var(--bg-tarjeta); border: 1px solid var(--borde); border-radius: 16px; padding: 30px; box-shadow: var(--sombra); }
+    .mensaje-sobre { 
+      max-width: 600px; margin: 40px auto 0; padding: 40px 50px; background: #fff; border-radius: 6px; 
+      box-shadow: 0 20px 50px rgba(0,0,0,0.06); display: none; font-family: 'Caveat', cursive; 
+      font-size: 2.4rem; color: var(--texto-elegante); line-height: 1.5; text-align: center;
+      animation: fadeInUp 0.8s ease; border: 1px solid rgba(242, 140, 166, 0.2); border-left: 6px solid var(--rosa-profundo);
+    }
+    .mensaje-sobre.visible { display: block; }
 
-    /* 🛑 BOTÓN DEL CINE ARRIBA A LA DERECHA 🛑 */
-    .btn-modo-cine { 
-      position: fixed; top: 20px; right: 20px; 
-      width: 50px; height: 50px; border-radius: 50%; 
-      background: var(--bg-tarjeta); color: var(--texto-principal); 
-      border: 1px solid var(--borde); 
-      display: flex; align-items: center; justify-content: center; 
-      cursor: pointer; box-shadow: var(--sombra); z-index: 9999; 
-      transition: transform 0.3s, background 0.5s; 
-    }
-    .btn-modo-cine:hover { transform: scale(1.1); background: var(--rosa); color: #fff; }
+    /* Sección de Música */
+    .music-section { padding: 120px 20px; display: flex; flex-direction: column; align-items: center; background: #fdfafb; position: relative; }
+    .music-section::before { content: "Nuestra Melodía"; font-family: 'Playfair Display', serif; font-style: italic; color: var(--texto-elegante); font-size: 2.2rem; margin-bottom: 30px; }
+    .music-card { background: #fff; border-radius: 8px; padding: 40px; display: flex; align-items: center; gap: 40px; box-shadow: 0 15px 35px rgba(0,0,0,0.04); max-width: 700px; width: 100%; flex-wrap: wrap; justify-content: center; text-align: center; border: 1px solid rgba(242, 140, 166, 0.1); }
 
-    /* 🛑 BOTÓN DE RECUERDO ABAJO A LA DERECHA 🛑 */
-    .btn-recuerdo-flotante { 
-      position: fixed; bottom: 20px; right: 20px; 
-      width: 50px; height: 50px; border-radius: 50%; 
-      background: var(--bg-tarjeta); border: 1px solid var(--borde); 
-      color: var(--rosa); display: flex; align-items: center; justify-content: center; 
-      cursor: pointer; box-shadow: var(--sombra); z-index: 9997; 
-      transition: transform 0.3s, background 0.5s; font-size: 1.3rem;
+    /* Botón PWA Exclusivo */
+    .btn-pwa-unico {
+      display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+      padding: 18px 45px; background: linear-gradient(135deg, #d96c88, #c9a050); color: #fff;
+      border: none; border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600;
+      letter-spacing: 1px; cursor: pointer; transition: all 0.4s ease; box-shadow: 0 15px 30px rgba(217, 108, 136, 0.3);
+      margin: 40px auto; position: relative; overflow: hidden;
     }
-    .btn-recuerdo-flotante:hover { transform: translateY(-5px) scale(1.05); background: var(--rosa); color: #fff; }
+    .btn-pwa-unico::before {
+      content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn-pwa-unico:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(217, 108, 136, 0.5); }
+    .btn-pwa-unico:hover::before { left: 100%; }
+    .btn-pwa-unico svg { width: 24px; height: 24px; fill: currentColor; }
 
-    /* 🛑 DISEÑO ESPECIAL PARA EL BOTÓN DE ADMIN (CONSOLA) 🛑 */
-    .admin-seccion {
-      max-width: 800px;
-      margin: 0 auto 80px auto;
-      padding: 0 20px;
-      text-align: center;
-      display: none; /* Oculto por defecto, JS lo muestra */
-    }
-    .btn-admin-consola {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-      background: #1a1a1a;
-      color: #fff;
-      padding: 20px 40px;
-      border-radius: 50px;
-      text-decoration: none;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-      border: 1px solid rgba(255,255,255,0.1);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
-    }
-    .btn-admin-consola:hover {
-      background: #2a2a2a;
-      transform: translateY(-3px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
-      border-color: var(--dorado);
-    }
-    .btn-admin-consola svg { width: 24px; height: 24px; stroke: var(--dorado); }
-    .btn-admin-consola span { color: var(--dorado); }
+    /* Modal Recuerdo */
+    .modal-recuerdo { position: fixed; inset: 0; background: rgba(44, 26, 36, 0.9); backdrop-filter: blur(15px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.4s ease; }
+    .modal-recuerdo.activo { display: flex; opacity: 1; }
+    .recuerdo-card-modal { background: #fff; border-radius: 8px; padding: 20px 20px 40px 20px; max-width: 450px; width: 100%; box-shadow: 0 30px 60px rgba(0,0,0,0.3); position: relative; transform: scale(0.9); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); text-align: center; }
+    .modal-recuerdo.activo .recuerdo-card-modal { transform: scale(1); }
+    .recuerdo-card-modal img { width: 100%; height: 350px; object-fit: cover; border-radius: 4px; margin-bottom: 20px; }
+    .btn-cerrar-modal { position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; border-radius: 50%; background: #fff; border: 1px solid #eee; color: #1a202c; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: 0.3s; }
+    .btn-cerrar-modal:hover { background: var(--rosa-profundo); color: #fff; transform: rotate(90deg); }
 
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    /* Botones Flotantes */
+    .btn-recuerdo-flotante { position: fixed; bottom: 20px; right: 20px; z-index: 9998; width: 56px; height: 56px; border-radius: 50%; background: #fff; border: 1px solid rgba(242, 140, 166, 0.2); color: var(--rosa-profundo); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.1); transition: all 0.3s ease; font-size: 1.5rem; }
+    .btn-recuerdo-flotante:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 15px 35px rgba(0,0,0,0.15); background: #fdfafb; }
+
+    /* El único botón de Modo Cine (Cámara) */
+    .btn-modo-cine { position: fixed; top: 80px; right: 20px; z-index: 9997; width: 50px; height: 50px; border-radius: 50%; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.3); transition: all 0.3s ease; }
+    .btn-modo-cine:hover { transform: scale(1.1); background: var(--dorado-suave); color: #1a1a1a; }
+    .btn-modo-cine svg { width: 22px; height: 22px; fill: currentColor; }
+
+    /* Tooltips Didácticos */
+    .tooltip {
+      position: absolute; background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 8px;
+      font-family: 'Poppins', sans-serif; font-size: 0.8rem; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      z-index: 10000; pointer-events: none; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(10px);
+    }
+    .tooltip.visible { opacity: 1; transform: translateY(0); }
+    .tooltip::after { content: ""; position: absolute; border: 6px solid transparent; bottom: -12px; left: 50%; margin-left: -6px; border-top-color: #1a1a1a; }
+
+    @keyframes fadeInSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-up { animation: fadeInSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  
+      /* Portada personalizada */
+    .hero { position: relative; overflow: hidden; }
+    .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; filter: blur(2px); z-index: 1; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,250,245,0.85), rgba(255,250,245,0.95)); z-index: 2; }
+    .hero-content { position: relative; z-index: 3; }
   </style>
 </head>
-<body>
+<body data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti">
 
-  <!-- 🛑 FONDO DE NUBES 🛑 -->
-  <div class="fondo-nubes">
-    <div class="nube"></div>
-    <div class="nube"></div>
-    <div class="nube"></div>
-    <div class="nube"></div>
-    <div class="nube"></div>
-  </div>
-
-  <!-- 🛑 BOTÓN DEL MODO CINE (Arriba a la derecha) 🛑 -->
-  <button class="btn-modo-cine" id="btnModoCine" title="Modo Cine" style="display: none;">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
-  </button>
+  <div class="hearts-bg" aria-hidden="true"></div>
 
   <!-- 1. PORTADA (HERO) -->
   <section class="hero" id="heroSection">
-    <img src="assets/images/portada.jpg" alt="Portada" id="portadaImg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; z-index: -1; border-radius: 0 0 50px 50px; mask-image: linear-gradient(to bottom, black 50%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);">
-    
-    <p id="saludoTag" style="letter-spacing: 4px; text-transform: uppercase; font-size: 0.8rem; color: var(--dorado); font-weight: 600;">Un pequeño universo</p>
-    <h1 class="hero-title" id="tituloSaludo">Hola, Mi Amor</h1>
-    <p class="hero-subtitle">Cada rincón de esta página guarda algo nuestro.<br>Tómate tu tiempo... esto es <em>todo</em> para ti.</p>
+    <div class="hero-overlay"></div>
+    <img src="assets/images/portada.jpg" alt="Portada" class="hero-img" id="portadaImg" onerror="this.style.display='none'">
 
-    <div id="contador" style="display: flex; gap: 15px; justify-content: center; margin: 40px 0;">
-      <div class="contador-item"><span id="dias">0</span><small>Días</small></div>
-      <div class="contador-item"><span id="horas">0</span><small>Horas</small></div>
-      <div class="contador-item"><span id="minutos">0</span><small>Min</small></div>
-      <div class="contador-item"><span id="segundos">0</span><small>Seg</small></div>
+    <div class="hero-content">
+      <p class="hero-tag" id="saludoTag">Un pequeño universo hecho para ti</p>
+      <h1 class="hero-title" id="tituloSaludo" style="font-family: 'Playfair Display', serif; font-style: italic;">Hola, Mi Amor</h1>
+      <p class="hero-subtitle" style="font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic;">Cada rincón de esta página guarda algo nuestro.<br>Tómate tu tiempo... esto es <em>todo</em> para ti.</p>
+
+      <div class="contador-hero" id="contador">
+        <div class="contador-item"><span id="dias">0</span><small>Días</small></div>
+        <div class="contador-item"><span id="horas">0</span><small>Horas</small></div>
+        <div class="contador-item"><span id="minutos">0</span><small>Min</small></div>
+        <div class="contador-item"><span id="segundos">0</span><small>Seg</small></div>
+      </div>
+
+      <p class="contador-label" style="font-family: 'Cormorant Garamond', serif; font-style: italic;">Juntos desde el <strong id="fecha-inicio">Cargando fecha...</strong></p>
+
+      <div class="hero-buttons">
+        <a href="#menu" class="btn btn-primary" style="border-radius: 4px;">Explorar</a>
+        <a href="pages/historia.html" class="btn btn-outline" style="border-radius: 4px;">Nuestra Historia</a>
+      </div>
     </div>
-    <p class="contador-label">Juntos desde el <strong id="fecha-inicio">Cargando fecha...</strong></p>
+    <div class="scroll-hint">↓</div>
   </section>
 
-  <!-- 2. EL SOBRE SECRETO -->
+  <!-- 2. EL SOBRE SECRETO (CON TOOLTIP DIDÁCTICO) -->
   <section class="sobre-section" id="seccionSobre">
     <h2 class="sobre-titulo">Un mensaje para ti</h2>
-    <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2rem; color: var(--texto-secundario); margin-bottom: 20px;">Presiona el sobre para descubrir lo que guardé hoy.</p>
+    <p class="sobre-sub">Presiona el sobre para descubrir lo que guardé hoy.</p>
     <div class="sobre-btn" id="btnAbrirSobre"></div>
     <div class="mensaje-sobre" id="mensajeSobre">
-      <p id="textoCartaSecreta" style="margin: 0;">"Eres mi persona favorita."</p>
-      <small id="autorCartaSecreta" style="display:block; margin-top: 15px; font-family: 'Poppins'; font-size: 0.8rem; color: var(--texto-secundario);"></small>
+      <p id="textoCartaSecreta">"Eres mi persona favorita en el mundo entero."</p>
+      <small id="autorCartaSecreta" style="display:block; margin-top: 15px; font-family: 'Poppins'; font-size: 0.8rem; color: #888;"></small>
     </div>
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltipSobre" style="top: 20px; left: 50%; transform: translateX(-50%);">¡Haz clic aquí para abrir tu carta diaria! ✨</div>
   </section>
 
-  <!-- 3. MENÚ PRINCIPAL (BENTO GRID 3D CON TODOS LOS BOTONES) -->
-  <section style="max-width: 1100px; margin: 0 auto; padding: 40px 20px;">
-    <h2 class="sobre-titulo" style="text-align: center; margin-bottom: 40px;">Explora Nuestro Mundo</h2>
-    
-    <div class="bento-grid">
-      
-      <!-- Tarjeta Destacada (Historia) -->
-      <a href="pages/historia.html" class="bento-item grande destacado" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
-        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-        <h3 style="font-size: 1.8rem;">Nuestra Historia</h3>
-        <p>Cómo nos conocimos y todo lo que vino después. Un viaje por nuestros momentos más importantes.</p>
-      </a>
+  <!-- 3. EL MENÚ PRINCIPAL -->
+  <section class="menu" id="menu">
+    <h2 class="section-title" style="font-family: 'Playfair Display', serif; font-style: italic;">Explora Nuestro Mundo</h2>
+    <p class="section-sub" style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2rem;">Cada sección es un pedacito de nosotros</p>
 
-      <!-- Tarjeta Normal (Recuerdos) -->
-      <a href="pages/recuerdos.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-        <h3>Recuerdos</h3>
-        <p>Momentos, fotos y cosas que me recuerdan a ti.</p>
+    <div class="cards-grid">
+      <a href="pages/historia.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">Nuestra Historia</h3><p>Cómo nos conocimos y todo lo que vino después.</p>
       </a>
-
-      <!-- Tarjeta Normal (Cartas) -->
-      <a href="pages/cartas.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-        <h3>Cartas</h3>
-        <p>Se desbloquea una nueva cada 48 horas.</p>
+      <a href="pages/recuerdos.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">Recuerdos</h3><p>Momentos, fotos y cosas que me recuerdan a ti.</p>
       </a>
-
-      <!-- Tarjeta Normal (Razones) -->
-      <a href="pages/razones.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-        <h3>1000 Razones</h3>
-        <p>Todas las razones por las que me enamoré de ti.</p>
+      <a href="pages/cartas.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">Cartas</h3><p>Se desbloquea una nueva cada 48 horas.</p>
       </a>
-
-      <!-- Tarjeta Normal (Juego) -->
-      <a href="pages/juego.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-        <h3>El Juego</h3>
-        <p>Cuánto me conoces? Gana puntos amorosos.</p>
+      <a href="pages/razones.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">1000 Razones</h3><p>Todas las razones por las que me enamoré de ti.</p>
       </a>
-
-      <!-- Tarjeta Normal (Cuponera) -->
-      <a href="pages/cuponera.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><path d="M20 12v10H4V12"></path><path d="M2 7h20v5H2z"></path><path d="M12 22V7"></path><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>
-        <h3>Cuponera</h3>
-        <p>Canjea tus puntos por cupones especiales.</p>
+      <a href="pages/juego.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">El Juego</h3><p>Cuánto me conoces? Gana puntos amorosos.</p>
       </a>
-
-      <!-- Tarjeta Normal (Diario) -->
-      <a href="pages/diario.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="11" x2="16" y2="11"></line></svg>
-        <h3>Nuestro Diario</h3>
-        <p>Un mural de momentos, uno por uno.</p>
+      <a href="pages/cuponera.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><path d="M20 12v10H4V12"></path><path d="M2 7h20v5H2z"></path><path d="M12 22V7"></path><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">Cuponera</h3><p>Canjea tus puntos por cupones especiales.</p>
       </a>
-
-      <!-- Tarjeta Normal (Arte) -->
-      <a href="pages/arte.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>
-        <h3>Taller de Arte</h3>
-        <p>Dibuja, guarda y descarga tus obras.</p>
+      <a href="pages/diario.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="11" x2="16" y2="11"></line></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">Nuestro Diario</h3><p>Un mural de momentos, uno por uno.</p>
       </a>
-
-      <!-- Tarjeta Normal (Audios) -->
-      <a href="pages/audios.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-        <h3>Notas de Voz</h3>
-        <p>Mensajes de voz para escuchar cuando quieras.</p>
+      <a href="pages/arte.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">Taller de Arte</h3><p>Dibuja, guarda y descarga tus obras.</p>
       </a>
-
-      <!-- Tarjeta Normal (Mapa) -->
-      <a href="pages/mapa.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-        <h3>Mapa de Recuerdos</h3>
-        <p>Los lugares que marcan nuestra historia.</p>
+      <a href="pages/audios.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">Notas de Voz</h3><p>Mensajes de voz para escuchar cuando quieras.</p>
       </a>
-
-      <!-- Tarjeta Normal (Calendario) -->
-      <a href="pages/calendario.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-        <h3>Calendario</h3>
-        <p>Fechas importantes que no queremos olvidar.</p>
+      <a href="pages/mapa.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">Mapa de Recuerdos</h3><p>Los lugares que marcan nuestra historia.</p>
       </a>
-
-      <!-- Tarjeta Normal (Metas/Sueños) -->
-      <a href="pages/metas.html" class="bento-item" data-tilt>
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-        <h3>Nuestros Sueños</h3>
-        <p>Las metas y sueños que queremos cumplir juntos.</p>
+      <a href="pages/calendario.html" class="card">
+        <div class="card-icono"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif;">Calendario</h3><p>Fechas importantes que no queremos olvidar.</p>
       </a>
-
+      <a href="pages/metas.html" class="card">
+        <div class="card-icono">
+          <svg class="icono" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+        </div>
+        <h3 style="font-family: 'Playfair Display', serif;">Nuestros Sueños</h3><p>Las metas y sueños que queremos cumplir juntos.</p>
+      </a>
+      <a href="admin.html" id="btnAdmin" class="card" style="border: 1px dashed var(--dorado-suave); background: rgba(201, 160, 80, 0.05);">
+        <div class="card-icono"><svg viewBox="0 0 24 24" style="stroke: var(--dorado-suave);"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
+        <h3 style="font-family: 'Playfair Display', serif; color: var(--dorado-suave);">Panel de Admin</h3><p>Configura cartas, juego y cupones.</p>
+      </a>
     </div>
-  </section>
-
-  <!-- 🛑 SECCIÓN EXCLUSIVA DE ADMIN (Solo dueño) 🛑 -->
-  <section class="admin-seccion" id="seccionAdmin">
-    <a href="admin.html" id="btnAdmin" class="btn-admin-consola">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-      Acceder a la <span>Consola de Administración</span>
-    </a>
   </section>
 
   <!-- 4. LA MÚSICA -->
   <section class="music-section">
-    <h2 class="sobre-titulo" style="font-size: 2rem; margin-bottom: 30px;">Nuestra Melodía</h2>
     <div class="music-card" id="musicCard"></div>
   </section>
 
-  <!-- Footer -->
-  <footer style="text-align: center; padding: 40px; font-size: 0.9rem; color: var(--texto-secundario); font-style: italic;">Hecho con amor, solo para ti.</footer>
+  <!-- 5. INVITAR A LA PAREJA -->
+  <section id="btnInvitarPareja" class="invitar-section" style="text-align: center; padding: 80px 30px; background: #fff; margin: 60px auto; max-width: 800px; border-radius: 8px; border: 1px solid rgba(242, 140, 166, 0.2); box-shadow: 0 20px 40px rgba(0,0,0,0.02);">
+    <h3 style="font-family: 'Playfair Display', serif; font-style: italic; color: var(--texto-elegante); margin-bottom: 12px; font-size: 2rem;">Un espacio para dos</h3>
+    <p style="color: #7a5c8c; font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; margin-bottom: 30px; font-style: italic;">Genera un código único y su código QR para que tu pareja se una a este pequeño universo.</p>
+    <a href="invitar.html" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; background: var(--dorado-suave);">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+      Generar Código / QR
+    </a>
+  </section>
 
-  <!-- 🛑 CONTENEDOR DEL MODO CINE 🛑 -->
+  <!-- BOTÓN ÚNICO DE DESCARGA PWA -->
+  <div style="text-align: center;">
+    <button id="btnInstalarPWAUnico" class="btn-pwa-unico" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Instalar Nuestra App
+    </button>
+  </div>
+
+  <footer class="footer" style="text-align: center; padding: 40px 20px; border-top: 1px solid rgba(242,140,166,0.1); font-size: 0.9rem; color: var(--texto-suave); font-style: italic;">Hecho con amor, solo para ti.</footer>
+  <canvas id="confetiCanvas" class="confeti-canvas"></canvas>
+
+  <!-- 🛑 CONTENEDOR DEL MODO CINE (Se llena dinámicamente) 🛑 -->
   <div class="cine-container" id="cineContainer"></div>
 
-  <!-- Botón Flotante Recuerdo del Día (Abajo a la derecha) -->
+  <!-- Botón Flotante Recuerdo del Día (Se mantiene) -->
   <button class="btn-recuerdo-flotante" id="btnVerRecuerdo" title="Recuerdo del Día">📸</button>
+  
+  <!-- 🛑 ÚNICO BOTÓN DEL MODO CINE (Cámara - Flotante) 🛑 -->
+  <button class="btn-modo-cine" id="btnModoCine" title="Modo Cine" style="display: none;">
+    <svg viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+  </button>
 
-  <!-- Modal Recuerdo -->
-  <div id="modalRecuerdo" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px;">
-    <div style="background: var(--bg-tarjeta); border-radius: 24px; padding: 20px; max-width: 450px; width: 100%; position: relative; text-align: center; box-shadow: var(--sombra); border: 1px solid var(--borde);">
-      <button id="btnCerrarRecuerdo" style="position: absolute; top: -15px; right: -15px; width: 40px; height: 40px; border-radius: 50%; background: var(--bg-claro); border: 1px solid var(--borde); cursor: pointer; font-size: 1.2rem; color: var(--texto-principal);">✕</button>
+  <!-- Modal Recuerdo del Día -->
+  <div class="modal-recuerdo" id="modalRecuerdo">
+    <div class="recuerdo-card-modal">
+      <button class="btn-cerrar-modal" id="btnCerrarRecuerdo">✕</button>
       <div id="contenidoRecuerdoModal"></div>
     </div>
   </div>
@@ -375,15 +310,21 @@
     import { supabase } from './js/supabase.js';
     import { iniciarRealtimeGlobal } from './js/realtime.js';
 
-    // 🛑 ACTIVAR EFECTO 3D EN LAS TARJETAS 🛑
-    if (window.VanillaTilt) {
-      VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
-        max: 15,
-        speed: 400,
-        glare: true,
-        "max-glare": 0.2,
-        scale: 1.02
-      });
+    // 🛑 LÓGICA DIDÁCTICA: ONBOARDING BÁSICO
+    function iniciarOnboarding() {
+      if (localStorage.getItem('onboarding_hecho')) return;
+      
+      const tooltipSobre = document.getElementById('tooltipSobre');
+      if (tooltipSobre) {
+        setTimeout(() => {
+          tooltipSobre.classList.add('visible');
+          setTimeout(() => {
+            tooltipSobre.classList.remove('visible');
+          }, 6000);
+        }, 2000);
+      }
+      
+      localStorage.setItem('onboarding_hecho', 'true');
     }
 
     function obtenerEmbedUrl(url) {
@@ -398,58 +339,19 @@
       } catch (e) { return null; }
     }
 
-    function obtenerMomentoDelDia() {
-      const hora = new Date().getHours();
-      if (hora >= 6 && hora < 12) return 'manana';
-      if (hora >= 12 && hora < 19) return 'tarde';
-      return 'noche';
-    }
-
     function configurarAmbientePorHora() {
       const hora = new Date().getHours();
+      const hero = document.getElementById('heroSection');
       const tag = document.getElementById('saludoTag');
       const titulo = document.getElementById('tituloSaludo');
-      
-      // 🛑 ACTIVAR MODO OSCURO SI ES DE NOCHE 🛑
-      if (obtenerMomentoDelDia() === 'noche') {
-        document.body.classList.add('modo-noche');
-      }
-
+      hero.classList.remove('manana', 'tarde', 'noche');
       if (hora >= 6 && hora < 12) {
-        tag.textContent = "Un nuevo amanecer a tu lado"; titulo.textContent = "Buenos días, Mi Amor";
+        hero.classList.add('manana'); tag.textContent = "Un nuevo amanecer a tu lado"; titulo.textContent = "Buenos días, Mi Amor";
       } else if (hora >= 12 && hora < 19) {
-        tag.textContent = "Un pequeño universo hecho para ti"; titulo.textContent = "Hola, Mi Amor";
+        hero.classList.add('tarde'); tag.textContent = "Un pequeño universo hecho para ti"; titulo.textContent = "Hola, Mi Amor";
       } else {
-        tag.textContent = "Para cerrar el día pensando en ti"; titulo.textContent = "Buenas noches, Mi Amor";
+        hero.classList.add('noche'); tag.textContent = "Para cerrar el día pensando en ti"; titulo.textContent = "Buenas noches, Mi Amor";
       }
-    }
-
-    async function configurarCartaSecreta(coupleId) {
-      const hoyStr = new Date().toISOString().split('T')[0];
-      const momentoActual = obtenerMomentoDelDia();
-
-      // 1. Carta para hoy
-      const { data: cartaFecha } = await supabase.from('cartas_secretas')
-        .select('*').eq('couple_id', coupleId).eq('fecha_especifica', hoyStr).maybeSingle();
-      if (cartaFecha) return mostrarCarta(cartaFecha.contenido, cartaFecha.autor);
-
-      // 2. Carta para el momento actual
-      const { data: cartasMomento } = await supabase.from('cartas_secretas')
-        .select('*').eq('couple_id', coupleId).eq('momento', momentoActual);
-      if (cartasMomento && cartasMomento.length > 0) {
-        const aleatoria = cartasMomento[Math.floor(Math.random() * cartasMomento.length)];
-        return mostrarCarta(aleatoria.contenido, aleatoria.autor);
-      }
-
-      // 3. Fallback
-      mostrarCarta("Eres mi persona favorita en el mundo entero. Incluso en los días grises, mi lugar seguro eres tú.", "Con amor, siempre.");
-    }
-
-    function mostrarCarta(contenido, autor) {
-      document.getElementById('textoCartaSecreta').textContent = `"${contenido}"`;
-      const autorEl = document.getElementById('autorCartaSecreta');
-      if (autor) { autorEl.textContent = `— ${autor}`; autorEl.style.display = 'block'; } 
-      else { autorEl.style.display = 'none'; }
     }
 
     async function cargarRecuerdoDelDia(coupleId) {
@@ -463,43 +365,110 @@
       const fechaObj = new Date(recuerdo.fecha);
       const fechaFormat = fechaObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
       container.innerHTML = `
-        <img src="${recuerdo.url}" style="width: 100%; height: 300px; object-fit: cover; border-radius: 12px; margin-bottom: 20px;">
-        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--dorado); font-weight: 600;">${fechaFormat}</span>
-        <h3 style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.8rem; margin: 8px 0 12px;">${recuerdo.titulo || 'Un momento'}</h3>
-        <p style="font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; line-height: 1.6; font-style: italic;">${recuerdo.descripcion || 'Un pedacito de nuestra historia.'}</p>
+        <img src="${recuerdo.url}" alt="Recuerdo">
+        <span style="font-family: 'Poppins'; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: var(--dorado-suave); font-weight: 600;">${fechaFormat}</span>
+        <h3 style="font-family: 'Playfair Display', serif; font-style: italic; color: #1a202c; font-size: 1.8rem; margin: 8px 0 12px;">${recuerdo.titulo || 'Un momento'}</h3>
+        <p style="font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: #4a5568; line-height: 1.6; font-style: italic;">${recuerdo.descripcion || 'Un pedacito de nuestra historia.'}</p>
       `;
+    }
+
+    // 🛑 FUNCIÓN PARA DETECTAR EL MOMENTO DEL DÍA 🛑
+    function obtenerMomentoDelDia() {
+      const hora = new Date().getHours();
+      if (hora >= 6 && hora < 12) return 'manana';
+      if (hora >= 12 && hora < 19) return 'tarde';
+      return 'noche';
+    }
+
+    // 🛑 LÓGICA PARA CARGAR Y MOSTRAR LA CARTA SECRETA 🛑
+    async function configurarCartaSecreta(coupleId) {
+      const hoyStr = new Date().toISOString().split('T')[0];
+      const momentoActual = obtenerMomentoDelDia();
+
+      // 1. Buscar si hay una carta específica para HOY
+      const { data: cartaFecha } = await supabase.from('cartas_secretas')
+        .select('*')
+        .eq('couple_id', coupleId)
+        .eq('fecha_especifica', hoyStr)
+        .maybeSingle();
+
+      if (cartaFecha) {
+        mostrarCarta(cartaFecha.contenido, cartaFecha.autor);
+        return;
+      }
+
+      // 2. Buscar si hay cartas para el momento actual (mañana, tarde, noche)
+      const { data: cartasMomento } = await supabase.from('cartas_secretas')
+        .select('*')
+        .eq('couple_id', coupleId)
+        .eq('momento', momentoActual);
+
+      if (cartasMomento && cartasMomento.length > 0) {
+        // Elegir una al azar entre las de este momento
+        const cartaAleatoria = cartasMomento[Math.floor(Math.random() * cartasMomento.length)];
+        mostrarCarta(cartaAleatoria.contenido, cartaAleatoria.autor);
+        return;
+      }
+
+      // 3. Si no hay nada programado, usar el fallback (predeterminadas)
+      const cartaFallback = "Eres mi persona favorita en el mundo entero. Incluso en los días grises, mi lugar seguro eres tú.";
+      mostrarCarta(cartaFallback, "Con amor, siempre.");
+    }
+
+    function mostrarCarta(contenido, autor) {
+      document.getElementById('textoCartaSecreta').textContent = `"${contenido}"`;
+      const autorEl = document.getElementById('autorCartaSecreta');
+      if (autor) {
+        autorEl.textContent = `— ${autor}`;
+        autorEl.style.display = 'block';
+      } else {
+        autorEl.style.display = 'none';
+      }
     }
 
     async function initIndex() {
       document.documentElement.style.visibility = "hidden";
+      
       try {
         configurarAmbientePorHora();
         const datos = await protegerRuta();
         if (!datos) return;
 
-        if (datos.couple && datos.couple.portada_url) {
-          const portadaImg = document.getElementById('portadaImg');
-          if (portadaImg) portadaImg.src = datos.couple.portada_url;
-        }
+        iniciarOnboarding();
 
         if (datos.couple && datos.couple.fecha_inicio) {
           const dateObj = new Date(datos.couple.fecha_inicio + 'T00:00:00');
           document.getElementById('fecha-inicio').textContent = dateObj.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
         }
 
-        // 🛑 MOSTRAR BOTÓN DE ADMIN SOLO SI ES EL DUEÑO 🛑
-        const seccionAdmin = document.getElementById('seccionAdmin');
         const btnAdmin = document.getElementById('btnAdmin');
+        const btnInvitar = document.getElementById('btnInvitarPareja');
         const esOwnerReal = datos.esOwner === true || (datos.couple && String(datos.couple.owner_id) === String(datos.user.id));
 
         if (esOwnerReal) {
-          if (seccionAdmin) seccionAdmin.style.display = 'block';
-          if (btnAdmin) btnAdmin.style.display = 'flex';
+          if (btnAdmin) btnAdmin.style.setProperty('display', 'block', 'important');
+          if (btnInvitar) btnInvitar.style.setProperty('display', 'block', 'important');
         } else {
-          if (seccionAdmin) seccionAdmin.remove();
+          if (btnAdmin) btnAdmin.remove();
+          if (btnInvitar) btnInvitar.remove();
         }
 
-        // 🛑 CARGAR CARTA SECRETA (Y recargar si cambia en admin) 🛑
+        // 🛑 CARGAR PORTADA PERSONALIZADA 🛑
+        if (datos.couple && datos.couple.portada_url) {
+          const portadaImg = document.getElementById('portadaImg');
+          if (portadaImg) {
+            portadaImg.src = datos.couple.portada_url;
+            portadaImg.style.display = 'block';
+            portadaImg.style.opacity = '0.35';
+          }
+        }
+
+        // 🛑 MODO NOCHE AUTOMÁTICO 🛑
+        if (obtenerMomentoDelDia() === 'noche') {
+          document.body.classList.add('modo-noche');
+        }
+
+        // 🛑 CARGAR LA CARTA SECRETA 🛑
         await configurarCartaSecreta(datos.couple.id);
 
         const musicCard = document.getElementById('musicCard');
@@ -508,12 +477,12 @@
           const mp3Url = datos.couple?.cancion_mp3_url;
           if (spotifyUrl) {
             const embedUrl = obtenerEmbedUrl(spotifyUrl);
-            if (embedUrl) musicCard.innerHTML = `<iframe style="border-radius:12px; border:none; width:100%; height:152px;" src="${embedUrl}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
-            else musicCard.innerHTML = `<p style="text-align:center;color:#888;">El enlace de Spotify no es válido.</p>`;
+            if (embedUrl) musicCard.innerHTML = `<iframe class="spotify-iframe" src="${embedUrl}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+            else musicCard.innerHTML = `<p style="text-align:center;color:#888; font-family: 'Cormorant Garamond', serif; font-style: italic;">El enlace de Spotify no es válido.</p>`;
           } else if (mp3Url) {
-            musicCard.innerHTML = `<div class="vinyl" id="vinyl"></div><div class="music-info"><h3 style="font-family: 'Playfair Display', serif; font-style: italic;">Nuestra Melodía</h3><p style="font-family: 'Cormorant Garamond', serif; font-style: italic;">Presiona play y piensa en mí</p><button class="btn btn-primary" id="playBtn" style="margin-top: 15px; padding: 10px 20px; border-radius: 8px; border: none; background: var(--rosa); color: #fff; cursor: pointer;">▶ Reproducir</button></div>`;
+            musicCard.innerHTML = `<div class="vinyl" id="vinyl"></div><div class="music-info"><h3 id="nombreCancion" style="font-family: 'Playfair Display', serif; font-style: italic; color: var(--texto-elegante);">Nuestra Melodía</h3><p id="artistaCancion" style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem;">Presiona play y piensa en mí</p><button class="btn btn-primary" id="playBtn" style="border-radius: 4px;">▶ Reproducir</button></div>`;
           } else {
-            musicCard.innerHTML = `<p style="text-align:center;color:#888;">Aún no hay música configurada.</p>`;
+            musicCard.innerHTML = `<p style="text-align:center;color:#888; font-family: 'Cormorant Garamond', serif; font-style: italic;">Aún no hay música configurada.</p>`;
           }
         }
 
@@ -533,18 +502,18 @@
           cargarRecuerdoDelDia(datos.couple.id);
           iniciarRealtimeGlobal(datos.couple.id);
 
+          // 🛑 CONFIGURAR BOTÓN DE MODO CINE (Solo la cámara) 🛑
           const btnModoCine = document.getElementById('btnModoCine');
-          if (datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
+          if (datos.couple && datos.couple.fondos_modo_cine && datos.couple.fondos_modo_cine.length > 0) {
             if (btnModoCine) {
               btnModoCine.style.display = 'flex';
               btnModoCine.onclick = () => abrirModoCine(datos.couple.fondos_modo_cine);
             }
+          } else {
+            if (btnModoCine) btnModoCine.style.display = 'none';
           }
 
           window.addEventListener('supabase-cambio', (e) => {
-            if (e.detail.tabla === 'cartas_secretas') {
-              configurarCartaSecreta(datos.couple.id);
-            }
             if (e.detail.tabla === 'recuerdos' || e.detail.tabla === 'mapa_recuerdos') {
               cargarRecuerdoDelDia(datos.couple.id);
             }
@@ -553,27 +522,34 @@
                 const portadaImg = document.getElementById('portadaImg');
                 if (portadaImg) portadaImg.src = e.detail.data.portada_url;
               }
-              if (e.detail.data.fondos_modo_cine && e.detail.data.fondos_modo_cine.length > 0) {
+              // Actualizar fondos de cine en vivo
+              if (e.detail.data.fondos_modo_cine) {
                 const btnModoCine = document.getElementById('btnModoCine');
                 if (btnModoCine) {
-                  btnModoCine.style.display = 'flex';
-                  btnModoCine.onclick = () => abrirModoCine(e.detail.data.fondos_modo_cine);
+                  if (e.detail.data.fondos_modo_cine.length > 0) {
+                    btnModoCine.style.display = 'flex';
+                    btnModoCine.onclick = () => abrirModoCine(e.detail.data.fondos_modo_cine);
+                  } else {
+                    btnModoCine.style.display = 'none';
+                  }
                 }
               }
+              // Actualizar música
               const spotifyUrl = e.detail.data.cancion_spotify_url;
               const mp3Url = e.detail.data.cancion_mp3_url;
               const musicCard = document.getElementById('musicCard');
               if (spotifyUrl) {
                 const embedUrl = obtenerEmbedUrl(spotifyUrl);
-                if (embedUrl) musicCard.innerHTML = `<iframe style="border-radius:12px; border:none; width:100%; height:152px;" src="${embedUrl}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+                if (embedUrl) musicCard.innerHTML = `<iframe class="spotify-iframe" src="${embedUrl}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
               } else if (mp3Url) {
-                musicCard.innerHTML = `<div class="vinyl" id="vinyl"></div><div class="music-info"><h3>🎵 Nuestra Canción</h3><p>Presiona play y piensa en mí</p><button class="btn btn-primary" id="playBtn">▶ Reproducir</button></div>`;
+                musicCard.innerHTML = `<div class="vinyl" id="vinyl"></div><div class="music-info"><h3 id="nombreCancion">🎵 Nuestra Canción</h3><p id="artistaCancion">Presiona play y piensa en mí</p><button class="btn btn-primary" id="playBtn">▶ Reproducir</button></div>`;
               } else {
                 musicCard.innerHTML = `<p style="text-align:center;color:#888;">Aún no hay música configurada.</p>`;
               }
             }
           });
         }
+
       } catch (error) {
         console.error("Error cargando el index:", error);
       } finally {
@@ -583,6 +559,7 @@
 
     document.addEventListener("DOMContentLoaded", initIndex);
 
+    // Lógica del Sobre y Modal
     document.addEventListener('DOMContentLoaded', () => {
       const btnSobre = document.getElementById('btnAbrirSobre');
       const mensajeSobre = document.getElementById('mensajeSobre');
@@ -590,6 +567,8 @@
         btnSobre.addEventListener('click', () => {
           mensajeSobre.classList.add('visible');
           if(window.lanzarConfeti) window.lanzarConfeti(1000);
+          btnSobre.style.transform = 'scale(0.9)';
+          setTimeout(() => btnSobre.style.transform = 'scale(1)', 200);
         });
       }
 
@@ -597,47 +576,98 @@
       const modal = document.getElementById('modalRecuerdo');
       const btnCerrar = document.getElementById('btnCerrarRecuerdo');
       if (btnVer && modal) {
-        btnVer.addEventListener('click', () => modal.style.display = 'flex');
-        btnCerrar.addEventListener('click', () => modal.style.display = 'none');
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+        btnVer.addEventListener('click', () => modal.classList.add('activo'));
+        btnCerrar.addEventListener('click', () => modal.classList.remove('activo'));
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('activo'); });
       }
     });
 
+    // 🛑 LÓGICA DEL MODO CINE (Cinta Infinita y Cierre Total) 🛑
     function abrirModoCine(fondos) {
       const container = document.getElementById('cineContainer');
       const body = document.body;
+
       if (!fondos || fondos.length === 0) return;
 
+      // 1. Duplicar las fotos para que la cinta no tenga huecos
       let fotosRepetidas = [];
       const repeticiones = Math.max(6, Math.ceil(20 / fondos.length)); 
-      for (let i = 0; i < repeticiones; i++) fotosRepetidas = fotosRepetidas.concat(fondos);
+      for (let i = 0; i < repeticiones; i++) {
+        fotosRepetidas = fotosRepetidas.concat(fondos);
+      }
 
+      // 2. Inyectar el HTML
       container.innerHTML = `
         <div class="cine-sala-oscura"></div>
         <div class="cine-proyector-luz"></div>
         <div class="cine-grano"></div>
         <div class="cine-rayas"></div>
+        
         <div class="cine-barra-superior"></div>
         <div class="cine-barra-inferior"></div>
+
         <div class="cine-cinta-wrapper">
           <div class="cine-cinta-agujeros"></div>
-          <div class="cine-carrusel" id="cineCarrusel" style="animation-duration: ${fotosRepetidas.length * 3}s;">
-            ${fotosRepetidas.map(foto => `<div class="cine-fotograma"><img src="${foto}" alt="Recuerdo" loading="lazy"><div class="cine-fotograma-flicker"></div></div>`).join('')}
+          <div class="cine-carrusel" id="cineCarrusel" style="animation-duration: ${fotosRepetidas.length * 10}s;">
+            ${fotosRepetidas.map(foto => `
+              <div class="cine-fotograma">
+                <img src="${foto}" alt="Recuerdo" loading="lazy">
+                <div class="cine-fotograma-flicker"></div>
+              </div>
+            `).join('')}
           </div>
         </div>
-        <div class="cine-texto"><h2>Nuestros Momentos</h2><p>Haz clic en cualquier lugar para salir</p></div>
+
+        <div class="cine-texto">
+          <h2>Nuestros Momentos</h2>
+          <p>Haz clic en cualquier lugar para salir</p>
+        </div>
       `;
 
       body.classList.add('modo-cine-activo');
+
+      // 3. Función para cerrar
       const cerrarCine = () => {
         body.classList.remove('modo-cine-activo');
         setTimeout(() => { container.innerHTML = ''; }, 1000); 
         document.removeEventListener('keydown', escucharEsc);
       };
+
+      // Cualquier clic en el contenedor cierra el modo cine
       container.addEventListener('click', cerrarCine);
-      const escucharEsc = (e) => { if (e.key === 'Escape') cerrarCine(); };
+
+      // Salir con ESC
+      const escucharEsc = (e) => {
+        if (e.key === 'Escape') cerrarCine();
+      };
       document.addEventListener('keydown', escucharEsc);
     }
+  </script>
+
+  <script>
+    // Lógica del Botón PWA Único
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredPrompt = e;
+      const btn = document.getElementById('btnInstalarPWAUnico');
+      if (btn) btn.style.display = 'inline-flex';
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const pwaBtn = document.getElementById('btnInstalarPWAUnico');
+        if (pwaBtn) {
+            pwaBtn.addEventListener('click', async () => {
+                if (!window.deferredPrompt) {
+                  alert("Para instalar la app, usa el menú de tu navegador y selecciona 'Añadir a pantalla de inicio'.");
+                  return;
+                }
+                window.deferredPrompt.prompt();
+                const { outcome } = await window.deferredPrompt.userChoice;
+                if (outcome === 'accepted') { pwaBtn.style.display = 'none'; }
+                window.deferredPrompt = null;
+            });
+        }
+    });
   </script>
 </body>
 </html>
