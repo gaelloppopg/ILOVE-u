@@ -18,7 +18,7 @@
 
   <style>
     /* =========================================
-       VARIABLES Y ESTILOS BASE
+       VARIABLES Y ESTILOS BASE (MODO CLARO)
        ========================================= */
     :root {
       --bg-claro: #fdfafb;
@@ -32,7 +32,7 @@
       --nube-color: rgba(255, 255, 255, 0.9);
     }
 
-    /* 🛑 MODO OSCURO (Noche) 🛑 */
+    /* 🛑 MODO OSCURO (Afecta a TODO el index) 🛑 */
     body.modo-noche {
       --bg-claro: #0b0e14;
       --bg-tarjeta: rgba(26, 30, 42, 0.85);
@@ -82,9 +82,15 @@
 
     /* ESTILOS DE LA PÁGINA */
     #btnAdmin, #btnInvitarPareja { display: none !important; }
+
+    /* 🛑 PORTADA ORIGINAL (Texto centrado y grande) 🛑 */
     .hero { position: relative; padding: 120px 20px 80px; text-align: center; z-index: 2; }
-    .hero-title { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(2.5rem, 6vw, 4.5rem); margin: 10px 0 20px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(2.5rem, 6vw, 4.5rem); margin: 10px 0 20px; color: var(--texto-principal); }
     .hero-subtitle { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-style: italic; max-width: 600px; margin: 0 auto; color: var(--texto-secundario); }
+    .contador-item { background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra); }
+    .contador-item span { display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa); }
+    .contador-item small { font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario); }
+    .contador-label { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--texto-secundario); margin-top: 20px; }
 
     /* 🛑 BENTO GRID (Tarjetas 3D) 🛑 */
     .bento-grid {
@@ -102,13 +108,13 @@
       box-shadow: var(--sombra);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.5s ease;
       cursor: pointer;
       transform-style: preserve-3d;
     }
     .bento-item:hover { border-color: var(--rosa); box-shadow: 0 25px 50px rgba(217, 108, 136, 0.25); }
     .bento-item svg { width: 36px; height: 36px; stroke: var(--rosa); fill: none; stroke-width: 1.5; margin-bottom: 15px; transform: translateZ(30px); }
-    .bento-item h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0 0 8px 0; transform: translateZ(20px); }
+    .bento-item h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 0 0 8px 0; transform: translateZ(20px); color: var(--texto-principal); }
     .bento-item p { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-style: italic; color: var(--texto-secundario); margin: 0; transform: translateZ(10px); }
     
     /* Tarjetas destacadas (Bento Box) */
@@ -121,17 +127,17 @@
 
     /* Resto de estilos (Sobre, Música, etc.) */
     .sobre-section, .music-section { padding: 80px 20px; text-align: center; z-index: 2; position: relative; }
-    .sobre-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.4rem; margin-bottom: 15px; }
+    .sobre-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: 2.4rem; margin-bottom: 15px; color: var(--texto-principal); }
     .sobre-btn { width: 160px; height: 100px; background: var(--bg-tarjeta); border: 1px solid var(--borde); border-radius: 6px; position: relative; cursor: pointer; display: inline-block; box-shadow: var(--sombra); margin: 20px 0; }
-    .sobre-btn::before { content: ''; position: absolute; top: 0; left: 0; border-left: 78px solid transparent; border-right: 78px solid transparent; border-top: 50px solid var(--borde); border-radius: 6px 6px 0 0; }
+    .sobre-btn::before { content: ''; position: absolute; top: 0; left: 0; border-left: 78px solid transparent; border-right: 78px solid transparent; border-top: 50px solid var(--borde); border-radius: 6px 6px 0 0; transition: border 0.5s ease; }
     .sobre-btn::after { content: "❤"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 32px; height: 32px; background: var(--dorado); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
-    .mensaje-sobre { max-width: 600px; margin: 0 auto; padding: 30px; background: var(--bg-tarjeta); border-radius: 12px; display: none; font-family: 'Caveat', cursive; font-size: 2rem; border-left: 4px solid var(--rosa); box-shadow: var(--sombra); }
+    .mensaje-sobre { max-width: 600px; margin: 0 auto; padding: 30px; background: var(--bg-tarjeta); border-radius: 12px; display: none; font-family: 'Caveat', cursive; font-size: 2rem; border-left: 4px solid var(--rosa); box-shadow: var(--sombra); color: var(--texto-principal); }
     .mensaje-sobre.visible { display: block; animation: fadeInUp 0.5s ease; }
     
     .music-card { max-width: 600px; margin: 0 auto; background: var(--bg-tarjeta); border: 1px solid var(--borde); border-radius: 16px; padding: 30px; box-shadow: var(--sombra); }
 
     /* Botones Flotantes */
-    .btn-recuerdo-flotante, .btn-modo-cine { position: fixed; right: 20px; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 9997; transition: transform 0.3s; }
+    .btn-recuerdo-flotante, .btn-modo-cine { position: fixed; right: 20px; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 9997; transition: transform 0.3s, background 0.5s; }
     .btn-recuerdo-flotante { bottom: 20px; background: var(--bg-tarjeta); border: 1px solid var(--borde); color: var(--rosa); font-size: 1.3rem; }
     .btn-modo-cine { bottom: 85px; background: #1a1a1a; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
     .btn-recuerdo-flotante:hover, .btn-modo-cine:hover { transform: translateY(-5px) scale(1.05); }
@@ -159,12 +165,12 @@
     <p class="hero-subtitle">Cada rincón de esta página guarda algo nuestro.<br>Tómate tu tiempo... esto es <em>todo</em> para ti.</p>
 
     <div id="contador" style="display: flex; gap: 15px; justify-content: center; margin: 40px 0;">
-      <div style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra);"><span id="dias" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa);">0</span><small style="font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario);">Días</small></div>
-      <div style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra);"><span id="horas" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa);">0</span><small style="font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario);">Horas</small></div>
-      <div style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra);"><span id="minutos" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa);">0</span><small style="font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario);">Min</small></div>
-      <div style="background: var(--bg-tarjeta); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--borde); box-shadow: var(--sombra);"><span id="segundos" style="display: block; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--rosa);">0</span><small style="font-size: 0.7rem; text-transform: uppercase; color: var(--texto-secundario);">Seg</small></div>
+      <div class="contador-item"><span id="dias">0</span><small>Días</small></div>
+      <div class="contador-item"><span id="horas">0</span><small>Horas</small></div>
+      <div class="contador-item"><span id="minutos">0</span><small>Min</small></div>
+      <div class="contador-item"><span id="segundos">0</span><small>Seg</small></div>
     </div>
-    <p style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; color: var(--texto-secundario);">Juntos desde el <strong id="fecha-inicio">Cargando fecha...</strong></p>
+    <p class="contador-label">Juntos desde el <strong id="fecha-inicio">Cargando fecha...</strong></p>
   </section>
 
   <!-- 2. EL SOBRE SECRETO -->
