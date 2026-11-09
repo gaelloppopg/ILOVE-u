@@ -135,9 +135,10 @@ body.modo-cine-activo .cine-container {
 /* El Carrusel Optimizado */
 .cine-carrusel {
   position: absolute; top: 0; left: 0; height: 100%; display: flex; align-items: center;
-  /* will-change le dice al navegador que use la GPU para animar esto */
   will-change: transform;
-  animation: deslizarCarrusel 10s linear infinite;
+  animation-name: deslizarCarrusel;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 .cine-carrusel:hover { animation-play-state: paused; }
 
@@ -148,7 +149,7 @@ body.modo-cine-activo .cine-container {
 
 @keyframes deslizarCarrusel {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-300%); } /* Asumiendo 4 fotos (100vw c/u) */
+  100% { transform: translateX(-50%); } 
 }
 
 /* El Fotograma (Cada foto) */
