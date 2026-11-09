@@ -136,11 +136,28 @@
     
     .music-card { max-width: 600px; margin: 0 auto; background: var(--bg-tarjeta); border: 1px solid var(--borde); border-radius: 16px; padding: 30px; box-shadow: var(--sombra); }
 
-    /* Botones Flotantes */
-    .btn-recuerdo-flotante, .btn-modo-cine { position: fixed; right: 20px; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 9997; transition: transform 0.3s, background 0.5s; }
-    .btn-recuerdo-flotante { bottom: 20px; background: var(--bg-tarjeta); border: 1px solid var(--borde); color: var(--rosa); font-size: 1.3rem; }
-    .btn-modo-cine { bottom: 85px; background: #1a1a1a; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
-    .btn-recuerdo-flotante:hover, .btn-modo-cine:hover { transform: translateY(-5px) scale(1.05); }
+    /* 🛑 BOTÓN DEL CINE ARRIBA A LA DERECHA 🛑 */
+    .btn-modo-cine { 
+      position: fixed; top: 20px; right: 20px; 
+      width: 50px; height: 50px; border-radius: 50%; 
+      background: var(--bg-tarjeta); color: var(--texto-principal); 
+      border: 1px solid var(--borde); 
+      display: flex; align-items: center; justify-content: center; 
+      cursor: pointer; box-shadow: var(--sombra); z-index: 9999; 
+      transition: transform 0.3s, background 0.5s; 
+    }
+    .btn-modo-cine:hover { transform: scale(1.1); background: var(--rosa); color: #fff; }
+
+    /* 🛑 BOTÓN DE RECUERDO ABAJO A LA DERECHA 🛑 */
+    .btn-recuerdo-flotante { 
+      position: fixed; bottom: 20px; right: 20px; 
+      width: 50px; height: 50px; border-radius: 50%; 
+      background: var(--bg-tarjeta); border: 1px solid var(--borde); 
+      color: var(--rosa); display: flex; align-items: center; justify-content: center; 
+      cursor: pointer; box-shadow: var(--sombra); z-index: 9997; 
+      transition: transform 0.3s, background 0.5s; font-size: 1.3rem;
+    }
+    .btn-recuerdo-flotante:hover { transform: translateY(-5px) scale(1.05); background: var(--rosa); color: #fff; }
 
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
@@ -155,6 +172,11 @@
     <div class="nube"></div>
     <div class="nube"></div>
   </div>
+
+  <!-- 🛑 BOTÓN DEL MODO CINE (Arriba a la derecha) 🛑 -->
+  <button class="btn-modo-cine" id="btnModoCine" title="Modo Cine" style="display: none;">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+  </button>
 
   <!-- 1. PORTADA (HERO) -->
   <section class="hero" id="heroSection">
@@ -261,11 +283,8 @@
   <!-- 🛑 CONTENEDOR DEL MODO CINE 🛑 -->
   <div class="cine-container" id="cineContainer"></div>
 
-  <!-- Botones Flotantes -->
+  <!-- Botón Flotante Recuerdo del Día (Abajo a la derecha) -->
   <button class="btn-recuerdo-flotante" id="btnVerRecuerdo" title="Recuerdo del Día">📸</button>
-  <button class="btn-modo-cine" id="btnModoCine" title="Modo Cine" style="display: none;">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
-  </button>
 
   <!-- Modal Recuerdo -->
   <div id="modalRecuerdo" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 20px;">
