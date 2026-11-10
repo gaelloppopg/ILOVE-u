@@ -20,18 +20,18 @@ let obraEditandoId = null;
 let fondoEditandoId = null;
 let preferenciaDispositivo = 'auto';
 
-// ARRAY DE COMPONENTES: Aquí se guardan todos los trazos
+// ARRAY DE COMPONENTES (Trazos)
 let trazos = []; 
 let trazoActual = null;
-let trazoSeleccionadoIndex = -1;
 let portapapeles = { fondo: null, trazos: [] }; 
 
 // ============================================================
 //  UTILIDADES
 // ============================================================
-function cargarImagen(src) {
+function cargarImagen(src, isCORS = false) {
   return new Promise((res, rej) => {
     const img = new Image();
+    if (isCORS) img.crossOrigin = "anonymous"; // Evita el error "Tainted canvas"
     img.onload = () => res(img);
     img.onerror = () => rej(new Error("No se pudo cargar imagen: " + src));
     img.src = src;
@@ -44,97 +44,6 @@ function canvasABlob(cnv) {
 
 function generarUUID() {
   return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2);
-}
-
-function renderizarTrazos() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  trazos.forEach((trazo, index) => {
-    ctx.beginPath();
-    ctx.lineCap = "round"; 
-    ctx.lineJoin = "round";
-    
-    if (trazo.tipo === "borrador") {
-      ctx.globalCompositeOperation = "destination-out";
-      ctx.lineWidth = trazo.grosor * 2;
-    } else {
-      ctx.globalCompositeOperation = "source-over";
-      ctx.lineWidth = trazo.grosor;
-      ctx.strokeStyle = trazo.color;
-      ctx.globalAlpha = trazo.opacidad || 1;
-      ctx.shadowBlur = trazo.sombra || 0;
-      if (trazo.sombra) ctx.shadowColor = trazo.color;
-    }
-    
-    if (trazo.tipo === "spray") {
-      ctx.fillStyle = trazo.color;
-      trazo.puntos.forEach(p => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, Math.random() * 1.5 + 0.5, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    } else {
-      if (trazo.puntos.length === 1) {
-        ctx.beginPath();
-        ctx.arc(trazo.puntos[0].x, trazo.puntos[0].y, ctx.lineWidth / 2, 0, Math.PI * 2);
-        ctx.fillStyle = trazo.color;
-        ctx.fill();
-      } else {
-        ctx.beginPath();
-        ctx.moveTo(trazo.puntos[0].x, trazo.puntos[0].y);
-        for (let i = 1; i < trazo.puntos.length; i++) {
-          ctx.lineTo(trazo.puntos[i].x, trazo.puntos[i].y);
-        }
-        ctx.stroke();
-      }
-    }
-
-    // Resaltar si está seleccionado en el panel
-    if (index === trazoSeleccionadoIndex) {
-      ctx.globalCompositeOperation = "source-over";
-      ctx.strokeStyle = "#3b82f6";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      ctx.strokeRect(
-        Math.min(...trazo.puntos.map(p=>p.x)) - 10,
-        Math.min(...trazo.puntos.map(p=>p.y)) - 10,
-        Math.max(...trazo.puntos.map(p=>p.x)) - Math.min(...trazo.puntos.map(p=>p.x)) + 20,
-        Math.max(...trazo.puntos.map(p=>p.y)) - Math.min(...trazo.puntos.map(p=>p.y)) + 20
-      );
-      ctx.setLineDash([]);
-    }
-  });
-  
-  ctx.globalCompositeOperation = "source-over";
-  ctx.globalAlpha = 1;
-  ctx.shadowBlur = 0;
-  
-  actualizarPanelTrazos();
-}
-
-function actualizarPanelTrazos() {
-  const lista = document.getElementById("listaTrazos");
-  if (!lista) return;
-  lista.innerHTML = "";
-  
-  if (trazos.length === 0) {
-    lista.innerHTML = "<div style='color:#666; font-size:0.8rem; text-align:center;'>Vacío</div>";
-    return;
-  }
-
-  trazos.forEach((trazo, i) => {
-    const item = document.createElement("div");
-    item.className = `trazo-item ${i === trazoSeleccionadoIndex ? 'seleccionado' : ''}`;
-    item.innerHTML = `
-      <span>${trazo.tipo.toUpperCase()} ${i+1}</span>
-      <span style="color:${trazo.color}">■</span>
-    `;
-    item.onclick = () => {
-      trazoSeleccionadoIndex = (trazoSeleccionadoIndex === i) ? -1 : i;
-      renderizarTrazos();
-    };
-    lista.appendChild(item);
-  });
 }
 
 // ============================================================
@@ -225,7 +134,7 @@ function reorganizarUI(dispositivo) {
 }
 
 // ============================================================
-//  EVENTOS DE DIBUJO Y COPIAR/PEGAR
+//  EVENTOS
 // ============================================================
 function configurarEventosDibujo() {
   canvas.addEventListener("mousedown", empezarDibujo);
@@ -260,13 +169,13 @@ function configurarEventosDibujo() {
     document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
   };
 
-  // ---- COPIAR Y PEGAR (LÓGICA DE COMPONENTES) ----
+  // ---- COPIAR Y PEGAR (COMPONENTES) ----
   const btnCopiar = document.getElementById("btnCopiarPintura");
   const btnPegar = document.getElementById("btnPegarPintura");
 
   if (btnCopiar) {
     btnCopiar.onclick = () => {
-      portapapeles.trazos = JSON.parse(JSON.stringify(trazos)); // Copia profunda
+      portapapeles.trazos = JSON.parse(JSON.stringify(trazos)); 
       const textoOriginal = btnCopiar.textContent;
       btnCopiar.textContent = "¡Copiado!";
       setTimeout(() => btnCopiar.textContent = textoOriginal, 1500);
@@ -279,24 +188,18 @@ function configurarEventosDibujo() {
         alert("No hay trazos copiados en el portapapeles.");
         return;
       }
-      
-      // Pegamos los trazos al array actual uno por uno
       portapapeles.trazos.forEach(trazoCopiado => {
-        // Clonamos para que no compartan referencia
         const nuevoTrazo = JSON.parse(JSON.stringify(trazoCopiado));
         trazos.push(nuevoTrazo);
       });
-      
-      trazoSeleccionadoIndex = -1;
       renderizarTrazos();
-      
       const textoOriginal = btnPegar.textContent;
       btnPegar.textContent = "¡Pegado!";
       setTimeout(() => btnPegar.textContent = textoOriginal, 1500);
     };
   }
 
-  // ---- FONDO (Capa bloqueada) ----
+  // ---- FONDO ----
   document.getElementById("fondoColor").oninput = (e) => { 
     fondoColor = e.target.value; 
     fondoImagen = null; 
@@ -326,16 +229,12 @@ function configurarEventosDibujo() {
 
   document.getElementById("btnLimpiar").onclick = () => {
     trazos = [];
-    trazoSeleccionadoIndex = -1;
     renderizarTrazos();
   };
   
   document.getElementById("btnGuardar").onclick = guardarObra;
 }
 
-// ============================================================
-//  EVENTOS UI
-// ============================================================
 function configurarEventosUI() {
   document.getElementById("btnNuevaObra").onclick = () => abrirEstudio();
   document.getElementById("cerrarEstudio").onclick = () => document.getElementById("estudioOverlay").classList.remove("activo");
@@ -370,9 +269,6 @@ function configurarEventosUI() {
   }
 }
 
-// ============================================================
-//  ESTUDIO: ABRIR / DIBUJAR FONDO
-// ============================================================
 function abrirEstudio() {
   modoEdicion = false;
   obraEditandoId = null;
@@ -381,8 +277,6 @@ function abrirEstudio() {
   document.getElementById("estudioOverlay").classList.add("activo");
   
   if (trazos.length === 0) {
-    trazos = [];
-    trazoSeleccionadoIndex = -1;
     renderizarTrazos();
   }
 
@@ -410,7 +304,7 @@ function dibujarFondo() {
 }
 
 // ============================================================
-//  LÓGICA DE DIBUJO (REGISTRANDO COMPONENTES)
+//  LÓGICA DE DIBUJO SILENCIOSA
 // ============================================================
 function getPos(e) {
   const rect = canvas.getBoundingClientRect();
@@ -461,8 +355,57 @@ function terminarDibujo() {
   trazoActual = null;
 }
 
+function renderizarTrazos() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  trazos.forEach((trazo) => {
+    ctx.beginPath();
+    ctx.lineCap = "round"; 
+    ctx.lineJoin = "round";
+    
+    if (trazo.tipo === "borrador") {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.lineWidth = trazo.grosor * 2;
+    } else {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.lineWidth = trazo.grosor;
+      ctx.strokeStyle = trazo.color;
+      ctx.globalAlpha = trazo.opacidad || 1;
+      ctx.shadowBlur = trazo.sombra || 0;
+      if (trazo.sombra) ctx.shadowColor = trazo.color;
+    }
+    
+    if (trazo.tipo === "spray") {
+      ctx.fillStyle = trazo.color;
+      trazo.puntos.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, Math.random() * 1.5 + 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    } else {
+      if (trazo.puntos.length === 1) {
+        ctx.beginPath();
+        ctx.arc(trazo.puntos[0].x, trazo.puntos[0].y, ctx.lineWidth / 2, 0, Math.PI * 2);
+        ctx.fillStyle = trazo.color;
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(trazo.puntos[0].x, trazo.puntos[0].y);
+        for (let i = 1; i < trazo.puntos.length; i++) {
+          ctx.lineTo(trazo.puntos[i].x, trazo.puntos[i].y);
+        }
+        ctx.stroke();
+      }
+    }
+  });
+  
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+}
+
 // ============================================================
-//  RESTO DE FUNCIONES (MUSEO, GUARDAR, etc.)
+//  RESTO DE FUNCIONES (MUSEO, TEMAS, LIBRO, GUARDAR)
 // ============================================================
 function initPanelTemas() {
   const btnAbrir = document.getElementById('btnAbrirPanelTemas');
@@ -665,9 +608,8 @@ async function copiarObraDesdeMuseo() {
   try {
     const obra = obraActualEnMuseo;
     
-    // Copiar fondo
     if (obra.capa_fondo_url) {
-      portapapeles.fondo = await cargarImagen(obra.capa_fondo_url);
+      portapapeles.fondo = await cargarImagen(obra.capa_fondo_url, true); // true activa CORS
     } else {
       const canvasFondoTemp = document.createElement("canvas");
       canvasFondoTemp.width = 900; canvasFondoTemp.height = 600;
@@ -677,13 +619,12 @@ async function copiarObraDesdeMuseo() {
       portapapeles.fondo = canvasFondoTemp;
     }
 
-    // Copiar trazos (Si la obra vieja no tiene trazos registrados, no podemos separarlos, 
-    // así que lo metemos como una imagen "quemada" en el portapapeles de trazos)
     if (obra.capa_trazos && obra.capa_trazos.length > 0) {
       portapapeles.trazos = obra.capa_trazos;
     } else {
-      alert("Esta es una obra antigua. Sus trazos no se pueden separar. Se copiará como una sola imagen.");
-      // Lógica de fallback para obras viejas...
+      // Fallback para obras viejas
+      portapapeles.trazos = [];
+      alert("Esta es una obra antigua. Sus trazos no se pueden separar, pero el fondo ha sido copiado.");
     }
     
     btn.textContent = "¡Copiado!";
@@ -723,23 +664,22 @@ async function editarObraDesdeMuseo() {
 
   const obra = obraActualEnMuseo;
 
-  // Si tiene trazos guardados, los cargamos como componentes
   if (obra.capa_trazos && Array.isArray(obra.capa_trazos)) {
     trazos = JSON.parse(JSON.stringify(obra.capa_trazos));
     renderizarTrazos();
     
     if (obra.capa_fondo_url) {
-      fondoImagen = await cargarImagen(obra.capa_fondo_url);
+      fondoImagen = await cargarImagen(obra.capa_fondo_url, true); // CORS activo
       dibujarFondo();
     }
     return;
   }
 
   // CASO B: Obra antigua (sin trazos separados, solo imagen plana)
-  trazos = []; // No hay componentes separados
+  trazos = []; 
   renderizarTrazos();
   try {
-    const imgFull = await cargarImagen(obra.imagen_url);
+    const imgFull = await cargarImagen(obra.imagen_url, true); // CORS activo
     ctx.drawImage(imgFull, 0, 0, canvas.width, canvas.height);
   } catch (err) {
     console.error("No se pudo cargar la obra:", err);
@@ -792,15 +732,25 @@ async function guardarObra() {
   tempCtx.drawImage(canvas, 0, 0);
 
   try {
-    const blobFinal = await canvasABlob(tempCanvas);
+    // Evitamos el error de exportación con try-catch
+    let blobFinal;
+    try {
+      blobFinal = await canvasABlob(tempCanvas);
+    } catch (error) {
+      throw new Error("El lienzo está contaminado por CORS. Asegúrate de que el bucket de Supabase sea público.");
+    }
+
     const fileFinal = new File([blobFinal], `obra_${Date.now()}.png`, { type: "image/png" });
     const { url: urlFinal } = await subirArchivo(fileFinal, "arte");
 
-    const blobFondo = await canvasABlob(canvasFondo);
-    const fileFondo = new File([blobFondo], `fondo_${fondoEditandoId}.png`, { type: "image/png" });
-    const { url: urlFondo } = await subirArchivo(fileFondo, "arte/capas");
+    let urlFondo = null;
+    if (fondoImagen) {
+      const blobFondo = await canvasABlob(canvasFondo);
+      const fileFondo = new File([blobFondo], `fondo_${fondoEditandoId}.png`, { type: "image/png" });
+      const res = await subirArchivo(fileFondo, "arte/capas");
+      urlFondo = res.url;
+    }
 
-    // Aquí guardamos el array de trazos como JSON en la base de datos
     const payload = {
       couple_id: coupleId,
       titulo,
@@ -809,7 +759,7 @@ async function guardarObra() {
       capa_trazos: trazos, // <-- Guardamos los componentes
       fondo_id: fondoEditandoId,
       fondo_color: fondoColor,
-      capas_version: 3 // Nueva versión con trazos
+      capas_version: 3
     };
 
     let obraGuardada;

@@ -46,21 +46,6 @@
       width: 100% !important; height: 100% !important; touch-action: none;
     }
 
-    /* Panel de Trazos (Capas) */
-    .panel-trazos {
-      position: absolute; right: 20px; top: 20px; width: 200px;
-      background: rgba(26, 26, 26, 0.9); border: 1px solid #444; border-radius: 8px;
-      color: #fff; padding: 10px; max-height: 80%; overflow-y: auto; z-index: 10;
-      backdrop-filter: blur(5px); display: none;
-    }
-    .panel-trazos h4 { margin: 0 0 10px 0; font-size: 0.9rem; color: var(--dorado, #c9a050); text-align: center;}
-    .trazo-item {
-      padding: 8px; border-bottom: 1px solid #333; font-size: 0.8rem;
-      display: flex; justify-content: space-between; align-items: center; cursor: pointer;
-    }
-    .trazo-item:hover { background: #333; }
-    .trazo-item.seleccionado { background: var(--dorado, #c9a050); color: #000; font-weight: bold; }
-
     .btn-menu-movil-flotante, #overlayMenu { display: none; }
     .btn-cerrar-toolbar { display: none; }
 
@@ -126,7 +111,6 @@
     body.layout-escritorio .estudio-topbar { display: flex !important; }
     body.layout-escritorio .estudio-footer { display: flex !important; }
     body.layout-escritorio .btn-cerrar-toolbar { display: none !important; }
-    body.layout-escritorio .panel-trazos { display: block; }
   </style>
 </head>
 <body class="page-inner album-body" data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti" data-tema="minimalista">
@@ -328,12 +312,6 @@
       </div>
 
       <div class="estudio-canvas-wrapper">
-        <!-- Panel de Componentes (Trazos) -->
-        <div class="panel-trazos" id="panelTrazos">
-          <h4>Componentes (Trazos)</h4>
-          <div id="listaTrazos"></div>
-        </div>
-
         <div class="canvas-stack" id="canvasStack">
           <canvas id="lienzoFondo" width="900" height="600"></canvas>
           <canvas id="lienzo" width="900" height="600"></canvas>
