@@ -94,7 +94,6 @@ function configurarEventosDibujo() {
     dibujarFondo(); 
   };
   
-  // 🛑 El limpiar borra el fondo y la pintura
   document.getElementById("btnLimpiar").onclick = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
@@ -351,21 +350,40 @@ async function editarObraDesdeMuseo() {
   const titulo = obraActualEnMuseo.titulo || "";
   document.getElementById("tituloObra").value = titulo;
   
-  const img = new Image();
-  img.crossOrigin = "anonymous";
-  img.onload = () => {
-    // 🛑 Cargamos la imagen original en la CAPA DE DIBUJO (lienzo)
-    // Esto hace que la pintura sea 100% editable/borrable.
+  // Cargar fondo original
+  if (obraActualEnMuseo.capa_fondo) {
+    const imgFondo = new Image();
+    imgFondo.crossOrigin = "anonymous";
+    imgFondo.onload = () => {
+      ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+      ctxFondo.drawImage(imgFondo, 0, 0, canvasFondo.width, canvasFondo.height);
+      fondoImagen = imgFondo;
+    };
+    imgFondo.src = obraActualEnMuseo.capa_fondo;
+  } else {
+    // Fallback para obras antiguas: cargar todo en el fondo
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+      ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
+      fondoImagen = img;
+    };
+    img.src = obraActualEnMuseo.imagen_url;
+  }
+
+  // Cargar dibujo original
+  if (obraActualEnMuseo.capa_dibujo) {
+    const imgDibujo = new Image();
+    imgDibujo.crossOrigin = "anonymous";
+    imgDibujo.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(imgDibujo, 0, 0, canvas.width, canvas.height);
+    };
+    imgDibujo.src = obraActualEnMuseo.capa_dibujo;
+  } else {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    
-    // Limpiamos la capa de fondo para que no haya duplicados
-    ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-    fondoImagen = null;
-    fondoColor = "#ffffff";
-    document.getElementById("fondoColor").value = "#ffffff";
-  };
-  img.src = obraActualEnMuseo.imagen_url;
+  }
 }
 
 async function descargarObraComoPNG() {
@@ -450,6 +468,7 @@ async function guardarObra() {
   const btn = document.getElementById("btnGuardar");
   if(btn) { btn.textContent = "Subiendo..."; btn.disabled = true; }
 
+  // Combinar para la miniatura
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
   const tempCtx = tempCanvas.getContext("2d");
@@ -461,10 +480,16 @@ async function guardarObra() {
       const file = new File([blob], "obra.png", { type: "image/png" });
       const { url } = await subirArchivo(file, "arte");
       
+      // Obtener los datos de las capas (Base64)
+      const capaFondoB64 = canvasFondo.toDataURL();
+      const capaDibujoB64 = canvas.toDataURL();
+
       let payload = { 
         couple_id: coupleId, 
         titulo, 
-        imagen_url: url
+        imagen_url: url,
+        capa_fondo: capaFondoB64,
+        capa_dibujo: capaDibujoB64
       };
 
       if (modoEdicion && obraEditandoId) {
