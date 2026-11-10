@@ -20,7 +20,7 @@ let obraEditandoId = null;
 let fondoEditandoId = null;
 let preferenciaDispositivo = 'auto';
 
-// Variable para guardar la pintura copiada (Capa superior)
+// Variable GLOBAL para guardar la pintura copiada
 let pinturaCopiada = null; 
 
 // ============================================================
@@ -170,21 +170,19 @@ function configurarEventosDibujo() {
     document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
   };
 
-  // ---- LÓGICA DE COPIAR / PEGAR PINTURA ----
+  // ---- LÓGICA DE COPIAR / PEGAR PINTURA (DENTRO DEL LIENZO) ----
   const btnCopiar = document.getElementById("btnCopiarPintura");
   const btnPegar = document.getElementById("btnPegarPintura");
 
   if (btnCopiar) {
     btnCopiar.onclick = () => {
       if (!canvas) return;
-      // Creamos un canvas temporal solo con la pintura
       pinturaCopiada = document.createElement("canvas");
       pinturaCopiada.width = canvas.width;
       pinturaCopiada.height = canvas.height;
       const pCtx = pinturaCopiada.getContext("2d");
       pCtx.drawImage(canvas, 0, 0); 
       
-      // Feedback visual
       const textoOriginal = btnCopiar.textContent;
       btnCopiar.textContent = "¡Copiado!";
       setTimeout(() => btnCopiar.textContent = textoOriginal, 1500);
@@ -197,10 +195,8 @@ function configurarEventosDibujo() {
         alert("No hay pintura copiada. Usa 'Copiar Pintura' primero.");
         return;
       }
-      // Pega la pintura en la capa superior. El fondo de abajo no se toca.
       ctx.drawImage(pinturaCopiada, 0, 0);
       
-      // Feedback visual
       const textoOriginal = btnPegar.textContent;
       btnPegar.textContent = "¡Pegado!";
       setTimeout(() => btnPegar.textContent = textoOriginal, 1500);
@@ -260,6 +256,9 @@ function configurarEventosUI() {
   document.getElementById("btnBorrarObra").onclick = borrarObraDesdeMuseo;
   document.getElementById("btnDescargarObra").onclick = descargarObraComoPNG;
   document.getElementById("btnEditarObra").onclick = editarObraDesdeMuseo;
+  
+  // NUEVO EVENTO: COPIAR DESDE EL MUSEO
+  document.getElementById("btnCopiarObraMuseo").onclick = copiarObraDesdeMuseo;
 
   const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
   const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
@@ -295,7 +294,9 @@ function abrirEstudio() {
   fondoColor = "#ffffff";
   fondoOpacidad = 100;
   document.getElementById("fondoColor").value = "#ffffff";
-  pinturaCopiada = null; // Limpiamos el portapapeles al abrir un lienzo nuevo
+  
+  // NOTA: Ya NO reseteamos 'pinturaCopiada' para que puedas pegar lo que copiaste.
+  
   dibujarFondo();
 }
 
@@ -520,6 +521,34 @@ window.abrirMuseo = function(id) {
 }
 
 // ============================================================
+//  COPIAR DESDE EL MUSEO
+// ============================================================
+async function copiarObraDesdeMuseo() {
+  if (!obraActualEnMuseo) return;
+  const btn = document.getElementById("btnCopiarObraMuseo");
+  const textoOriginal = btn.textContent;
+  btn.textContent = "Copiando...";
+
+  try {
+    const img = await cargarImagen(obraActualEnMuseo.imagen_url);
+    pinturaCopiada = document.createElement("canvas");
+    pinturaCopiada.width = 900;
+    pinturaCopiada.height = 600;
+    const pCtx = pinturaCopiada.getContext("2d");
+    
+    // Dibujamos la imagen de la obra en el lienzo virtual
+    pCtx.drawImage(img, 0, 0, 900, 600);
+    
+    btn.textContent = "¡Copiado!";
+    setTimeout(() => btn.textContent = textoOriginal, 1500);
+  } catch (err) {
+    console.error("Error al copiar obra:", err);
+    alert("No se pudo copiar la obra.");
+    btn.textContent = textoOriginal;
+  }
+}
+
+// ============================================================
 //  EDICIÓN (SEPARANDO FONDO Y PINTURA)
 // ============================================================
 async function editarObraDesdeMuseo() {
@@ -541,7 +570,6 @@ async function editarObraDesdeMuseo() {
   ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
   ctxFondo.fillStyle = "#ffffff";
   ctxFondo.fillRect(0, 0, canvasFondo.width, canvasFondo.height);
-  pinturaCopiada = null;
 
   const obra = obraActualEnMuseo;
 

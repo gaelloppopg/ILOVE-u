@@ -51,6 +51,10 @@
 
     .btn-museo.editar { background: #3b82f6; color: white; border: 1px solid #3b82f6; }
     .btn-museo.editar:hover { background: #2563eb; }
+    
+    /* Estilo para el nuevo botón de copiar en el museo */
+    .btn-museo.copiar { background: #10b981; color: white; border: 1px solid #10b981; }
+    .btn-museo.copiar:hover { background: #059669; }
 
     /* Estilos para layout móvil */
     body.layout-movil .estudio-overlay { padding: 0 !important; }
@@ -246,6 +250,7 @@
         <span id="museoFecha">Fecha</span>
         <div class="museo-placa-linea"></div>
         <div class="museo-acciones">
+          <button class="btn-museo copiar" id="btnCopiarObraMuseo">Copiar Pintura</button>
           <button class="btn-museo editar" id="btnEditarObra">Editar Obra</button>
           <button class="btn-museo borrar" id="btnBorrarObra">Eliminar</button>
           <button class="btn-museo descargar" id="btnDescargarObra">Descargar PNG</button>
@@ -281,7 +286,6 @@
           <button type="button" class="tool-btn" data-tool="borrador">Borrador</button>
         </div>
 
-        <!-- NUEVOS BOTONES: COPIAR / PEGAR PINTURA -->
         <div class="tool-group herramientas-extras" style="margin-top: 10px; border-top: 1px solid #444; padding-top: 10px;">
           <span class="tool-label">Acciones de Capa</span>
           <button type="button" class="tool-btn" id="btnCopiarPintura">Copiar Pintura</button>
