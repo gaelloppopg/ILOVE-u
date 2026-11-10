@@ -17,6 +17,7 @@ const OBRAS_POR_PAGINA = 4;
 let obraActualEnMuseo = null;
 let modoEdicion = false;
 let obraEditandoId = null;
+let fondoEditandoId = null; // ID único del fondo que estamos editando
 let preferenciaDispositivo = 'auto';
 
 // ============================================================
@@ -34,6 +35,10 @@ function cargarImagen(src) {
 
 function canvasABlob(cnv) {
   return new Promise((res) => cnv.toBlob(res, "image/png"));
+}
+
+function generarUUID() {
+  return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
 
 // ============================================================
@@ -162,7 +167,7 @@ function configurarEventosDibujo() {
     document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
   };
 
-  // ---- FONDO (capa bloqueada inferior) ----
+  // ---- FONDO (Capa bloqueada) ----
   document.getElementById("fondoColor").oninput = (e) => { 
     fondoColor = e.target.value; 
     fondoImagen = null; 
@@ -190,9 +195,10 @@ function configurarEventosDibujo() {
     dibujarFondo(); 
   };
 
-  // ---- LIMPIAR LIENZO: solo pintura, fondo intacto ----
+  // ---- LIMPIAR LIENZO: SOLO BORRA LA PINTURA ----
   document.getElementById("btnLimpiar").onclick = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // El fondo (canvasFondo) no se toca.
   };
   
   document.getElementById("btnGuardar").onclick = guardarObra;
@@ -235,11 +241,12 @@ function configurarEventosUI() {
 }
 
 // ============================================================
-//  ESTUDIO
+//  ESTUDIO: ABRIR / DIBUJAR FONDO
 // ============================================================
 function abrirEstudio() {
   modoEdicion = false;
   obraEditandoId = null;
+  fondoEditandoId = generarUUID(); // ID único para el nuevo fondo
   
   document.getElementById("estudioOverlay").classList.add("activo");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -473,7 +480,7 @@ window.abrirMuseo = function(id) {
 }
 
 // ============================================================
-//  EDICIÓN: RECONSTRUIR CADA CAPA DESDE LA BD/STORAGE
+//  EDICIÓN (SEPARANDO FONDO Y PINTURA)
 // ============================================================
 async function editarObraDesdeMuseo() {
   if (!obraActualEnMuseo) return;
@@ -481,6 +488,9 @@ async function editarObraDesdeMuseo() {
 
   modoEdicion = true;
   obraEditandoId = obraActualEnMuseo.id;
+  
+  // Asignamos el ID del fondo (si no tiene, creamos uno nuevo)
+  fondoEditandoId = obraActualEnMuseo.fondo_id || generarUUID();
 
   document.getElementById("estudioOverlay").classList.add("activo");
   document.getElementById("tituloObra").value = obraActualEnMuseo.titulo || "";
@@ -498,101 +508,52 @@ async function editarObraDesdeMuseo() {
   const obra = obraActualEnMuseo;
 
   // ------------------------------------------------------------
-  // CASO A: la BD YA tiene ambas capas separadas → cargar cada una
+  // CASO A: Obra moderna (Ya tiene las capas separadas)
   // ------------------------------------------------------------
-  if (obra.capa_fondo_url && obra.capa_dibujo_url) {
+  if (obra.capa_fondo_url && obra.capa_dibujo_url && obra.capas_version === 2) {
     try {
       const [imgFondo, imgDibujo] = await Promise.all([
         cargarImagen(obra.capa_fondo_url),
         cargarImagen(obra.capa_dibujo_url)
       ]);
 
-      // Fondo → capa inferior
+      // Fondo intacto en la capa inferior
       ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
       ctxFondo.drawImage(imgFondo, 0, 0, canvasFondo.width, canvasFondo.height);
       fondoImagen = imgFondo;
 
-      // Pintura → capa superior (borrable)
+      // Pintura en la capa superior (borrable)
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(imgDibujo, 0, 0, canvas.width, canvas.height);
       return;
     } catch (err) {
-      console.warn("Fallo cargando capas separadas, se migrará:", err);
-      // cae al CASO B
+      console.warn("Fallo cargando capas, forzando migración:", err);
     }
   }
 
   // ------------------------------------------------------------
-  // CASO B: obra antigua (sin capas) → MIGRAR
-  //   - La imagen_url (fondo + pintura) se coloca en la CAPA SUPERIOR
-  //     para que sea borrable.
-  //   - El fondo queda blanco debajo.
-  //   - Se guardan las dos capas en Storage y se actualizan las URLs
-  //     en la BD, de modo que la próxima edición ya entra por CASO A.
+  // CASO B: Obra antigua (capas_version = 0, fondo y pintura juntos)
   // ------------------------------------------------------------
   try {
     const imgFull = await cargarImagen(obra.imagen_url);
 
-    // Pintura editable = imagen completa
+    // 1. Ponemos TODA la imagen antigua en la CAPA DE PINTURA (para que se pueda borrar)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imgFull, 0, 0, canvas.width, canvas.height);
 
-    // Fondo = blanco sólido
+    // 2. El fondo se queda como un lienzo blanco limpio
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
     ctxFondo.fillStyle = "#ffffff";
     ctxFondo.fillRect(0, 0, canvasFondo.width, canvasFondo.height);
 
-    // ---- Migración: subir ambas capas a Storage y guardar URLs ----
-    await migrarObraACapas(obra.id, canvasFondo, canvas);
+    console.log("Obra antigua preparada. Fondo separado (blanco), pintura en capa superior editable.");
+    
+    // NOTA: No guardamos en la BD todavía. Si el usuario presiona "Guardar", 
+    // se crearán las capas correctamente en el paso de guardado.
 
   } catch (err) {
-    console.error("No se pudo migrar la obra:", err);
+    console.error("No se pudo cargar la obra:", err);
     alert("No se pudo cargar la obra para editar.");
-  }
-}
-
-/**
- * Sube las dos capas actuales a Storage y persiste sus URLs en la BD.
- * Se llama al editar una obra antigua para que a partir de ahora tenga capas separadas.
- */
-async function migrarObraACapas(obraId, cnvFondo, cnvDibujo) {
-  try {
-    const blobFondo = await canvasABlob(cnvFondo);
-    const blobDibujo = await canvasABlob(cnvDibujo);
-
-    const fileFondo = new File([blobFondo], `fondo_${obraId}.png`, { type: "image/png" });
-    const fileDibujo = new File([blobDibujo], `dibujo_${obraId}.png`, { type: "image/png" });
-
-    const [{ url: urlFondo }, { url: urlDibujo }] = await Promise.all([
-      subirArchivo(fileFondo, "arte/capas"),
-      subirArchivo(fileDibujo, "arte/capas")
-    ]);
-
-    await supabase
-      .from('arte_obras')
-      .update({
-        capa_fondo_url: urlFondo,
-        capa_dibujo_url: urlDibujo,
-        capas_version: 2
-      })
-      .eq('id', obraId);
-
-    // Actualizar el objeto en memoria para que la próxima edición use CASO A
-    if (obraActualEnMuseo && obraActualEnMuseo.id === obraId) {
-      obraActualEnMuseo.capa_fondo_url = urlFondo;
-      obraActualEnMuseo.capa_dibujo_url = urlDibujo;
-      obraActualEnMuseo.capas_version = 2;
-    }
-    const idx = obras.findIndex(o => o.id === obraId);
-    if (idx !== -1) {
-      obras[idx].capa_fondo_url = urlFondo;
-      obras[idx].capa_dibujo_url = urlDibujo;
-      obras[idx].capas_version = 2;
-    }
-
-    console.log("Obra migrada a capas separadas ✅");
-  } catch (err) {
-    console.error("Error en migración de capas:", err);
   }
 }
 
@@ -618,13 +579,12 @@ async function borrarObraDesdeMuseo() {
   if (!confirm("¿Estás seguro de que quieres eliminar esta obra para siempre?")) return;
   try {
     const obra = obraActualEnMuseo;
-
-    // Borrar archivos de Storage si están en /media/
     const paths = [];
     const pushPath = (u) => { if (u && u.includes('/media/')) paths.push(u.split('/media/')[1]); };
     pushPath(obra.imagen_url);
     pushPath(obra.capa_fondo_url);
     pushPath(obra.capa_dibujo_url);
+    
     if (paths.length) await supabase.storage.from('media').remove(paths);
 
     await supabase.from('arte_obras').delete().eq('id', obra.id);
@@ -635,7 +595,7 @@ async function borrarObraDesdeMuseo() {
 }
 
 // ============================================================
-//  DIBUJO (capa superior, borrable)
+//  DIBUJO (Lógica del borrador)
 // ============================================================
 function getPos(e) {
   const rect = canvas.getBoundingClientRect();
@@ -651,7 +611,7 @@ function empezarDibujo(e) {
   ctx.lineCap = "round"; ctx.lineJoin = "round";
   
   if (herramienta === "borrador") {
-    // Solo borra la capa de PINTURA. El fondo (canvasFondo) es intocable aquí.
+    // ESTO ES CLAVE: El borrador SOLO afecta a 'canvas', no a 'canvasFondo'
     ctx.globalCompositeOperation = "destination-out";
     ctx.lineWidth = grosor * 2;
     ctx.shadowBlur = 0;
@@ -715,14 +675,13 @@ function dispararSpray(x, y) {
 }
 
 // ============================================================
-//  GUARDAR: COMPOSICIÓN + DOS CAPAS EN STORAGE + URLs EN BD
+//  GUARDAR: GUARDA LOS IDs Y LAS IMÁGENES POR SEPARADO
 // ============================================================
 async function guardarObra() {
   const titulo = document.getElementById("tituloObra").value.trim() || "Sin título";
   const btn = document.getElementById("btnGuardar");
   if (btn) { btn.textContent = "Subiendo..."; btn.disabled = true; }
 
-  // 1. Composición final (fondo + pintura) para el museo
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
   const tempCtx = tempCanvas.getContext("2d");
@@ -730,18 +689,16 @@ async function guardarObra() {
   tempCtx.drawImage(canvas, 0, 0);
 
   try {
-    // 2. Subir composición
     const blobFinal = await canvasABlob(tempCanvas);
     const fileFinal = new File([blobFinal], `obra_${Date.now()}.png`, { type: "image/png" });
     const { url: urlFinal } = await subirArchivo(fileFinal, "arte");
 
-    // 3. Subir cada capa por separado
     const blobFondo = await canvasABlob(canvasFondo);
     const blobDibujo = await canvasABlob(canvas);
-    const idTag = modoEdicion && obraEditandoId ? obraEditandoId : Date.now();
-
-    const fileFondo = new File([blobFondo], `fondo_${idTag}.png`, { type: "image/png" });
-    const fileDibujo = new File([blobDibujo], `dibujo_${idTag}.png`, { type: "image/png" });
+    
+    // Usamos el ID del fondo generado para nombrar los archivos y evitar colisiones
+    const fileFondo = new File([blobFondo], `fondo_${fondoEditandoId}.png`, { type: "image/png" });
+    const fileDibujo = new File([blobDibujo], `dibujo_${Date.now()}.png`, { type: "image/png" });
 
     const [{ url: urlFondo }, { url: urlDibujo }] = await Promise.all([
       subirArchivo(fileFondo, "arte/capas"),
@@ -754,12 +711,14 @@ async function guardarObra() {
       imagen_url: urlFinal,
       capa_fondo_url: urlFondo,
       capa_dibujo_url: urlDibujo,
-      capas_version: 2
+      fondo_id: fondoEditandoId, // ID ÚNICO DEL FONDO GUARDADO
+      fondo_color: fondoColor,   // Guardamos el color por si acaso
+      capas_version: 2           // 2 = Versión nueva con capas separadas
     };
 
     let obraGuardada;
     if (modoEdicion && obraEditandoId) {
-      // Borrar capas viejas de Storage si existían
+      // Si editamos, borramos las capas viejas de Storage para no acumular basura
       const vieja = obras.find(o => o.id === obraEditandoId);
       if (vieja) {
         const paths = [];
@@ -774,7 +733,6 @@ async function guardarObra() {
       obraGuardada = data;
     }
 
-    // Sincronizar objeto en memoria
     if (obraGuardada) {
       const idx = obras.findIndex(o => o.id === obraGuardada.id);
       if (idx !== -1) obras[idx] = obraGuardada;
@@ -787,7 +745,7 @@ async function guardarObra() {
     if (window.lanzarConfeti) window.lanzarConfeti(1000);
     if (btn) { btn.textContent = "Guardar Obra"; btn.disabled = false; }
     
-    modoEdicion = false; obraEditandoId = null;
+    modoEdicion = false; obraEditandoId = null; fondoEditandoId = null;
 
   } catch (err) {
     alert("Error: " + err.message);
