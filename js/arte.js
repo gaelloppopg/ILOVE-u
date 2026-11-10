@@ -20,8 +20,11 @@ let obraEditandoId = null;
 let fondoEditandoId = null;
 let preferenciaDispositivo = 'auto';
 
-// Variable GLOBAL para guardar la imagen o canvas copiado
-let pinturaCopiada = null; 
+// Variables GLOBALES para guardar los componentes separados
+let portapapeles = {
+  fondo: null,    // Puede ser un objeto Image o un canvas
+  pintura: null   // Puede ser un objeto Image o un canvas
+};
 
 // ============================================================
 //  UTILIDADES
@@ -29,8 +32,6 @@ let pinturaCopiada = null;
 function cargarImagen(src) {
   return new Promise((res, rej) => {
     const img = new Image();
-    // No usamos crossOrigin para evitar bloqueos al copiar en memoria. 
-    // Al no usar toDataURL, no necesitamos permisos CORS para pintar en el lienzo.
     img.onload = () => res(img);
     img.onerror = () => rej(new Error("No se pudo cargar imagen: " + src));
     img.src = src;
@@ -177,14 +178,18 @@ function configurarEventosDibujo() {
 
   if (btnCopiar) {
     btnCopiar.onclick = () => {
-      if (!canvas) return;
-      // Copiamos el canvas de pintura a un canvas temporal en memoria
-      pinturaCopiada = document.createElement("canvas");
-      pinturaCopiada.width = canvas.width;
-      pinturaCopiada.height = canvas.height;
-      const pCtx = pinturaCopiada.getContext("2d");
-      pCtx.drawImage(canvas, 0, 0); 
+      if (!canvas || !canvasFondo) return;
+      // Copiamos AMBAS capas por separado a la memoria
+      portapapeles.pintura = document.createElement("canvas");
+      portapapeles.pintura.width = canvas.width;
+      portapapeles.pintura.height = canvas.height;
+      portapapeles.pintura.getContext("2d").drawImage(canvas, 0, 0); 
       
+      portapapeles.fondo = document.createElement("canvas");
+      portapapeles.fondo.width = canvasFondo.width;
+      portapapeles.fondo.height = canvasFondo.height;
+      portapapeles.fondo.getContext("2d").drawImage(canvasFondo, 0, 0);
+
       const textoOriginal = btnCopiar.textContent;
       btnCopiar.textContent = "¡Copiado!";
       setTimeout(() => btnCopiar.textContent = textoOriginal, 1500);
@@ -193,12 +198,23 @@ function configurarEventosDibujo() {
 
   if (btnPegar) {
     btnPegar.onclick = () => {
-      if (!pinturaCopiada) {
-        alert("No hay pintura copiada. Copia una obra desde el museo o usa 'Copiar Pintura'.");
+      if (!portapapeles.pintura && !portapapeles.fondo) {
+        alert("El portapapeles está vacío. Copia una obra desde el museo o usa 'Copiar Pintura'.");
         return;
       }
-      // Pegamos la imagen o canvas en la capa superior (pintura)
-      ctx.drawImage(pinturaCopiada, 0, 0, canvas.width, canvas.height);
+      
+      // Pegamos el fondo (si existe) en la capa inferior
+      if (portapapeles.fondo) {
+        ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+        ctxFondo.drawImage(portapapeles.fondo, 0, 0, canvasFondo.width, canvasFondo.height);
+        fondoImagen = portapapeles.fondo; 
+      }
+      
+      // Pegamos la pintura (si existe) en la capa superior
+      if (portapapeles.pintura) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(portapapeles.pintura, 0, 0, canvas.width, canvas.height);
+      }
       
       const textoOriginal = btnPegar.textContent;
       btnPegar.textContent = "¡Pegado!";
@@ -260,7 +276,6 @@ function configurarEventosUI() {
   document.getElementById("btnDescargarObra").onclick = descargarObraComoPNG;
   document.getElementById("btnEditarObra").onclick = editarObraDesdeMuseo;
   
-  // NUEVO EVENTO: COPIAR DESDE EL MUSEO
   document.getElementById("btnCopiarObraMuseo").onclick = copiarObraDesdeMuseo;
 
   const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
@@ -297,8 +312,6 @@ function abrirEstudio() {
   fondoColor = "#ffffff";
   fondoOpacidad = 100;
   document.getElementById("fondoColor").value = "#ffffff";
-  
-  // NO reseteamos 'pinturaCopiada' para que puedas pegar inmediatamente si copiaste algo
   
   dibujarFondo();
 }
@@ -524,7 +537,7 @@ window.abrirMuseo = function(id) {
 }
 
 // ============================================================
-//  COPIAR DESDE EL MUSEO Y ABRIR ESTUDIO
+//  COPIAR DESDE EL MUSEO (SEPARANDO FONDO Y PINTURA)
 // ============================================================
 async function copiarObraDesdeMuseo() {
   if (!obraActualEnMuseo) return;
@@ -533,22 +546,43 @@ async function copiarObraDesdeMuseo() {
   btn.textContent = "Copiando...";
 
   try {
-    // 1. Cargamos la imagen en memoria
-    const img = await cargarImagen(obraActualEnMuseo.imagen_url);
+    const obra = obraActualEnMuseo;
     
-    // 2. La guardamos en la variable global (usamos el objeto img directamente)
-    pinturaCopiada = img;
+    // Si la obra tiene sus capas separadas en la base de datos, las copiamos tal cual
+    if (obra.capa_fondo_url && obra.capa_dibujo_url && obra.capas_version === 2) {
+      const [imgFondo, imgDibujo] = await Promise.all([
+        cargarImagen(obra.capa_fondo_url),
+        cargarImagen(obra.capa_dibujo_url)
+      ]);
+      portapapeles.fondo = imgFondo;
+      portapapeles.pintura = imgDibujo;
+    } else {
+      // Si es una obra vieja (quemada), la imagen completa la ponemos de pintura
+      // y creamos un fondo blanco por defecto.
+      const imgFull = await cargarImagen(obra.imagen_url);
+      
+      const canvasPintura = document.createElement("canvas");
+      canvasPintura.width = 900;
+      canvasPintura.height = 600;
+      canvasPintura.getContext("2d").drawImage(imgFull, 0, 0, 900, 600);
+      portapapeles.pintura = canvasPintura;
+
+      const canvasFondo = document.createElement("canvas");
+      canvasFondo.width = 900;
+      canvasFondo.height = 600;
+      const ctxF = canvasFondo.getContext("2d");
+      ctxF.fillStyle = "#ffffff";
+      ctxF.fillRect(0, 0, 900, 600);
+      portapapeles.fondo = canvasFondo;
+    }
     
     btn.textContent = "¡Copiado!";
-    
-    // 3. Cerramos el museo y abrimos el estudio automáticamente
     document.getElementById("museoOverlay").classList.remove("activo");
     abrirEstudio(); 
     
-    // 4. Damos tiempo al usuario a ver la alerta
     setTimeout(() => {
       btn.textContent = textoOriginal;
-      alert("Pintura copiada. Ahora puedes presionar 'Pegar Pintura' en el panel de la izquierda.");
+      alert("Pintura y fondo copiados por separado. Presiona 'Pegar Pintura' en el panel de la izquierda.");
     }, 500);
 
   } catch (err) {
@@ -605,11 +639,9 @@ async function editarObraDesdeMuseo() {
   // CASO B: Obra antigua (todo quemado)
   try {
     const imgFull = await cargarImagen(obra.imagen_url);
-    // Ponemos la imagen completa en la capa de pintura superior
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imgFull, 0, 0, canvas.width, canvas.height);
 
-    // El fondo es un lienzo blanco limpio
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
     ctxFondo.fillStyle = "#ffffff";
     ctxFondo.fillRect(0, 0, canvasFondo.width, canvasFondo.height);
