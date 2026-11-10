@@ -15,6 +15,8 @@ let paginas = [];
 let paginaActual = 0;
 const OBRAS_POR_PAGINA = 4;
 let obraActualEnMuseo = null;
+let modoEdicion = false; // 🛑 NUEVO: Para saber si estamos editando
+let obraEditandoId = null; // 🛑 NUEVO: Guarda el ID de la obra a editar
 
 async function initArte() {
   const { data: { user } } = await supabase.auth.getUser();
@@ -97,12 +99,20 @@ function configurarEventosUI() {
   document.getElementById("museoOverlay").onclick = (e) => { if (e.target.id === 'museoOverlay') document.getElementById("museoOverlay").classList.remove("activo"); };
   document.getElementById("btnBorrarObra").onclick = borrarObraDesdeMuseo;
   document.getElementById("btnDescargarObra").onclick = descargarObraComoPNG;
+  
+  // 🛑 NUEVO BOTÓN DE EDITAR
+  document.getElementById("btnEditarObra").onclick = editarObraDesdeMuseo;
 }
 
 function abrirEstudio() {
+  modoEdicion = false; // Reseteamos el modo edición
+  obraEditandoId = null;
+  
   document.getElementById("estudioOverlay").classList.add("activo");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   document.getElementById("tituloObra").value = "";
+  fondoImagen = null;
+  fondoColor = "#ffffff";
   dibujarFondo();
 }
 
@@ -127,6 +137,8 @@ function initPanelTemas() {
   const body = document.body;
   const items = document.querySelectorAll('.tema-card');
   const previewColor = document.getElementById('previewColorActual');
+
+  if(!btnAbrir) return;
 
   btnAbrir.onclick = () => {
     drawer.classList.add('activo');
@@ -170,6 +182,7 @@ function initPanelTemas() {
 
 function initParallaxLibro() {
   const wrapper = document.getElementById("libroWrapper");
+  if(!wrapper) return;
   wrapper.addEventListener("mousemove", (e) => {
     if (!wrapper.classList.contains("abierto")) return;
     const rect = wrapper.getBoundingClientRect();
@@ -330,6 +343,44 @@ window.abrirMuseo = function(id) {
   document.getElementById("museoOverlay").classList.add("activo");
 }
 
+// 🛑 NUEVA FUNCIÓN: Cargar Obra para Editar
+async function editarObraDesdeMuseo() {
+  if (!obraActualEnMuseo) return;
+  
+  // Cerramos el museo
+  document.getElementById("museoOverlay").classList.remove("activo");
+  
+  // Abrimos el estudio en modo edición
+  modoEdicion = true;
+  obraEditandoId = obraActualEnMuseo.id;
+  document.getElementById("estudioOverlay").classList.add("activo");
+  document.getElementById("tituloObra").value = obraActualEnMuseo.titulo || "";
+  
+  // Si no guardamos las capas, tendremos que extraer la imagen completa (esto es un fallback)
+  if (!obraActualEnMuseo.capa_fondo || !obraActualEnMuseo.capa_dibujo) {
+    const img = new Image();
+    img.crossOrigin = "anonymous"; // Para evitar problemas de CORS
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+      
+      // Pintamos la imagen completa en el fondo
+      ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
+      fondoImagen = img;
+    };
+    img.src = obraActualEnMuseo.imagen_url;
+  } else {
+    // Si tenemos las capas guardadas, las cargamos
+    const imgFondo = new Image();
+    imgFondo.onload = () => { ctxFondo.drawImage(imgFondo, 0, 0, canvasFondo.width, canvasFondo.height); fondoImagen = imgFondo; };
+    imgFondo.src = obraActualEnMuseo.capa_fondo;
+    
+    const imgDibujo = new Image();
+    imgDibujo.onload = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.drawImage(imgDibujo, 0, 0, canvas.width, canvas.height); };
+    imgDibujo.src = obraActualEnMuseo.capa_dibujo;
+  }
+}
+
 async function descargarObraComoPNG() {
   if (!obraActualEnMuseo || !obraActualEnMuseo.imagen_url) return;
   try {
@@ -421,6 +472,7 @@ async function guardarObra() {
   const btn = document.getElementById("btnGuardar");
   btn.textContent = "Subiendo..."; btn.disabled = true;
 
+  // Combinar fondo y dibujo en una sola imagen para la galería
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
   const tempCtx = tempCanvas.getContext("2d");
@@ -431,12 +483,33 @@ async function guardarObra() {
     try {
       const file = new File([blob], "obra.png", { type: "image/png" });
       const { url } = await subirArchivo(file, "arte");
-      await supabase.from('arte_obras').insert([{ couple_id: coupleId, titulo, imagen_url: url }]);
+      
+      let payload = { 
+        couple_id: coupleId, 
+        titulo, 
+        imagen_url: url,
+        // Si guardamos las capas, las mandamos (el navegador no permite sacar base64 de un canvas con imágenes externas fácilmente, pero como el usuario sube la imagen local, podemos intentarlo)
+        capa_fondo: canvasFondo.toDataURL(),
+        capa_dibujo: canvas.toDataURL()
+      };
+
+      if (modoEdicion && obraEditandoId) {
+        // Actualizamos la obra existente
+        await supabase.from('arte_obras').update(payload).eq('id', obraEditandoId);
+      } else {
+        // Insertamos nueva obra
+        await supabase.from('arte_obras').insert([payload]);
+      }
+
       document.getElementById("estudioOverlay").classList.remove("activo");
       cerrarLibro();
       await cargarObras();
+      
       if (window.lanzarConfeti) window.lanzarConfeti(1000);
       btn.textContent = "Guardar Obra"; btn.disabled = false;
+      modoEdicion = false; // Salimos del modo edición
+      obraEditandoId = null;
+      
     } catch (err) {
       alert("Error: " + err.message);
       btn.textContent = "Guardar Obra"; btn.disabled = false;

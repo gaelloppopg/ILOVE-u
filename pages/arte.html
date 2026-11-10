@@ -29,221 +29,81 @@
     });
   </script>
 
-  <!-- 🛑 CSS INTEGRADO PARA EL MODO DIBUJO RESPONSIVO 🛑 -->
   <style>
-    /* Variables para el diseño */
-    :root {
-      --hud-height: 40px;
-    }
+    /* Variables para el diseño móvil */
+    :root { --hud-height: 50px; }
 
-    /* Forzar que el canvas se adapte a la pantalla sin perder resolución */
     .estudio-canvas-wrapper {
-      touch-action: none;
-      -webkit-user-select: none;
-      user-select: none;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #e5e5e5;
-      width: 100%;
-      flex: 1; /* Ocupa el espacio restante */
-      overflow: hidden;
+      touch-action: none; -webkit-user-select: none; user-select: none;
+      display: flex; justify-content: center; align-items: center;
+      background: #e5e5e5; width: 100%; flex: 1; overflow: hidden;
     }
     
     .canvas-stack {
-      position: relative;
-      max-width: 100%;
-      max-height: 100%;
-      aspect-ratio: 3 / 2; /* Mantiene la proporción del canvas original (900x600) */
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      background: #fff;
+      position: relative; max-width: 100%; max-height: 100%;
+      aspect-ratio: 3 / 2; box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #fff;
     }
 
     .canvas-stack canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100% !important;
-      height: 100% !important;
-      touch-action: none;
+      position: absolute; top: 0; left: 0;
+      width: 100% !important; height: 100% !important; touch-action: none;
     }
 
-    /* Ocultar el HUD y el Botón Menú en Computadoras (solo visible en móviles) */
     #btnMenuMovil, #hudEstado { display: none; }
 
     /* ==========================================
-       DISEÑO EXCLUSIVO PARA MÓVILES Y TABLETS
+       DISEÑO RESPONSIVO PARA MÓVILES Y TABLETS
        ========================================== */
     @media (max-width: 1024px) {
-      /* Hacemos que el estudio sea de pantalla completa */
-      .estudio {
-        width: 100vw !important;
-        height: 100vh !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
-        display: flex;
-        flex-direction: column;
-      }
-      
-      /* Ocultamos la barra superior original para que no quite espacio */
+      .estudio { width: 100vw !important; height: 100vh !important; margin: 0 !important; border-radius: 0 !important; display: flex; flex-direction: column; }
       .estudio-topbar { display: none !important; }
+      .estudio-toolbar, .estudio-footer { display: none !important; }
 
-      /* Ocultamos la barra de herramientas original para meterla en el menú lateral */
-      .estudio-toolbar, .estudio-footer {
-        display: none !important;
-      }
-
-      /* Mostramos el HUD de estado */
       #hudEstado {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        height: var(--hud-height);
-        background: #1a1a1a;
-        color: #fff;
-        padding: 0 15px;
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.85rem;
-        font-weight: 500;
-        z-index: 100;
+        display: flex; align-items: center; justify-content: space-between;
+        height: var(--hud-height); background: #1a1a1a; color: #fff; padding: 0 15px;
+        font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 500; z-index: 100;
       }
-      
-      /* Indicador de color y pincel en el HUD */
       .hud-info { display: flex; align-items: center; gap: 8px; }
-      .hud-color-dot {
-        width: 16px; height: 16px; border-radius: 50%; border: 2px solid white;
-        background: #1a1a1a; /* Se cambia con JS */
-      }
+      .hud-color-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; background: #1a1a1a; }
 
-      /* Botón para abrir el menú */
       #btnMenuMovil {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--dorado, #c9a050);
-        color: #fff;
-        border: none;
-        padding: 6px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        display: flex; align-items: center; gap: 6px;
+        background: var(--dorado, #c9a050); color: #fff; border: none;
+        padding: 8px 16px; border-radius: 20px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       }
 
-      /* El contenedor del canvas ocupa el resto de la pantalla */
-      .estudio-canvas-wrapper {
-        flex: 1;
-        padding: 10px;
-      }
+      .estudio-canvas-wrapper { flex: 1; padding: 10px; }
+      .canvas-stack { width: 100%; max-height: 100%; }
 
-      .canvas-stack {
-        width: 100%;
-        max-height: 100%;
-      }
-
-      /* CONVERTIR LA TOOLBAR EN UN DRAWER (Menú lateral deslizante) */
+      /* Menú lateral deslizante */
       .estudio-toolbar {
-        display: flex !important; /* Volvemos a mostrarlo */
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        right: -100%; /* Oculto a la derecha */
-        width: 300px;
-        height: 100vh;
-        background: #1a1a1a;
-        color: #fff;
-        z-index: 9999;
-        padding: 20px;
-        overflow-y: auto;
-        transition: right 0.4s ease;
-        box-shadow: -5px 0 30px rgba(0,0,0,0.5);
+        display: flex !important; flex-direction: column;
+        position: fixed; top: 0; right: -100%; width: 320px; height: 100vh;
+        background: #1a1a1a; color: #fff; z-index: 9999; padding: 20px; overflow-y: auto;
+        transition: right 0.4s ease; box-shadow: -5px 0 30px rgba(0,0,0,0.5);
       }
+      .estudio-toolbar.activo { right: 0; }
 
-      /* Clase activa para mostrar el menú */
-      .estudio-toolbar.activo {
-        right: 0;
-      }
-
-      /* Adaptar los botones del toolbar para celular */
-      .estudio-toolbar .tool-group {
-        margin-bottom: 25px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .estudio-toolbar .tool-label {
-        font-size: 1.1rem;
-        color: var(--dorado, #c9a050);
-        font-weight: 700;
-      }
-
-      .estudio-toolbar .tool-btn {
-        width: 100%;
-        padding: 12px;
-        background: #333;
-        color: #fff;
-        border: 1px solid #444;
-        border-radius: 8px;
-        font-size: 1rem;
-        text-align: left;
-      }
+      .estudio-toolbar .tool-group { margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+      .estudio-toolbar .tool-label { font-size: 1.1rem; color: var(--dorado, #c9a050); font-weight: 700; }
+      .estudio-toolbar .tool-btn { width: 100%; padding: 12px; background: #333; color: #fff; border: 1px solid #444; border-radius: 8px; font-size: 1rem; text-align: left; }
+      .estudio-toolbar .tool-btn.active { background: var(--dorado, #c9a050); border-color: var(--dorado, #c9a050); color: #000; }
       
-      .estudio-toolbar .tool-btn.active {
-        background: var(--dorado, #c9a050);
-        border-color: var(--dorado, #c9a050);
-        color: #000;
-      }
-
-      /* Botones de colores más grandes */
-      .estudio-toolbar .colores-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-      }
-
-      .estudio-toolbar .color-btn {
-        width: 100%;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        border: 2px solid #555;
-      }
-
-      /* El input de texto del título */
-      .estudio-toolbar input[type="text"] {
-        width: 100%;
-        padding: 10px;
-        background: #333;
-        border: 1px solid #555;
-        color: #fff;
-        border-radius: 8px;
-      }
-
-      /* Botones de acción de abajo (Guardar, Limpiar) */
-      .estudio-toolbar .footer-right {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 20px;
-      }
-      .estudio-toolbar .btn-accion {
-        width: 100%;
-        padding: 15px;
-        border-radius: 8px;
-        font-size: 1rem;
-      }
+      .estudio-toolbar .colores-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+      .estudio-toolbar .color-btn { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid #555; }
+      
+      .estudio-toolbar input[type="text"] { width: 100%; padding: 10px; background: #333; border: 1px solid #555; color: #fff; border-radius: 8px; }
+      .estudio-toolbar .footer-right { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+      .estudio-toolbar .btn-accion { width: 100%; padding: 15px; border-radius: 8px; font-size: 1rem; }
     }
 
-    /* Overlay oscuro cuando el menú está abierto */
-    #overlayMenu {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 9998;
-      backdrop-filter: blur(2px);
-    }
+    #overlayMenu { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; backdrop-filter: blur(2px); }
     #overlayMenu.activo { display: block; }
+    
+    /* Estilo para el botón de editar en el museo */
+    .btn-museo.editar { background: #3b82f6; color: white; }
+    .btn-museo.editar:hover { background: #2563eb; }
   </style>
 </head>
 <body class="page-inner album-body" data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti" data-tema="minimalista">
@@ -268,7 +128,6 @@
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           Crear Nueva Obra
         </button>
-
         <button class="btn-menu-temas" id="btnAbrirPanelTemas">
           <span class="color-preview" id="previewColorActual"></span>
           Cambiar Estilo de Página
@@ -325,71 +184,42 @@
         <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
-    
     <div class="drawer-body">
       <p class="drawer-desc">Selecciona un entorno visual para transformar toda la galería.</p>
-      
       <div class="temas-lista">
         <button class="tema-card activo" data-set-tema="minimalista">
           <div class="tema-card-preview" style="background: #f4f4f5; border: 1px solid #e4e4e7;"></div>
-          <div class="tema-card-info">
-            <span class="tema-card-nombre">Minimalista</span>
-            <span class="tema-card-desc">Limpio y enfocado en el arte</span>
-          </div>
+          <div class="tema-card-info"><span class="tema-card-nombre">Minimalista</span><span class="tema-card-desc">Limpio y enfocado en el arte</span></div>
           <div class="tema-check">✓</div>
         </button>
-
         <button class="tema-card" data-set-tema="vinilo">
           <div class="tema-card-preview" style="background: repeating-radial-gradient(circle, #111 0, #111 2px, #222 3px, #222 4px);"></div>
-          <div class="tema-card-info">
-            <span class="tema-card-nombre">Vinilo / Música</span>
-            <span class="tema-card-desc">Oscuro, analógico y elegante</span>
-          </div>
+          <div class="tema-card-info"><span class="tema-card-nombre">Vinilo / Música</span><span class="tema-card-desc">Oscuro, analógico y elegante</span></div>
           <div class="tema-check">✓</div>
         </button>
-
         <button class="tema-card" data-set-tema="liquido">
           <div class="tema-card-preview" style="background: linear-gradient(135deg, #000, #444, #000);"></div>
-          <div class="tema-card-info">
-            <span class="tema-card-nombre">Metal Líquido</span>
-            <span class="tema-card-desc">Ondas plateadas y reflejos</span>
-          </div>
+          <div class="tema-card-info"><span class="tema-card-nombre">Metal Líquido</span><span class="tema-card-desc">Ondas plateadas y reflejos</span></div>
           <div class="tema-check">✓</div>
         </button>
-
         <button class="tema-card" data-set-tema="iridiscente">
           <div class="tema-card-preview" style="background: linear-gradient(45deg, #ff00cc, #333399, #00ffff);"></div>
-          <div class="tema-card-info">
-            <span class="tema-card-nombre">Iridiscente</span>
-            <span class="tema-card-desc">Colores cromados vibrantes</span>
-          </div>
+          <div class="tema-card-info"><span class="tema-card-nombre">Iridiscente</span><span class="tema-card-desc">Colores cromados vibrantes</span></div>
           <div class="tema-check">✓</div>
         </button>
-
         <button class="tema-card" data-set-tema="noche">
           <div class="tema-card-preview" style="background: #0a1128;"></div>
-          <div class="tema-card-info">
-            <span class="tema-card-nombre">Noche Estrellada</span>
-            <span class="tema-card-desc">Azul profundo y estrellas</span>
-          </div>
+          <div class="tema-card-info"><span class="tema-card-nombre">Noche Estrellada</span><span class="tema-card-desc">Azul profundo y estrellas</span></div>
           <div class="tema-check">✓</div>
         </button>
-
         <button class="tema-card" data-set-tema="grafiti">
           <div class="tema-card-preview" style="background: linear-gradient(135deg, #f43f5e, #eab308);"></div>
-          <div class="tema-card-info">
-            <span class="tema-card-nombre">Grafiti</span>
-            <span class="tema-card-desc">Urbano, vibrante y concreto</span>
-          </div>
+          <div class="tema-card-info"><span class="tema-card-nombre">Grafiti</span><span class="tema-card-desc">Urbano, vibrante y concreto</span></div>
           <div class="tema-check">✓</div>
         </button>
-
         <button class="tema-card" data-set-tema="tv">
           <div class="tema-card-preview" style="background: repeating-linear-gradient(0deg, #333 0, #333 1px, #111 2px, #111 3px);"></div>
-          <div class="tema-card-info">
-            <span class="tema-card-nombre">Ciberpunk TV</span>
-            <span class="tema-card-desc">Estática retro y neón</span>
-          </div>
+          <div class="tema-card-info"><span class="tema-card-nombre">Ciberpunk TV</span><span class="tema-card-desc">Estática retro y neón</span></div>
           <div class="tema-check">✓</div>
         </button>
       </div>
@@ -409,6 +239,7 @@
         <span id="museoFecha">Fecha</span>
         <div class="museo-placa-linea"></div>
         <div class="museo-acciones">
+          <button class="btn-museo editar" id="btnEditarObra">Editar Obra</button>
           <button class="btn-museo borrar" id="btnBorrarObra">Eliminar</button>
           <button class="btn-museo descargar" id="btnDescargarObra">Descargar PNG</button>
         </div>
@@ -416,11 +247,10 @@
     </div>
   </div>
 
-  <!-- 🛑 ESTUDIO MODIFICADO 🛑 -->
   <div class="estudio-overlay" id="estudioOverlay">
     <div class="estudio" id="estudio">
       
-      <!-- HUD PARA MÓVILES (Indicador de estado y Botón menú) -->
+      <!-- HUD Móvil -->
       <div id="hudEstado">
         <div class="hud-info">
           <div class="hud-color-dot" id="hudColorDot"></div>
@@ -431,8 +261,6 @@
           Menú
         </button>
       </div>
-
-      <!-- OVERLAY PARA CERRAR EL MENÚ -->
       <div id="overlayMenu"></div>
 
       <div class="estudio-topbar">
@@ -444,12 +272,10 @@
       </div>
 
       <div class="estudio-toolbar" id="estudioToolbar">
-        <!-- Título dentro del menú para móviles (oculto en PC) -->
         <div class="tool-group" style="display:none; @media(max-width:1024px){display:flex}">
            <span class="tool-label">Título de la Obra</span>
            <input type="text" id="tituloObraMovil" placeholder="Título de tu obra..." maxlength="40" />
         </div>
-
         <div class="tool-group herramientas">
           <span class="tool-label">Herramientas</span>
           <button type="button" class="tool-btn active" data-tool="pincel">Pincel</button>
@@ -502,12 +328,6 @@
           <button type="button" class="btn-accion primario" id="btnGuardar">Guardar Obra</button>
         </div>
       </div>
-
-      <!-- Botones extra dentro del menú móvil para fondo -->
-      <div class="estudio-toolbar-extra-movil" style="display:none;">
-        <!-- Estos se inyectarán visualmente en el menú de móvil con JS -->
-      </div>
-
     </div>
   </div>
 
@@ -516,30 +336,23 @@
   <script src="../js/confeti.js"></script>
   
   <script>
+    // Arreglar el lienzo táctil para que no haga scroll
     document.addEventListener("DOMContentLoaded", () => {
-      // 1. Arreglar el lienzo táctil para que no haga scroll
       const canvas = document.getElementById('lienzo');
-      const canvasFondo = document.getElementById('lienzoFondo');
-      
+      if(!canvas) return;
+
       function simularEvento(tipo, touch) {
         const rect = canvas.getBoundingClientRect();
-        // Calculamos la proporción por si el canvas está escalado en pantalla
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        
         const x = (touch.clientX - rect.left) * scaleX;
         const y = (touch.clientY - rect.top) * scaleY;
         
         const evento = new MouseEvent(tipo, {
-          clientX: touch.clientX,
-          clientY: touch.clientY,
-          bubbles: true,
-          cancelable: true
+          clientX: touch.clientX, clientY: touch.clientY, bubbles: true, cancelable: true
         });
-        
         Object.defineProperty(evento, 'offsetX', { value: x });
         Object.defineProperty(evento, 'offsetY', { value: y });
-        
         canvas.dispatchEvent(evento);
       }
 
@@ -547,7 +360,7 @@
       canvas.addEventListener('touchmove', (e) => { e.preventDefault(); simularEvento('mousemove', e.touches[0]); }, { passive: false });
       canvas.addEventListener('touchend', (e) => { e.preventDefault(); simularEvento('mouseup', e.changedTouches[0]); }, { passive: false });
 
-      // 2. Lógica del menú lateral en móviles
+      // Lógica del menú lateral en móviles
       const btnMenu = document.getElementById('btnMenuMovil');
       const toolbar = document.getElementById('estudioToolbar');
       const overlay = document.getElementById('overlayMenu');
@@ -555,23 +368,16 @@
       const hudColorDot = document.getElementById('hudColorDot');
       const hudTexto = document.getElementById('hudTexto');
 
-      // Mover el footer dentro del menú en móviles
-      if (window.innerWidth <= 1024) {
+      if (window.innerWidth <= 1024 && footer && toolbar) {
         toolbar.appendChild(footer);
-        toolbar.style.display = 'flex'; // Aseguramos que el menú existe
+        toolbar.style.display = 'flex';
       }
 
-      btnMenu.addEventListener('click', () => {
-        toolbar.classList.add('activo');
-        overlay.classList.add('activo');
-      });
+      if(btnMenu && overlay) {
+        btnMenu.addEventListener('click', () => { toolbar.classList.add('activo'); overlay.classList.add('activo'); });
+        overlay.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
+      }
 
-      overlay.addEventListener('click', () => {
-        toolbar.classList.remove('activo');
-        overlay.classList.remove('activo');
-      });
-
-      // 3. Actualizar el HUD cuando se cambia de herramienta o color
       document.querySelectorAll('.tool-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
@@ -589,36 +395,25 @@
       });
 
       const colorPicker = document.getElementById('colorPicker');
-      if(colorPicker) {
-          colorPicker.addEventListener('input', actualizarHUD);
-      }
+      if(colorPicker) colorPicker.addEventListener('input', actualizarHUD);
 
       function actualizarHUD() {
+        if(!hudTexto || !hudColorDot) return;
         const herramientaActiva = document.querySelector('.tool-btn.active');
         const colorActivo = document.querySelector('.color-btn.active');
         const textoHerramienta = herramientaActiva ? herramientaActiva.innerText : 'Pincel';
         
         let colorHex = '#1a1a1a';
-        let nombreColor = 'Negro';
+        if (colorActivo) colorHex = colorActivo.getAttribute('data-color');
+        else if (colorPicker) colorHex = colorPicker.value;
         
-        if (colorActivo) {
-            colorHex = colorActivo.getAttribute('data-color');
-        } else if (colorPicker) {
-            colorHex = colorPicker.value;
-        }
-        
-        // Mapeo básico de colores a nombres
-        const nombres = {
-            '#1a1a1a': 'Negro', '#e63946': 'Rojo', '#f4a261': 'Naranja', 
-            '#2a9d8f': 'Verde', '#457b9d': 'Azul', '#9d4edd': 'Morado', '#f28ca6': 'Rosa'
-        };
-        nombreColor = nombres[colorHex] || colorHex;
+        const nombres = { '#1a1a1a': 'Negro', '#e63946': 'Rojo', '#f4a261': 'Naranja', '#2a9d8f': 'Verde', '#457b9d': 'Azul', '#9d4edd': 'Morado', '#f28ca6': 'Rosa' };
+        let nombreColor = nombres[colorHex] || colorHex;
 
         hudTexto.innerText = `${textoHerramienta} • ${nombreColor}`;
         hudColorDot.style.background = colorHex;
       }
 
-      // Sincronizar el input de título del menú con el original
       const tituloOriginal = document.getElementById('tituloObra');
       const tituloMovil = document.getElementById('tituloObraMovil');
       if(tituloOriginal && tituloMovil) {
@@ -626,7 +421,6 @@
           tituloMovil.addEventListener('input', (e) => tituloOriginal.value = e.target.value);
       }
       
-      // Inicializar HUD
       actualizarHUD();
     });
   </script>
