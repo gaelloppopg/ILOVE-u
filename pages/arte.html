@@ -35,10 +35,14 @@
       touch-action: none; -webkit-user-select: none; user-select: none;
       display: flex; justify-content: center; align-items: center;
       background: #e5e5e5; width: 100%; overflow: hidden;
+      /* Aseguramos que el lienzo siempre quepa */
+      max-height: 100vh;
     }
     .canvas-stack {
       position: relative; max-width: 100%; max-height: 100%;
       aspect-ratio: 3 / 2; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin: 0 auto;
+      /* Ajuste para que no se deforme */
+      width: 100%; height: auto;
     }
     .canvas-stack canvas {
       position: absolute; top: 0; left: 0;
@@ -99,6 +103,19 @@
       .estudio-footer { display: none !important; }
       
       #overlayMenu.activo { display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9998; backdrop-filter: blur(3px); }
+    }
+
+    /* Ajuste específico para orientación vertical */
+    @media (max-width: 1024px) and (orientation: portrait) {
+      .estudio-canvas-wrapper {
+        align-items: flex-start; /* Alinea arriba para aprovechar el espacio */
+        padding-top: 20px;
+      }
+      .canvas-stack {
+        max-height: 60vh; /* Limita la altura en vertical para que no se salga de la pantalla */
+        width: auto; /* Mantiene la proporción */
+        max-width: 90vw;
+      }
     }
   </style>
 </head>
@@ -261,7 +278,6 @@
       <div class="estudio-toolbar" id="estudioToolbar">
         <button class="btn-cerrar-toolbar" id="btnCerrarMenuM" style="display:none;">✕</button>
         
-        <!-- Título dentro del menú (Móvil) -->
         <div class="tool-group" id="grupoTituloM">
           <span class="tool-label">Título de la Obra</span>
           <input type="text" id="tituloObraM" placeholder="Título de tu obra..." maxlength="40" />
@@ -298,7 +314,6 @@
           <div class="color-custom"><input type="color" id="colorPicker" value="#1a1a1a" /></div>
         </div>
 
-        <!-- Controles de Fondo (Móvil) -->
         <div class="tool-group" id="grupoFondoM">
           <span class="tool-label">Fondo</span>
           <div class="fondo-controles">
@@ -308,7 +323,6 @@
           </div>
         </div>
 
-        <!-- Botones de Acción (Móvil) -->
         <div class="tool-group" id="grupoAccionesM" style="margin-top: 15px; gap: 10px;">
           <button type="button" class="btn-accion secundario" id="btnLimpiarM">Limpiar Lienzo</button>
           <button type="button" class="btn-accion primario" id="btnGuardarM">Guardar Obra</button>

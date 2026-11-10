@@ -326,14 +326,12 @@ async function editarObraDesdeMuseo() {
   document.getElementById("estudioOverlay").classList.add("activo");
   document.getElementById("tituloObra").value = obraActualEnMuseo.titulo || "";
   
-  // Cargar la imagen de la obra en el fondo del lienzo para poder dibujar encima
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.onload = () => {
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
     ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
     fondoImagen = img;
-    // Limpiamos la capa de dibujo para que empiece limpia
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
   img.src = obraActualEnMuseo.imagen_url;
