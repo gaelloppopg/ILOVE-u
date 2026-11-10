@@ -52,6 +52,9 @@
     .btn-museo.editar { background: #3b82f6; color: white; border: 1px solid #3b82f6; }
     .btn-museo.editar:hover { background: #2563eb; }
 
+    /* ==========================================
+       DISEÑO PARA MÓVILES
+       ========================================== */
     @media (max-width: 1024px) {
       .estudio-overlay { padding: 0 !important; }
       .estudio { 
@@ -182,6 +185,7 @@
     </div>
   </main>
 
+  <!-- El panel de temas ahora está oculto por defecto y solo se abre con el botón -->
   <div class="panel-temas-overlay" id="panelTemasOverlay"></div>
   <aside class="panel-temas-drawer" id="panelTemasDrawer">
     <div class="drawer-header">
@@ -271,6 +275,12 @@
       <div class="estudio-toolbar" id="estudioToolbar">
         <button class="btn-cerrar-toolbar" id="btnCerrarMenuM">✕</button>
         
+        <!-- Título dentro del menú (Móvil) -->
+        <div class="tool-group" id="grupoTituloM">
+          <span class="tool-label">Título de la Obra</span>
+          <input type="text" id="tituloObraM" placeholder="Título de tu obra..." maxlength="40" />
+        </div>
+
         <div class="tool-group herramientas">
           <span class="tool-label">Herramientas</span>
           <button type="button" class="tool-btn active" data-tool="pincel">Pincel</button>
@@ -300,6 +310,22 @@
             <button type="button" class="color-btn" data-color="#f28ca6" style="--c:#f28ca6"></button>
           </div>
           <div class="color-custom"><input type="color" id="colorPicker" value="#1a1a1a" /></div>
+        </div>
+
+        <!-- Controles de Fondo (Móvil) -->
+        <div class="tool-group" id="grupoFondoM">
+          <span class="tool-label">Fondo</span>
+          <div class="fondo-controles">
+            <input type="color" id="fondoColorM" value="#ffffff" />
+            <button type="button" id="btnSubirFondoM">Subir Foto</button>
+            <button type="button" id="btnQuitarFondoM">Quitar</button>
+          </div>
+        </div>
+
+        <!-- Botones de Acción (Móvil) -->
+        <div class="tool-group" id="grupoAccionesM" style="margin-top: 15px; gap: 10px;">
+          <button type="button" class="btn-accion secundario" id="btnLimpiarM">Limpiar Lienzo</button>
+          <button type="button" class="btn-accion primario" id="btnGuardarM">Guardar Obra</button>
         </div>
       </div>
 
@@ -335,7 +361,9 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const canvas = document.getElementById('lienzo');
+      const canvasFondo = document.getElementById('lienzoFondo');
       
+      // 1. Traducir toques a ratón
       function simularEvento(tipo, touch) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -355,6 +383,7 @@
       canvas.addEventListener('touchmove', (e) => { e.preventDefault(); simularEvento('mousemove', e.touches[0]); }, { passive: false });
       canvas.addEventListener('touchend', (e) => { e.preventDefault(); simularEvento('mouseup', e.changedTouches[0]); }, { passive: false });
 
+      // 2. Mover controles al menú móvil (EVITA DUPLICADOS)
       const isMobile = window.innerWidth <= 1024;
       const toolbar = document.getElementById('estudioToolbar');
       const topbar = document.getElementById('estudioTopbar');
@@ -362,84 +391,62 @@
 
       if (isMobile) {
         if(topbar) topbar.style.display = 'none';
+        // El menú móvil se llena de controles copiados del footer y topbar
+        // Este proceso ya está manejado por las clases CSS y los IDs que se añadieron en el HTML de arriba.
+      }
 
-        const tituloObra = document.getElementById('tituloObra');
-        const grupoHerramientas = toolbar.querySelector('.herramientas');
-        
-        if(tituloObra) {
-          const divTitulo = document.createElement('div');
-          divTitulo.className = 'tool-group';
-          divTitulo.innerHTML = '<span class="tool-label">Título de la Obra</span>';
-          const clonTitulo = tituloObra.cloneNode(true);
-          clonTitulo.id = 'tituloObraM';
-          divTitulo.appendChild(clonTitulo);
-          toolbar.insertBefore(divTitulo, grupoHerramientas);
-          
-          clonTitulo.addEventListener('input', (e) => tituloObra.value = e.target.value);
-          tituloObra.addEventListener('input', (e) => clonTitulo.value = e.target.value);
-        }
+      // 3. Lógica de abrir/cerrar menú móvil
+      const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
+      const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
+      const overlay = document.getElementById('overlayMenu');
 
-        if(footer) {
-          const divAcciones = document.createElement('div');
-          divAcciones.className = 'tool-group';
-          divAcciones.style.marginTop = '20px';
-          
-          const fondoColor = document.getElementById('fondoColor');
-          const btnSubirFondo = document.getElementById('btnSubirFondo');
-          const btnLimpiar = document.getElementById('btnLimpiar');
-          const btnGuardar = document.getElementById('btnGuardar');
-          
-          const divFondo = document.createElement('div');
-          divFondo.innerHTML = '<span class="tool-label">Fondo</span>';
-          divFondo.className = 'fondo-controles';
-          
-          const clonFondoColor = fondoColor.cloneNode(true);
-          clonFondoColor.id = 'fondoColorM';
-          const clonSubir = btnSubirFondo.cloneNode(true);
-          clonSubir.id = 'btnSubirFondoM';
-          const clonQuitar = document.getElementById('btnQuitarFondo').cloneNode(true);
-          clonQuitar.id = 'btnQuitarFondoM';
-          
-          divFondo.appendChild(clonFondoColor);
-          divFondo.appendChild(clonSubir);
-          divFondo.appendChild(clonQuitar);
-          
-          const clonLimpiar = btnLimpiar.cloneNode(true);
-          clonLimpiar.id = 'btnLimpiarM';
-          clonLimpiar.className = 'btn-accion secundario';
-          clonLimpiar.style.marginTop = '10px';
-          
-          const clonGuardar = btnGuardar.cloneNode(true);
-          clonGuardar.id = 'btnGuardarM';
-          clonGuardar.className = 'btn-accion primario';
-          clonGuardar.style.marginTop = '10px';
-
-          divAcciones.appendChild(divFondo);
-          divAcciones.appendChild(clonLimpiar);
-          divAcciones.appendChild(clonGuardar);
-          
-          toolbar.appendChild(divAcciones);
-
-          clonFondoColor.addEventListener('input', (e) => { fondoColor.value = e.target.value; fondoColor.dispatchEvent(new Event('input')); });
-          clonSubir.addEventListener('click', () => btnSubirFondo.click());
-          clonQuitar.addEventListener('click', () => document.getElementById('btnQuitarFondo').click());
-          clonLimpiar.addEventListener('click', () => btnLimpiar.click());
-          clonGuardar.addEventListener('click', () => btnGuardar.click());
-        }
-
-        const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
-        const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
-        const overlay = document.getElementById('overlayMenu');
-
+      if (btnAbrirMenu && overlay) {
         btnAbrirMenu.addEventListener('click', () => { toolbar.classList.add('activo'); overlay.classList.add('activo'); });
+      }
+      if (btnCerrarMenu && overlay) {
         btnCerrarMenu.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
+      }
+      if (overlay) {
         overlay.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
+      }
 
-        document.querySelectorAll('.tool-btn, .color-btn').forEach(el => {
-          el.addEventListener('click', () => {
+      document.querySelectorAll('.tool-btn, .color-btn').forEach(el => {
+        el.addEventListener('click', () => {
+          if (window.innerWidth <= 1024) { 
             setTimeout(() => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); }, 150);
-          });
+          }
         });
+      });
+
+      // 4. Sincronizar los controles móviles
+      const btnGuardar = document.getElementById('btnGuardar');
+      const btnGuardarM = document.getElementById('btnGuardarM');
+      if(btnGuardar && btnGuardarM) btnGuardarM.addEventListener('click', () => btnGuardar.click());
+
+      const btnLimpiar = document.getElementById('btnLimpiar');
+      const btnLimpiarM = document.getElementById('btnLimpiarM');
+      if(btnLimpiar && btnLimpiarM) btnLimpiarM.addEventListener('click', () => btnLimpiar.click());
+
+      const btnSubirFondo = document.getElementById('btnSubirFondo');
+      const btnSubirFondoM = document.getElementById('btnSubirFondoM');
+      if(btnSubirFondo && btnSubirFondoM) btnSubirFondoM.addEventListener('click', () => btnSubirFondo.click());
+
+      const btnQuitarFondo = document.getElementById('btnQuitarFondo');
+      const btnQuitarFondoM = document.getElementById('btnQuitarFondoM');
+      if(btnQuitarFondo && btnQuitarFondoM) btnQuitarFondoM.addEventListener('click', () => btnQuitarFondo.click());
+
+      const fondoColor = document.getElementById('fondoColor');
+      const fondoColorM = document.getElementById('fondoColorM');
+      if(fondoColor && fondoColorM) {
+        fondoColor.addEventListener('input', (e) => fondoColorM.value = e.target.value);
+        fondoColorM.addEventListener('input', (e) => { fondoColor.value = e.target.value; fondoColor.dispatchEvent(new Event('input')); });
+      }
+
+      const tituloObra = document.getElementById('tituloObra');
+      const tituloObraM = document.getElementById('tituloObraM');
+      if(tituloObra && tituloObraM) {
+        tituloObra.addEventListener('input', (e) => tituloObraM.value = e.target.value);
+        tituloObraM.addEventListener('input', (e) => tituloObra.value = e.target.value);
       }
     });
   </script>
