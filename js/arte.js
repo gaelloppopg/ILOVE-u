@@ -331,11 +331,13 @@ async function editarObraDesdeMuseo() {
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.onload = () => {
-    ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-    ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
-    fondoImagen = img;
-    // Limpiamos la capa de dibujo
+    // 🛑 CARGAMOS LA IMAGEN EN LA CAPA DE DIBUJO (lienzo) PARA QUE SE PUEDA BORRAR
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
+    // Limpiamos la capa de fondo para que no haya duplicados
+    ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+    fondoImagen = null;
   };
   img.src = obraActualEnMuseo.imagen_url;
 }
@@ -439,7 +441,6 @@ async function guardarObra() {
         imagen_url: url
       };
 
-      // 🛑 Actualizar si estamos en modo edición
       if (modoEdicion && obraEditandoId) {
         await supabase.from('arte_obras').update(payload).eq('id', obraEditandoId);
       } else {
