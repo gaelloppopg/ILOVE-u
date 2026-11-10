@@ -82,7 +82,15 @@ function configurarEventosDibujo() {
     }
   };
   document.getElementById("btnQuitarFondo").onclick = () => { fondoImagen = null; fondoColor = "#ffffff"; dibujarFondo(); };
-  document.getElementById("btnLimpiar").onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById("btnLimpiar").onclick = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Si estamos editando, también limpiamos el fondo
+    if (modoEdicion) {
+      ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+      fondoImagen = null;
+      fondoColor = "#ffffff";
+    }
+  };
   document.getElementById("btnGuardar").onclick = guardarObra;
 }
 

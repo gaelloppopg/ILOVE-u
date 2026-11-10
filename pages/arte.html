@@ -46,17 +46,12 @@
       width: 100% !important; height: 100% !important; touch-action: none;
     }
 
-    /* Ocultos en PC por defecto */
     .btn-menu-movil-flotante, #overlayMenu { display: none; }
     .btn-cerrar-toolbar { display: none; }
 
-    /* Botón de Editar en Museo */
     .btn-museo.editar { background: #3b82f6; color: white; border: 1px solid #3b82f6; }
     .btn-museo.editar:hover { background: #2563eb; }
 
-    /* ==========================================
-       DISEÑO PARA MÓVILES Y TABLETS
-       ========================================== */
     @media (max-width: 1024px) {
       .estudio-overlay { padding: 0 !important; }
       .estudio { 
@@ -64,7 +59,6 @@
         margin: 0 !important; border-radius: 0 !important; 
         display: flex !important; flex-direction: column !important;
       }
-
       .estudio-topbar { display: none !important; }
       
       .btn-menu-movil-flotante {
@@ -75,7 +69,6 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
       }
 
-      /* Panel deslizante móvil */
       .estudio-toolbar { 
         position: fixed !important; top: 0 !important; right: -100% !important;
         width: 85vw !important; max-width: 320px !important; height: 100vh !important;
@@ -90,7 +83,6 @@
         font-size: 1.5rem; text-align: right; cursor: pointer; margin-bottom: 5px;
       }
 
-      /* Adaptación táctil */
       .estudio-toolbar .tool-group { display: flex !important; flex-direction: column !important; gap: 8px !important; }
       .estudio-toolbar .tool-label { font-size: 0.9rem !important; color: var(--dorado) !important; font-weight: 700 !important; }
       .estudio-toolbar .tool-btn {
@@ -263,7 +255,6 @@
 
   <div class="estudio-overlay" id="estudioOverlay">
     <div class="estudio" id="estudio">
-      
       <div class="estudio-topbar" id="estudioTopbar">
         <div class="estudio-titulo-app"><span class="app-logo">🎨</span><span>Estudio Creativo</span></div>
         <input type="text" id="tituloObra" placeholder="Título de tu obra maestra..." maxlength="40" />
@@ -345,7 +336,6 @@
     document.addEventListener("DOMContentLoaded", () => {
       const canvas = document.getElementById('lienzo');
       
-      // 1. Traducir toques a ratón
       function simularEvento(tipo, touch) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -365,7 +355,6 @@
       canvas.addEventListener('touchmove', (e) => { e.preventDefault(); simularEvento('mousemove', e.touches[0]); }, { passive: false });
       canvas.addEventListener('touchend', (e) => { e.preventDefault(); simularEvento('mouseup', e.changedTouches[0]); }, { passive: false });
 
-      // 2. Mover controles al menú móvil (EVITA DUPLICADOS)
       const isMobile = window.innerWidth <= 1024;
       const toolbar = document.getElementById('estudioToolbar');
       const topbar = document.getElementById('estudioTopbar');
