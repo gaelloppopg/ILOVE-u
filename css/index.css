@@ -1,6 +1,6 @@
-/* =========================================
-   VARIABLES Y ESTILOS BASE (MODO CLARO)
-   ========================================= */
+/* =========================================================
+   VARIABLES GLOBALES — MODO CLARO
+   ========================================================= */
 :root {
   /* Fondos */
   --bg-claro: #fdfafb;
@@ -8,6 +8,7 @@
   --bg-tarjeta: rgba(255, 255, 255, 0.75);
   --bg-tarjeta-hover: rgba(255, 255, 255, 0.92);
   --bg-overlay: rgba(253, 250, 251, 0.6);
+  --bg-modal: rgba(0, 0, 0, 0.75);
 
   /* Textos */
   --texto-principal: #2c1a24;
@@ -29,15 +30,22 @@
 
   /* Nubes */
   --nube-color: rgba(255, 255, 255, 0.9);
+
+  /* Fondo del input de reproducción y otros detalles */
+  --blanco-puro: #ffffff;
+  --negro-vinilo: #111;
 }
 
-/* 🛑 MODO OSCURO GLOBAL 🛑 */
+/* =========================================================
+   MODO OSCURO GLOBAL
+   ========================================================= */
 body.modo-noche {
   --bg-claro: #0a0d14;
   --bg-secundario: #12161f;
   --bg-tarjeta: rgba(26, 30, 42, 0.75);
   --bg-tarjeta-hover: rgba(36, 42, 56, 0.92);
   --bg-overlay: rgba(10, 13, 20, 0.7);
+  --bg-modal: rgba(0, 0, 0, 0.85);
 
   --texto-principal: #e8eaf0;
   --texto-secundario: #a0a8bd;
@@ -55,6 +63,16 @@ body.modo-noche {
   --sombra-hover: 0 25px 60px rgba(244, 114, 182, 0.25);
 
   --nube-color: rgba(244, 114, 182, 0.04);
+
+  --blanco-puro: #1a1e2a;
+  --negro-vinilo: #000;
+}
+
+/* =========================================================
+   RESET Y BASE
+   ========================================================= */
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -64,11 +82,32 @@ body {
   transition: background-color 0.8s ease, color 0.8s ease;
   overflow-x: hidden;
   margin: 0;
+  line-height: 1.6;
 }
 
-/* =========================================
+h1, h2, h3 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--rosa);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--dorado);
+}
+
+/* =========================================================
    FONDO DE NUBES
-   ========================================= */
+   ========================================================= */
 .fondo-nubes {
   position: fixed;
   inset: 0;
@@ -100,9 +139,9 @@ body {
   100% { transform: translateX(0) translateY(0); }
 }
 
-/* =========================================
-   PORTADA (HERO VERTICAL EDITORIAL)
-   ========================================= */
+/* =========================================================
+   HERO / PORTADA VERTICAL
+   ========================================================= */
 .hero {
   position: relative;
   min-height: 100vh;
@@ -116,7 +155,6 @@ body {
   overflow: hidden;
 }
 
-/* Imagen de portada de fondo, sutil */
 .hero > img#portadaImg {
   position: absolute;
   inset: 0;
@@ -129,8 +167,7 @@ body {
   -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
 }
 
-/* Etiqueta superior */
-.hero .hero-tag {
+.hero-tag {
   display: inline-block;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
@@ -146,7 +183,6 @@ body {
   animation: fadeInUp 0.9s ease both;
 }
 
-/* TÍTULO VERTICAL — letras de arriba a abajo */
 .hero-title-vertical {
   display: flex;
   flex-direction: column;
@@ -168,14 +204,12 @@ body {
 }
 
 .hero-title-vertical .linea:nth-child(1) { animation-delay: 0.1s; }
-.hero-title-vertical .linea:nth-child(2) {
+.hero-title-vertical .linea:nth-child(3) {
   animation-delay: 0.25s;
   color: var(--rosa);
   font-style: italic;
 }
-.hero-title-vertical .linea:nth-child(3) { animation-delay: 0.4s; }
 
-/* Línea decorativa entre secciones del título */
 .hero-title-vertical .separador {
   width: 1px;
   height: 40px;
@@ -183,7 +217,6 @@ body {
   margin: 8px 0;
 }
 
-/* Subtítulo */
 .hero-subtitle {
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
@@ -195,7 +228,9 @@ body {
   animation: fadeInUp 0.9s ease 0.55s both;
 }
 
-/* CONTADOR */
+/* =========================================================
+   CONTADOR
+   ========================================================= */
 .contador {
   display: flex;
   gap: 14px;
@@ -256,7 +291,9 @@ body {
   font-weight: 600;
 }
 
-/* Scroll hint */
+/* =========================================================
+   SCROLL HINT
+   ========================================================= */
 .scroll-hint {
   position: absolute;
   bottom: 30px;
@@ -273,9 +310,9 @@ body {
   50%       { transform: translateX(-50%) translateY(10px); }
 }
 
-/* =========================================
-   SECCIÓN SOBRE / MENSAJE SECRETO
-   ========================================= */
+/* =========================================================
+   SOBRE SECRETO
+   ========================================================= */
 .sobre-section {
   padding: 100px 24px;
   text-align: center;
@@ -381,6 +418,10 @@ body {
   animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.mensaje-sobre #textoCartaSecreta {
+  margin: 0;
+}
+
 .mensaje-sobre small {
   display: block;
   margin-top: 18px;
@@ -391,9 +432,9 @@ body {
   letter-spacing: 0.05em;
 }
 
-/* =========================================
+/* =========================================================
    EXPLORA — BENTO GRID
-   ========================================= */
+   ========================================================= */
 .explora-section {
   max-width: 1180px;
   margin: 0 auto;
@@ -449,7 +490,6 @@ body {
   overflow: hidden;
 }
 
-/* Brillo sutil de fondo en hover */
 .bento-item::before {
   content: "";
   position: absolute;
@@ -506,7 +546,6 @@ body {
   line-height: 1.5;
 }
 
-/* Tarjeta grande (Historia) */
 .bento-item.grande {
   grid-column: span 2;
   min-height: 280px;
@@ -522,7 +561,6 @@ body {
   max-width: 480px;
 }
 
-/* Tarjeta destacada (dorada) */
 .bento-item.destacado {
   background: linear-gradient(135deg, var(--dorado-suave), var(--rosa-suave));
   border-color: var(--dorado);
@@ -541,72 +579,9 @@ body {
   .bento-item.grande p { font-size: 1rem; }
 }
 
-/* =========================================
-   BOTÓN MODO CINE
-   ========================================= */
-.btn-modo-cine {
-  position: fixed;
-  top: 22px;
-  right: 22px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--bg-tarjeta);
-  color: var(--texto-principal);
-  border: 1px solid var(--borde);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--sombra);
-  z-index: 9999;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: transform 0.3s ease, background 0.5s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-.btn-modo-cine:hover {
-  transform: scale(1.1) rotate(-6deg);
-  background: var(--rosa);
-  color: #fff;
-  border-color: var(--rosa);
-}
-
-/* =========================================
-   BOTÓN RECUERDO FLOTANTE
-   ========================================= */
-.btn-recuerdo-flotante {
-  position: fixed;
-  bottom: 22px;
-  right: 22px;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: var(--bg-tarjeta);
-  border: 1px solid var(--borde);
-  color: var(--rosa);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--sombra);
-  z-index: 9997;
-  font-size: 1.4rem;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: transform 0.3s ease, background 0.5s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-.btn-recuerdo-flotante:hover {
-  transform: translateY(-5px) scale(1.06);
-  background: var(--rosa);
-  color: #fff;
-  border-color: var(--rosa);
-}
-
-/* =========================================
-   SECCIÓN ADMIN (ENGRANAJE)
-   ========================================= */
+/* =========================================================
+   BOTÓN ADMIN — ENGRANAJE
+   ========================================================= */
 .admin-seccion {
   max-width: 900px;
   margin: 0 auto 100px auto;
@@ -614,6 +589,10 @@ body {
   text-align: center;
   position: relative;
   z-index: 2;
+}
+
+#btnAdmin {
+  display: none;
 }
 
 .btn-admin-engranaje {
@@ -694,14 +673,9 @@ body {
   color: var(--rosa-fuerte);
 }
 
-/* Oculto por defecto */
-#btnAdmin {
-  display: none;
-}
-
-/* =========================================
-   SECCIÓN MÚSICA
-   ========================================= */
+/* =========================================================
+   MÚSICA
+   ========================================================= */
 .music-section {
   padding: 60px 24px 120px;
   text-align: center;
@@ -735,13 +709,96 @@ body {
   border-color: var(--borde-fuerte);
 }
 
-.music-card iframe {
-  border-radius: 14px !important;
+.music-iframe {
+  border-radius: 14px;
+  border: none;
+  width: 100%;
+  height: 152px;
 }
 
-/* =========================================
+.music-vacio {
+  text-align: center;
+  color: var(--texto-terciario);
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+}
+
+/* Vinilo para MP3 */
+.vinyl {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, #222 0 4px, #111 4px 6px);
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 auto 20px;
+}
+
+.vinyl::after {
+  content: "💗";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 40px;
+  height: 40px;
+  background: var(--rosa);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.vinyl.playing {
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.music-info h3 {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: var(--rosa);
+  margin-bottom: 6px;
+}
+
+.music-info p {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--texto-secundario);
+  font-size: 0.95rem;
+  margin-bottom: 18px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 26px;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--rosa), var(--dorado));
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(217, 108, 136, 0.35);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(217, 108, 136, 0.5);
+}
+
+/* =========================================================
    FOOTER
-   ========================================= */
+   ========================================================= */
 .footer {
   text-align: center;
   padding: 50px 24px;
@@ -756,13 +813,129 @@ body {
   z-index: 2;
 }
 
-/* =========================================
+/* =========================================================
+   BOTONES FLOTANTES
+   ========================================================= */
+.btn-modo-cine {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--bg-tarjeta);
+  color: var(--texto-principal);
+  border: 1px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--sombra);
+  z-index: 9999;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.3s ease, background 0.5s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-modo-cine:hover {
+  transform: scale(1.1) rotate(-6deg);
+  background: var(--rosa);
+  color: #fff;
+  border-color: var(--rosa);
+}
+
+.btn-recuerdo-flotante {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--bg-tarjeta);
+  border: 1px solid var(--borde);
+  color: var(--rosa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--sombra);
+  z-index: 9997;
+  font-size: 1.4rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.3s ease, background 0.5s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-recuerdo-flotante:hover {
+  transform: translateY(-5px) scale(1.06);
+  background: var(--rosa);
+  color: #fff;
+  border-color: var(--rosa);
+}
+
+/* Botón tema (si script.js lo inyecta) */
+.btn-tema {
+  position: fixed;
+  bottom: 22px;
+  left: 22px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--bg-tarjeta);
+  color: var(--texto-principal);
+  border: 1px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--sombra);
+  z-index: 9998;
+  font-size: 1.3rem;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.3s ease, background 0.5s ease, color 0.3s ease;
+}
+
+.btn-tema:hover {
+  transform: scale(1.1) rotate(15deg);
+  background: var(--rosa);
+  color: #fff;
+}
+
+/* Botón instalar PWA */
+.btn-instalar {
+  position: fixed;
+  bottom: 22px;
+  right: 90px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background: linear-gradient(135deg, var(--rosa), var(--dorado));
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(217, 108, 136, 0.4);
+  z-index: 9998;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-instalar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(217, 108, 136, 0.6);
+}
+
+/* =========================================================
    MODAL DE RECUERDO
-   ========================================= */
+   ========================================================= */
 #modalRecuerdo {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: var(--bg-modal);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   z-index: 99999;
@@ -800,7 +973,7 @@ body {
   font-size: 1.1rem;
   color: var(--texto-principal);
   box-shadow: var(--sombra);
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
 }
 
 #btnCerrarRecuerdo:hover {
@@ -809,17 +982,227 @@ body {
   color: #fff;
 }
 
-/* =========================================
+.modal-vacio {
+  color: var(--texto-terciario);
+  text-align: center;
+  padding: 40px 20px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1rem;
+}
+
+.modal-recuerdo-img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.modal-recuerdo-fecha {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--dorado);
+  font-weight: 600;
+  display: block;
+}
+
+.modal-recuerdo-titulo {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.8rem;
+  margin: 10px 0 12px;
+  color: var(--texto-principal);
+}
+
+.modal-recuerdo-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  line-height: 1.6;
+  font-style: italic;
+  color: var(--texto-secundario);
+}
+
+/* =========================================================
+   REPRODUCTOR FLOTANTE (para musica-flotante.js)
+   ========================================================= */
+.floating-vinyl-container {
+  position: fixed;
+  bottom: 90px;
+  right: 22px;
+  z-index: 9996;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.floating-vinyl-container:hover {
+  transform: scale(1.05);
+}
+
+.floating-vinyl {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, #222 0 3px, #111 3px 6px);
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.floating-vinyl::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%);
+}
+
+.floating-vinyl.playing {
+  animation: spin 4s linear infinite;
+}
+
+.floating-vinyl-hole {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--rosa);
+  border: 4px solid var(--blanco-puro);
+  z-index: 2;
+}
+
+/* Mini-player (por si musica-flotante.js lo usa) */
+.mini-player {
+  position: fixed;
+  bottom: 90px;
+  right: 22px;
+  width: 300px;
+  background: var(--bg-tarjeta);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 20px;
+  box-shadow: var(--sombra);
+  border: 1px solid var(--borde);
+  z-index: 9996;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Poppins', sans-serif;
+}
+
+.mini-player.minimizado {
+  width: 200px;
+  border-radius: 50px;
+}
+
+.mini-player.minimizado .mini-player-body {
+  display: none;
+}
+
+.mini-player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, var(--rosa-suave), var(--dorado-suave));
+  cursor: pointer;
+  border-bottom: 1px solid var(--borde);
+}
+
+.mini-player.minimizado .mini-player-header {
+  border-bottom: none;
+  padding: 15px 20px;
+}
+
+.mini-player-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rosa);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mini-player-toggle {
+  background: transparent;
+  border: none;
+  color: var(--rosa);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.mini-player-body {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mini-player-mp3 {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.mini-vinyl {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, #222 0 4px, #111 4px 6px);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.mini-vinyl::after {
+  content: "💗";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 20px;
+  height: 20px;
+  background: var(--rosa);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+}
+
+.mini-vinyl.playing {
+  animation: spin 4s linear infinite;
+}
+
+.mini-play-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--rosa);
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 15px rgba(217, 108, 136, 0.4);
+}
+
+.mini-play-btn:hover {
+  transform: scale(1.1);
+}
+
+/* =========================================================
    ANIMACIONES
-   ========================================= */
+   ========================================================= */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* =========================================
+/* =========================================================
    RESPONSIVE
-   ========================================= */
+   ========================================================= */
 @media (max-width: 768px) {
   .hero {
     padding: 100px 20px 60px;
@@ -840,8 +1223,64 @@ body {
     min-height: 200px;
   }
   .btn-modo-cine,
-  .btn-recuerdo-flotante {
+  .btn-recuerdo-flotante,
+  .btn-tema {
     width: 46px;
     height: 46px;
+    font-size: 1.1rem;
+  }
+  .btn-instalar {
+    right: 14px;
+    bottom: 80px;
+    font-size: 0.8rem;
+    padding: 10px 16px;
+  }
+  .floating-vinyl-container {
+    bottom: 80px;
+    right: 14px;
+  }
+  .floating-vinyl {
+    width: 64px;
+    height: 64px;
+  }
+  .floating-vinyl-hole {
+    width: 18px;
+    height: 18px;
+    border-width: 3px;
+  }
+  .mensaje-sobre {
+    padding: 30px 24px;
+    font-size: 1.8rem;
+  }
+  .hero-title-vertical .separador {
+    height: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title-vertical .linea {
+    font-size: clamp(2.4rem, 11vw, 3.5rem);
+  }
+  .contador {
+    gap: 10px;
+  }
+  .contador-item {
+    padding: 12px 16px;
+    min-width: 64px;
+  }
+  .contador-item span {
+    font-size: 1.5rem;
+  }
+  .contador-item small {
+    font-size: 0.58rem;
+  }
+  .btn-admin-engranaje {
+    padding: 14px 22px;
+    font-size: 0.7rem;
+    gap: 10px;
+  }
+  .btn-admin-engranaje svg {
+    width: 20px;
+    height: 20px;
   }
 }
