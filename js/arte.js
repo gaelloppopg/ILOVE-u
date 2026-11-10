@@ -20,7 +20,7 @@ let obraEditandoId = null;
 let fondoEditandoId = null;
 let preferenciaDispositivo = 'auto';
 
-// ARRAY DE COMPONENTES (Trazos)
+// ARRAYS Y ESTADOS DE COMPONENTES
 let trazos = []; 
 let trazoActual = null;
 let portapapeles = { fondo: null, trazos: [] }; 
@@ -169,7 +169,7 @@ function configurarEventosDibujo() {
     document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
   };
 
-  // ---- COPIAR Y PEGAR (COMPONENTES) ----
+  // ---- COPIAR Y PEGAR ----
   const btnCopiar = document.getElementById("btnCopiarPintura");
   const btnPegar = document.getElementById("btnPegarPintura");
 
@@ -269,21 +269,31 @@ function configurarEventosUI() {
   }
 }
 
+// ============================================================
+//  ESTUDIO: ABRIR (NUEVO LIENZO 100% EN BLANCO)
+// ============================================================
 function abrirEstudio() {
   modoEdicion = false;
   obraEditandoId = null;
   fondoEditandoId = generarUUID();
   
-  // LIMPIAMOS EL LIENZO POR COMPLETO PARA NUEVO PROYECTO
+  // 1. LIMPIEZA TOTAL DE TRAZOS
   trazos = []; 
-  renderizarTrazos();
+  trazoActual = null;
+  renderizarTrazos(); // Borra el canvas transparente
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
+  // 2. LIMPIEZA TOTAL DEL FONDO
   fondoImagen = null;
   fondoColor = "#ffffff";
   document.getElementById("fondoColor").value = "#ffffff";
-  dibujarFondo();
+  dibujarFondo(); // Pinta el fondo de blanco sólido
   
+  // 3. LIMPIAR EL PORTAPAPELES AL EMPEZAR DE CERO (Opcional, para que no queden trazos viejos en memoria)
+  // Si quieres que al crear un lienzo nuevo el portapapeles se vacíe, descomenta la siguiente línea:
+  // portapapeles.trazos = []; 
+
+  // 4. INTERFAZ
   document.getElementById("estudioOverlay").classList.add("activo");
   document.getElementById("tituloObra").value = "";
 }
@@ -302,7 +312,7 @@ function dibujarFondo() {
 }
 
 // ============================================================
-//  LÓGICA DE DIBUJO SILENCIOSA
+//  LÓGICA DE DIBUJO
 // ============================================================
 function getPos(e) {
   const rect = canvas.getBoundingClientRect();
@@ -606,7 +616,7 @@ async function copiarObraDesdeMuseo() {
   try {
     const obra = obraActualEnMuseo;
     
-    // 1. COPIAR COMPONENTE FONDO
+    // COPIAR FONDO
     if (obra.capa_fondo_url) {
       portapapeles.fondo = await cargarImagen(obra.capa_fondo_url, true); 
     } else {
@@ -618,7 +628,7 @@ async function copiarObraDesdeMuseo() {
       portapapeles.fondo = canvasFondoTemp;
     }
 
-    // 2. COPIAR COMPONENTES TRAZOS
+    // COPIAR TRAZOS
     if (obra.capa_trazos && obra.capa_trazos.length > 0) {
       portapapeles.trazos = obra.capa_trazos;
     } else {
@@ -665,14 +675,25 @@ async function editarObraDesdeMuseo() {
     trazos = JSON.parse(JSON.stringify(obra.capa_trazos));
     renderizarTrazos();
     
+    // AQUI ESTABA EL BUG DEL FONDO QUE DESAPARECIA
     if (obra.capa_fondo_url) {
-      fondoImagen = await cargarImagen(obra.capa_fondo_url, true);
+      try {
+        fondoImagen = await cargarImagen(obra.capa_fondo_url, true);
+        dibujarFondo();
+      } catch (err) {
+        console.warn("Fondo no encontrado, usando color plano.");
+        fondoColor = obra.fondo_color || "#ffffff";
+        dibujarFondo();
+      }
+    } else if (obra.fondo_color) {
+      fondoColor = obra.fondo_color;
+      document.getElementById("fondoColor").value = fondoColor;
       dibujarFondo();
     }
     return;
   }
 
-  // CASO B: Obra antigua (sin trazos separados, solo imagen plana)
+  // CASO B: Obra antigua
   trazos = []; 
   renderizarTrazos();
   try {
