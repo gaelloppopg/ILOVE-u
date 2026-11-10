@@ -22,6 +22,17 @@
 </head>
 <body>
 
+  <!-- 🌙 BOTÓN MODO OSCURO (Arriba a la izquierda) -->
+<button class="btn-tema" id="btnTema" title="Cambiar tema" aria-label="Cambiar entre modo claro y oscuro">
+  <svg class="icono-luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+  <svg class="icono-sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"></circle>
+    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+  </svg>
+</button>
+
   <!-- 🛑 FONDO DE NUBES 🛑 -->
   <div class="fondo-nubes">
     <div class="nube"></div>
@@ -477,6 +488,62 @@
       const escucharEsc = (e) => { if (e.key === 'Escape') cerrarCine(); };
       document.addEventListener('keydown', escucharEsc);
     }
+
+    // =========================================
+// 🌙 MODO OSCURO FUNCIONAL
+// =========================================
+const btnTema = document.getElementById('btnTema');
+
+function aplicarTema(oscuro) {
+  if (oscuro) {
+    document.body.classList.add('modo-noche');
+    btnTema?.setAttribute('title', 'Cambiar a modo claro');
+  } else {
+    document.body.classList.remove('modo-noche');
+    btnTema?.setAttribute('title', 'Cambiar a modo oscuro');
+  }
+  try {
+    localStorage.setItem('tema-preferido', oscuro ? 'oscuro' : 'claro');
+  } catch (e) {}
+}
+
+// Cargar preferencia guardada
+try {
+  const guardado = localStorage.getItem('tema-preferido');
+  if (guardado === 'oscuro') aplicarTema(true);
+  else if (guardado === 'claro') aplicarTema(false);
+} catch (e) {}
+
+// Toggle al hacer click
+if (btnTema) {
+  btnTema.addEventListener('click', () => {
+    const esOscuro = document.body.classList.contains('modo-noche');
+    aplicarTema(!esOscuro);
+
+    // Pequeño efecto de "onda"
+    const ripple = document.createElement('span');
+    ripple.style.cssText = `
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      animation: rippleTema 0.6s ease-out forwards;
+      pointer-events: none;
+    `;
+    btnTema.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  });
+}
+
+// Animación del ripple
+const estiloRipple = document.createElement('style');
+estiloRipple.textContent = `
+  @keyframes rippleTema {
+    from { transform: scale(0); opacity: 0.6; }
+    to   { transform: scale(2.5); opacity: 0; }
+  }
+`;
+document.head.appendChild(estiloRipple);
   </script>
 </body>
 </html>
