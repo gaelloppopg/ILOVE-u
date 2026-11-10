@@ -9,6 +9,7 @@
   "background_color": "#fbf9f6",
   "theme_color": "#d96c88",
   "lang": "es",
+  "categories": ["lifestyle", "social"],
   "icons": [
     {
       "src": "assets/images/icons/icon-192.png",
@@ -20,7 +21,7 @@
       "src": "assets/images/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable"
     }
   ]
 }

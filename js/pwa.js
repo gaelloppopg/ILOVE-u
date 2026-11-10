@@ -30,13 +30,12 @@ let deferredPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  console.log("🔥 beforeinstallprompt detectado. Botón PWA listo.");
+  // Mostramos el botón si el navegador permite la instalación
   const btn = document.getElementById("btnInstalarPWAUnico");
   if (btn) btn.style.display = "inline-flex";
 });
 
 window.addEventListener("appinstalled", () => {
-  console.log("🎉 App instalada correctamente.");
   const btn = document.getElementById("btnInstalarPWAUnico");
   if (btn) btn.style.display = "none";
   if (window.lanzarConfeti) window.lanzarConfeti(1500);
@@ -44,28 +43,21 @@ window.addEventListener("appinstalled", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("btnInstalarPWAUnico");
-  if (!btn) {
-    console.warn("⚠️ No se encontró el botón PWA (id='btnInstalarPWAUnico')");
-    return;
+  if (btn) {
+    // Siempre lo mostramos por defecto para que el usuario lo vea
+    btn.style.display = "inline-flex";
+    
+    btn.addEventListener("click", async () => {
+      // Si es iPhone o no está soportado el prompt
+      if (!deferredPrompt) {
+        alert("Para instalar la app en tu celular:\n\n1. Si estás en iPhone, toca el botón 'Compartir' (cuadro con flecha) en Safari.\n2. Selecciona 'Añadir a pantalla de inicio'.\n\nSi estás en Android o PC, usa el menú del navegador (⋮) y elige 'Instalar App'.");
+        return;
+      }
+      // Si está soportado, lanzamos la ventana nativa
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") btn.style.display = "none";
+      deferredPrompt = null;
+    });
   }
-
-  // Forzamos que se vea SIEMPRE, independientemente del evento
-  btn.style.display = "inline-flex";
-
-  btn.addEventListener("click", async () => {
-    if (!deferredPrompt) {
-      alert(
-        "Para instalar la app:\n\n" +
-        "1. Toca el menú ⋮ de tu navegador\n" +
-        "2. Selecciona 'Añadir a pantalla de inicio' o 'Instalar app'\n\n" +
-        "Si ya está instalada, este mensaje no aparecerá más."
-      );
-      return;
-    }
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log("Resultado de la instalación:", outcome);
-    if (outcome === "accepted") btn.style.display = "none";
-    deferredPrompt = null;
-  });
 });
