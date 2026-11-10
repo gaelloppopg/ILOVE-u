@@ -35,7 +35,7 @@
       touch-action: none; -webkit-user-select: none; user-select: none;
       display: flex; justify-content: center; align-items: center;
       background: #e5e5e5; width: 100%; overflow: hidden;
-      flex: 1; /* Para que ocupe el espacio sobrante en móvil */
+      flex: 1; 
     }
     .canvas-stack {
       position: relative; max-width: 100%; max-height: 100%;
@@ -48,6 +48,7 @@
 
     /* Ocultos en PC por defecto */
     .btn-menu-movil-flotante, #overlayMenu { display: none; }
+    .btn-cerrar-toolbar { display: none; }
 
     /* Botón de Editar en Museo */
     .btn-museo.editar { background: #3b82f6; color: white; border: 1px solid #3b82f6; }
@@ -57,7 +58,6 @@
        DISEÑO EXCLUSIVO PARA MÓVILES Y TABLETS
        ========================================== */
     @media (max-width: 1024px) {
-      /* Pantalla completa para el estudio */
       .estudio-overlay { padding: 0 !important; }
       .estudio { 
         width: 100vw !important; height: 100vh !important; max-height: 100vh !important;
@@ -65,26 +65,8 @@
         display: flex !important; flex-direction: column !important;
       }
 
-      /* Ocultamos la barra superior clásica */
       .estudio-topbar { display: none !important; }
       
-      /* Ocultamos la barra de herramientas clásica (se usará el menú lateral) */
-      .estudio-toolbar { 
-        position: fixed !important; top: 0 !important; right: -100% !important;
-        width: 85vw !important; max-width: 350px !important; height: 100vh !important;
-        background: #1a1a1a !important; color: #fff !important;
-        z-index: 9999 !important; padding: 20px !important; overflow-y: auto !important;
-        transition: right 0.3s ease !important; display: flex !important; flex-direction: column !important; gap: 15px !important;
-      }
-      .estudio-toolbar.activo { right: 0 !important; }
-      
-      /* Botón para cerrar el menú */
-      .btn-cerrar-toolbar {
-        display: block !important; background: transparent; border: none; color: #fff;
-        font-size: 1.5rem; text-align: right; cursor: pointer; margin-bottom: 5px;
-      }
-
-      /* Botón flotante para abrir el menú */
       .btn-menu-movil-flotante {
         display: flex; align-items: center; justify-content: center;
         position: absolute; top: 15px; right: 15px; z-index: 100;
@@ -93,7 +75,22 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
       }
 
-      /* Adaptación de los controles para que sean táctiles en el menú lateral */
+      /* Panel deslizante móvil */
+      .estudio-toolbar { 
+        position: fixed !important; top: 0 !important; right: -100% !important;
+        width: 85vw !important; max-width: 320px !important; height: 100vh !important;
+        background: #1a1a1a !important; color: #fff !important;
+        z-index: 9999 !important; padding: 20px !important; overflow-y: auto !important;
+        transition: right 0.3s ease !important; display: flex !important; flex-direction: column !important; gap: 15px !important;
+      }
+      .estudio-toolbar.activo { right: 0 !important; }
+      
+      .btn-cerrar-toolbar {
+        display: block !important; background: transparent; border: none; color: #fff;
+        font-size: 1.5rem; text-align: right; cursor: pointer; margin-bottom: 5px;
+      }
+
+      /* Adaptación táctil */
       .estudio-toolbar .tool-group { display: flex !important; flex-direction: column !important; gap: 8px !important; }
       .estudio-toolbar .tool-label { font-size: 0.9rem !important; color: var(--dorado) !important; font-weight: 700 !important; }
       .estudio-toolbar .tool-btn {
@@ -113,23 +110,13 @@
       
       .btn-accion { width: 100% !important; padding: 15px !important; border-radius: 8px !important; font-size: 1rem !important; margin-top: 5px; }
       
-      /* Ocultamos el footer original porque se mueve al menú lateral */
       .estudio-footer { display: none !important; }
-      
       #overlayMenu.activo { display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9998; backdrop-filter: blur(3px); }
     }
 
-    /* Ajuste específico para orientación vertical en móviles/tablets */
     @media (max-width: 1024px) and (orientation: portrait) {
-      .estudio-canvas-wrapper {
-        align-items: flex-start;
-        padding-top: 20px;
-      }
-      .canvas-stack {
-        max-height: 60vh; /* Limita la altura para que no se desborde */
-        width: auto;
-        max-width: 90vw;
-      }
+      .estudio-canvas-wrapper { align-items: flex-start; padding-top: 20px; }
+      .canvas-stack { max-height: 60vh; width: auto; max-width: 90vw; }
     }
   </style>
 </head>
@@ -276,7 +263,9 @@
 
   <div class="estudio-overlay" id="estudioOverlay">
     <div class="estudio" id="estudio">
-      <div class="estudio-topbar">
+      
+      <!-- Barra superior solo PC -->
+      <div class="estudio-topbar" id="estudioTopbar">
         <div class="estudio-titulo-app"><span class="app-logo">🎨</span><span>Estudio Creativo</span></div>
         <input type="text" id="tituloObra" placeholder="Título de tu obra maestra..." maxlength="40" />
         <button type="button" class="estudio-cerrar" id="cerrarEstudio" title="Cerrar Estudio">
@@ -284,15 +273,15 @@
         </button>
       </div>
 
-      <!-- Menú móvil (oculto en PC) -->
-      <div id="overlayMenu"></div>
+      <!-- Botón menú solo móvil -->
       <button class="btn-menu-movil-flotante" id="btnAbrirMenuM">
         <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
+      <div id="overlayMenu"></div>
 
-      <!-- Contenedor de herramientas original -->
+      <!-- Contenedor de herramientas (ÚNICO) -->
       <div class="estudio-toolbar" id="estudioToolbar">
-        <button class="btn-cerrar-toolbar" id="btnCerrarMenuM" style="display:none;">✕</button>
+        <button class="btn-cerrar-toolbar" id="btnCerrarMenuM">✕</button>
         
         <div class="tool-group herramientas">
           <span class="tool-label">Herramientas</span>
@@ -333,6 +322,7 @@
         </div>
       </div>
 
+      <!-- Footer original (PC) -->
       <div class="estudio-footer" id="estudioFooter">
         <div class="footer-left">
           <span class="footer-label">Fondo:</span>
@@ -360,7 +350,7 @@
       const canvas = document.getElementById('lienzo');
       const canvasFondo = document.getElementById('lienzoFondo');
       
-      // 1. Traducir toques a ratón para el lienzo
+      // 1. Traducir toques a ratón
       function simularEvento(tipo, touch) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -380,34 +370,102 @@
       canvas.addEventListener('touchmove', (e) => { e.preventDefault(); simularEvento('mousemove', e.touches[0]); }, { passive: false });
       canvas.addEventListener('touchend', (e) => { e.preventDefault(); simularEvento('mouseup', e.changedTouches[0]); }, { passive: false });
 
-      // 2. Lógica del Menú Móvil
-      const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
-      const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
+      // 2. Mover los controles al menú móvil si es necesario (EVITA DUPLICADOS)
+      const isMobile = window.innerWidth <= 1024;
       const toolbar = document.getElementById('estudioToolbar');
-      const overlay = document.getElementById('overlayMenu');
+      const topbar = document.getElementById('estudioTopbar');
+      const footer = document.getElementById('estudioFooter');
 
-      if (window.innerWidth <= 1024) {
-        if(btnCerrarMenu) btnCerrarMenu.style.display = 'block';
-      }
+      if (isMobile) {
+        // Ocultar la barra superior de PC
+        if(topbar) topbar.style.display = 'none';
 
-      if(btnAbrirMenu && overlay) {
+        // Mover el título y fondo al menú lateral
+        const tituloObra = document.getElementById('tituloObra');
+        const grupoHerramientas = toolbar.querySelector('.herramientas');
+        
+        // Crear grupo para el título si no existe
+        if(tituloObra) {
+          const divTitulo = document.createElement('div');
+          divTitulo.className = 'tool-group';
+          divTitulo.innerHTML = '<span class="tool-label">Título de la Obra</span>';
+          const clonTitulo = tituloObra.cloneNode(true);
+          clonTitulo.id = 'tituloObraM';
+          divTitulo.appendChild(clonTitulo);
+          toolbar.insertBefore(divTitulo, grupoHerramientas);
+          
+          // Sincronizar
+          clonTitulo.addEventListener('input', (e) => tituloObra.value = e.target.value);
+          tituloObra.addEventListener('input', (e) => clonTitulo.value = e.target.value);
+        }
+
+        // Mover el footer (Fondo, Limpiar, Guardar) al menú
+        if(footer) {
+          const divAcciones = document.createElement('div');
+          divAcciones.className = 'tool-group';
+          divAcciones.style.marginTop = '20px';
+          
+          // Clonar los inputs/botones del footer
+          const fondoColor = document.getElementById('fondoColor');
+          const btnSubirFondo = document.getElementById('btnSubirFondo');
+          const btnLimpiar = document.getElementById('btnLimpiar');
+          const btnGuardar = document.getElementById('btnGuardar');
+          
+          const divFondo = document.createElement('div');
+          divFondo.innerHTML = '<span class="tool-label">Fondo</span>';
+          divFondo.className = 'fondo-controles';
+          
+          const clonFondoColor = fondoColor.cloneNode(true);
+          clonFondoColor.id = 'fondoColorM';
+          const clonSubir = btnSubirFondo.cloneNode(true);
+          clonSubir.id = 'btnSubirFondoM';
+          const clonQuitar = document.getElementById('btnQuitarFondo').cloneNode(true);
+          clonQuitar.id = 'btnQuitarFondoM';
+          
+          divFondo.appendChild(clonFondoColor);
+          divFondo.appendChild(clonSubir);
+          divFondo.appendChild(clonQuitar);
+          
+          const clonLimpiar = btnLimpiar.cloneNode(true);
+          clonLimpiar.id = 'btnLimpiarM';
+          clonLimpiar.className = 'btn-accion secundario';
+          clonLimpiar.style.marginTop = '10px';
+          
+          const clonGuardar = btnGuardar.cloneNode(true);
+          clonGuardar.id = 'btnGuardarM';
+          clonGuardar.className = 'btn-accion primario';
+          clonGuardar.style.marginTop = '10px';
+
+          divAcciones.appendChild(divFondo);
+          divAcciones.appendChild(clonLimpiar);
+          divAcciones.appendChild(clonGuardar);
+          
+          toolbar.appendChild(divAcciones);
+
+          // Sincronizar eventos
+          clonFondoColor.addEventListener('input', (e) => { fondoColor.value = e.target.value; fondoColor.dispatchEvent(new Event('input')); });
+          clonSubir.addEventListener('click', () => btnSubirFondo.click());
+          clonQuitar.addEventListener('click', () => document.getElementById('btnQuitarFondo').click());
+          clonLimpiar.addEventListener('click', () => btnLimpiar.click());
+          clonGuardar.addEventListener('click', () => btnGuardar.click());
+        }
+
+        // 3. Lógica de abrir/cerrar menú móvil
+        const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
+        const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
+        const overlay = document.getElementById('overlayMenu');
+
         btnAbrirMenu.addEventListener('click', () => { toolbar.classList.add('activo'); overlay.classList.add('activo'); });
-      }
-      if(btnCerrarMenu && overlay) {
         btnCerrarMenu.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
-      }
-      if(overlay) {
         overlay.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
-      }
 
-      // Cerrar menú al elegir herramienta o color
-      document.querySelectorAll('.tool-btn, .color-btn').forEach(el => {
-        el.addEventListener('click', () => {
-          if (window.innerWidth <= 1024) { 
+        // Cerrar menú al elegir herramienta
+        document.querySelectorAll('.tool-btn, .color-btn').forEach(el => {
+          el.addEventListener('click', () => {
             setTimeout(() => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); }, 150);
-          }
+          });
         });
-      });
+      }
     });
   </script>
 

@@ -334,6 +334,7 @@ async function editarObraDesdeMuseo() {
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
     ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
     fondoImagen = img;
+    // Limpiamos la capa de dibujo
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
   img.src = obraActualEnMuseo.imagen_url;
@@ -438,7 +439,7 @@ async function guardarObra() {
         imagen_url: url
       };
 
-      // Actualizar si estamos en modo edición
+      // 🛑 Actualizar si estamos en modo edición
       if (modoEdicion && obraEditandoId) {
         await supabase.from('arte_obras').update(payload).eq('id', obraEditandoId);
       } else {
