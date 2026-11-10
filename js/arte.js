@@ -17,13 +17,31 @@ const OBRAS_POR_PAGINA = 4;
 let obraActualEnMuseo = null;
 let modoEdicion = false;
 let obraEditandoId = null;
+let preferenciaDispositivo = 'auto';
 
 async function initArte() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
-  const { data: couple } = await supabase.from('couples').select('id').or(`owner_id.eq.${user.id},partner_id.eq.${user.id}`).maybeSingle();
+  
+  // 1. Obtener coupleId y la preferencia de dispositivo
+  const { data: couple } = await supabase.from('couples').select('id, preferencia_dispositivo').or(`owner_id.eq.${user.id},partner_id.eq.${user.id}`).maybeSingle();
   if (!couple) return;
+  
   coupleId = couple.id;
+  preferenciaDispositivo = couple.preferencia_dispositivo || 'auto';
+
+  // 2. Detectar dispositivo si la preferencia es 'auto'
+  if (preferenciaDispositivo === 'auto') {
+    const isMobile = window.innerWidth <= 1024 || /Mobi|Android/i.test(navigator.userAgent);
+    preferenciaDispositivo = isMobile ? 'movil' : 'escritorio';
+  }
+
+  // 3. Aplicar clases al body para que el CSS reaccione
+  document.body.classList.remove('layout-movil', 'layout-escritorio');
+  document.body.classList.add(`layout-${preferenciaDispositivo}`);
+
+  // 4. Mover los elementos del DOM según la preferencia
+  reorganizarUI(preferenciaDispositivo);
 
   canvasFondo = document.getElementById("lienzoFondo");
   ctxFondo = canvasFondo.getContext("2d");
@@ -35,6 +53,61 @@ async function initArte() {
   initPanelTemas();
   initParallaxLibro();
   await cargarObras();
+}
+
+function reorganizarUI(dispositivo) {
+  const toolbar = document.getElementById('estudioToolbar');
+  const topbar = document.getElementById('estudioTopbar');
+  const footer = document.getElementById('estudioFooter');
+  
+  if (!toolbar || !topbar || !footer) return;
+
+  // Limpiar movimientos previos
+  if (document.getElementById('grupoTituloM')) document.getElementById('grupoTituloM').remove();
+  if (document.getElementById('grupoAccionesM')) document.getElementById('grupoAccionesM').remove();
+
+  if (dispositivo === 'movil') {
+    // Mover título
+    const tituloObra = document.getElementById('tituloObra');
+    if(tituloObra) {
+      const divTitulo = document.createElement('div');
+      divTitulo.className = 'tool-group';
+      divTitulo.id = 'grupoTituloM';
+      divTitulo.innerHTML = '<span class="tool-label">Título de la Obra</span>';
+      tituloObra.parentNode.removeChild(tituloObra);
+      divTitulo.appendChild(tituloObra);
+      toolbar.insertBefore(divTitulo, toolbar.firstChild);
+    }
+
+    // Mover footer (acciones)
+    const divAcciones = document.createElement('div');
+    divAcciones.className = 'tool-group';
+    divAcciones.id = 'grupoAccionesM';
+    divAcciones.style.marginTop = '20px';
+    footer.parentNode.removeChild(footer);
+    divAcciones.appendChild(footer);
+    toolbar.appendChild(divAcciones);
+    footer.style.display = 'flex'; 
+    footer.style.flexDirection = 'column';
+    footer.style.gap = '10px';
+
+    // Mostrar botón de menú flotante
+    document.getElementById('btnAbrirMenuM').style.display = 'flex';
+    topbar.style.display = 'none';
+  } else {
+    // Si es escritorio, restaurar
+    const tituloObra = document.getElementById('tituloObra');
+    if(tituloObra) {
+      topbar.appendChild(tituloObra);
+    }
+    topbar.appendChild(footer);
+    footer.style.display = 'flex';
+    footer.style.flexDirection = 'row';
+    footer.style.gap = '10px';
+    
+    document.getElementById('btnAbrirMenuM').style.display = 'none';
+    topbar.style.display = 'flex';
+  }
 }
 
 function configurarEventosDibujo() {
@@ -120,6 +193,24 @@ function configurarEventosUI() {
   document.getElementById("btnBorrarObra").onclick = borrarObraDesdeMuseo;
   document.getElementById("btnDescargarObra").onclick = descargarObraComoPNG;
   document.getElementById("btnEditarObra").onclick = editarObraDesdeMuseo;
+
+  // Lógica para abrir/cerrar menú móvil
+  const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
+  const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
+  const overlay = document.getElementById('overlayMenu');
+  const toolbar = document.getElementById('estudioToolbar');
+
+  if (btnAbrirMenu && overlay) {
+    btnAbrirMenu.addEventListener('click', () => { toolbar.classList.add('activo'); overlay.classList.add('activo'); });
+    btnCerrarMenu.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
+    overlay.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
+
+    document.querySelectorAll('.tool-btn, .color-btn').forEach(el => {
+      el.addEventListener('click', () => {
+        setTimeout(() => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); }, 150);
+      });
+    });
+  }
 }
 
 function abrirEstudio() {
@@ -353,7 +444,7 @@ async function editarObraDesdeMuseo() {
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.onload = () => {
-    // 🛑 Cargamos la imagen en la capa de FONDO (bloqueada para el borrador)
+    // Cargamos la imagen en la capa de FONDO (bloqueada para el borrador)
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
     ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
     fondoImagen = img;

@@ -52,67 +52,65 @@
     .btn-museo.editar { background: #3b82f6; color: white; border: 1px solid #3b82f6; }
     .btn-museo.editar:hover { background: #2563eb; }
 
-    /* ==========================================
-       DISEÑO PARA MÓVILES
-       ========================================== */
-    @media (max-width: 1024px) {
-      .estudio-overlay { padding: 0 !important; }
-      .estudio { 
-        width: 100vw !important; height: 100vh !important; max-height: 100vh !important;
-        margin: 0 !important; border-radius: 0 !important; 
-        display: flex !important; flex-direction: column !important;
-      }
-      .estudio-topbar { display: none !important; }
-      
-      .btn-menu-movil-flotante {
-        display: flex; align-items: center; justify-content: center;
-        position: absolute; top: 15px; right: 15px; z-index: 100;
-        background: var(--dorado, #c9a050); color: #fff; border: none;
-        width: 45px; height: 45px; border-radius: 50%;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
-      }
-
-      .estudio-toolbar { 
-        position: fixed !important; top: 0 !important; right: -100% !important;
-        width: 85vw !important; max-width: 320px !important; height: 100vh !important;
-        background: #1a1a1a !important; color: #fff !important;
-        z-index: 9999 !important; padding: 20px !important; overflow-y: auto !important;
-        transition: right 0.3s ease !important; display: flex !important; flex-direction: column !important; gap: 15px !important;
-      }
-      .estudio-toolbar.activo { right: 0 !important; }
-      
-      .btn-cerrar-toolbar {
-        display: block !important; background: transparent; border: none; color: #fff;
-        font-size: 1.5rem; text-align: right; cursor: pointer; margin-bottom: 5px;
-      }
-
-      .estudio-toolbar .tool-group { display: flex !important; flex-direction: column !important; gap: 8px !important; }
-      .estudio-toolbar .tool-label { font-size: 0.9rem !important; color: var(--dorado) !important; font-weight: 700 !important; }
-      .estudio-toolbar .tool-btn {
-        width: 100% !important; padding: 12px !important; background: #333 !important; color: #fff !important;
-        border: 1px solid #444 !important; border-radius: 8px !important; text-align: left !important; font-size: 1rem !important;
-      }
-      .estudio-toolbar .tool-btn.active { background: var(--dorado) !important; color: #000 !important; border-color: var(--dorado) !important; }
-      
-      .estudio-toolbar .colores-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
-      .estudio-toolbar .color-btn { width: 100% !important; aspect-ratio: 1 !important; border-radius: 50% !important; border: 2px solid #555 !important; }
-      
-      .estudio-toolbar input[type="text"] { width: 100% !important; padding: 12px !important; background: #333 !important; border: 1px solid #555 !important; color: #fff !important; border-radius: 8px !important; font-size: 1rem !important; }
-      
-      .estudio-toolbar .fondo-controles { display: flex !important; flex-wrap: wrap !important; gap: 10px !important; }
-      .estudio-toolbar .fondo-controles input[type="color"] { height: 40px !important; width: 60px !important; border-radius: 8px !important; border: none !important; }
-      .estudio-toolbar .fondo-controles button { flex: 1 !important; padding: 10px !important; border-radius: 8px !important; font-size: 0.9rem !important; background: #333 !important; color: #fff !important; border: 1px solid #444 !important; }
-      
-      .btn-accion { width: 100% !important; padding: 15px !important; border-radius: 8px !important; font-size: 1rem !important; margin-top: 5px; }
-      
-      .estudio-footer { display: none !important; }
-      #overlayMenu.activo { display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9998; backdrop-filter: blur(3px); }
+    /* Estilos para layout móvil */
+    body.layout-movil .estudio-overlay { padding: 0 !important; }
+    body.layout-movil .estudio { 
+      width: 100vw !important; height: 100vh !important; max-height: 100vh !important;
+      margin: 0 !important; border-radius: 0 !important; 
+      display: flex !important; flex-direction: column !important;
+    }
+    body.layout-movil .estudio-topbar { display: none !important; }
+    
+    body.layout-movil .btn-menu-movil-flotante {
+      display: flex; align-items: center; justify-content: center;
+      position: absolute; top: 15px; right: 15px; z-index: 100;
+      background: var(--dorado, #c9a050); color: #fff; border: none;
+      width: 45px; height: 45px; border-radius: 50%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
     }
 
-    @media (max-width: 1024px) and (orientation: portrait) {
-      .estudio-canvas-wrapper { align-items: flex-start; padding-top: 20px; }
-      .canvas-stack { max-height: 60vh; width: auto; max-width: 90vw; }
+    body.layout-movil .estudio-toolbar { 
+      position: fixed !important; top: 0 !important; right: -100% !important;
+      width: 85vw !important; max-width: 320px !important; height: 100vh !important;
+      background: #1a1a1a !important; color: #fff !important;
+      z-index: 9999 !important; padding: 20px !important; overflow-y: auto !important;
+      transition: right 0.3s ease !important; display: flex !important; flex-direction: column !important; gap: 15px !important;
     }
+    body.layout-movil .estudio-toolbar.activo { right: 0 !important; }
+    
+    body.layout-movil .btn-cerrar-toolbar {
+      display: block !important; background: transparent; border: none; color: #fff;
+      font-size: 1.5rem; text-align: right; cursor: pointer; margin-bottom: 5px;
+    }
+
+    body.layout-movil .estudio-toolbar .tool-group { display: flex !important; flex-direction: column !important; gap: 8px !important; }
+    body.layout-movil .estudio-toolbar .tool-label { font-size: 0.9rem !important; color: var(--dorado) !important; font-weight: 700 !important; }
+    body.layout-movil .estudio-toolbar .tool-btn {
+      width: 100% !important; padding: 12px !important; background: #333 !important; color: #fff !important;
+      border: 1px solid #444 !important; border-radius: 8px !important; text-align: left !important; font-size: 1rem !important;
+    }
+    body.layout-movil .estudio-toolbar .tool-btn.active { background: var(--dorado) !important; color: #000 !important; border-color: var(--dorado) !important; }
+    
+    body.layout-movil .estudio-toolbar .colores-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
+    body.layout-movil .estudio-toolbar .color-btn { width: 100% !important; aspect-ratio: 1 !important; border-radius: 50% !important; border: 2px solid #555 !important; }
+    
+    body.layout-movil .estudio-toolbar input[type="text"] { width: 100% !important; padding: 12px !important; background: #333 !important; border: 1px solid #555 !important; color: #fff !important; border-radius: 8px !important; font-size: 1rem !important; }
+    
+    body.layout-movil .estudio-toolbar .fondo-controles { display: flex !important; flex-wrap: wrap !important; gap: 10px !important; }
+    body.layout-movil .estudio-toolbar .fondo-controles input[type="color"] { height: 40px !important; width: 60px !important; border-radius: 8px !important; border: none !important; }
+    body.layout-movil .estudio-toolbar .fondo-controles button { flex: 1 !important; padding: 10px !important; border-radius: 8px !important; font-size: 0.9rem !important; background: #333 !important; color: #fff !important; border: 1px solid #444 !important; }
+    
+    body.layout-movil .btn-accion { width: 100% !important; padding: 15px !important; border-radius: 8px !important; font-size: 1rem !important; margin-top: 5px; }
+    
+    body.layout-movil .estudio-footer { display: none !important; }
+    body.layout-movil #overlayMenu.activo { display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9998; backdrop-filter: blur(3px); }
+
+    /* Estilos para layout escritorio (por defecto) */
+    body.layout-escritorio .btn-menu-movil-flotante { display: none !important; }
+    body.layout-escritorio .estudio-toolbar { display: flex !important; position: static !important; width: 100% !important; height: auto !important; background: transparent !important; padding: 0 !important; }
+    body.layout-escritorio .estudio-topbar { display: flex !important; }
+    body.layout-escritorio .estudio-footer { display: flex !important; }
+    body.layout-escritorio .btn-cerrar-toolbar { display: none !important; }
   </style>
 </head>
 <body class="page-inner album-body" data-cancion-titulo="Nuestra Canción" data-cancion-artista="Para ti" data-tema="minimalista">
@@ -359,50 +357,7 @@
       canvas.addEventListener('touchmove', (e) => { e.preventDefault(); simularEvento('mousemove', e.touches[0]); }, { passive: false });
       canvas.addEventListener('touchend', (e) => { e.preventDefault(); simularEvento('mouseup', e.changedTouches[0]); }, { passive: false });
 
-      const isMobile = window.innerWidth <= 1024;
-      const toolbar = document.getElementById('estudioToolbar');
-      const topbar = document.getElementById('estudioTopbar');
-      const footer = document.getElementById('estudioFooter');
-
-      if (isMobile) {
-        if(topbar) topbar.style.display = 'none';
-
-        const tituloObra = document.getElementById('tituloObra');
-        if(tituloObra) {
-          const divTitulo = document.createElement('div');
-          divTitulo.className = 'tool-group';
-          divTitulo.innerHTML = '<span class="tool-label">Título de la Obra</span>';
-          tituloObra.parentNode.removeChild(tituloObra);
-          divTitulo.appendChild(tituloObra);
-          toolbar.insertBefore(divTitulo, toolbar.firstChild);
-        }
-
-        if(footer) {
-          const divAcciones = document.createElement('div');
-          divAcciones.className = 'tool-group';
-          divAcciones.style.marginTop = '20px';
-          footer.parentNode.removeChild(footer);
-          divAcciones.appendChild(footer);
-          toolbar.appendChild(divAcciones);
-          footer.style.display = 'flex'; 
-          footer.style.flexDirection = 'column';
-          footer.style.gap = '10px';
-        }
-
-        const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
-        const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
-        const overlay = document.getElementById('overlayMenu');
-
-        btnAbrirMenu.addEventListener('click', () => { toolbar.classList.add('activo'); overlay.classList.add('activo'); });
-        btnCerrarMenu.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
-        overlay.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
-
-        document.querySelectorAll('.tool-btn, .color-btn').forEach(el => {
-          el.addEventListener('click', () => {
-            setTimeout(() => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); }, 150);
-          });
-        });
-      }
+      // La lógica de reorganización ahora se maneja desde arte.js
     });
   </script>
 
