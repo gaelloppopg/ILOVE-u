@@ -321,8 +321,10 @@ window.abrirMuseo = function(id) {
 async function editarObraDesdeMuseo() {
   if (!obraActualEnMuseo) return;
   document.getElementById("museoOverlay").classList.remove("activo");
+  
   modoEdicion = true;
   obraEditandoId = obraActualEnMuseo.id;
+  
   document.getElementById("estudioOverlay").classList.add("activo");
   document.getElementById("tituloObra").value = obraActualEnMuseo.titulo || "";
   
@@ -417,9 +419,7 @@ function dispararSpray(x, y) {
 async function guardarObra() {
   const titulo = document.getElementById("tituloObra").value.trim() || "Sin título";
   const btn = document.getElementById("btnGuardar");
-  const btnM = document.getElementById("btnGuardarM");
   if(btn) { btn.textContent = "Subiendo..."; btn.disabled = true; }
-  if(btnM) { btnM.textContent = "Subiendo..."; btnM.disabled = true; }
 
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
@@ -438,6 +438,7 @@ async function guardarObra() {
         imagen_url: url
       };
 
+      // Actualizar si estamos en modo edición
       if (modoEdicion && obraEditandoId) {
         await supabase.from('arte_obras').update(payload).eq('id', obraEditandoId);
       } else {
@@ -450,13 +451,12 @@ async function guardarObra() {
       
       if (window.lanzarConfeti) window.lanzarConfeti(1000);
       if(btn) { btn.textContent = "Guardar Obra"; btn.disabled = false; }
-      if(btnM) { btnM.textContent = "Guardar Obra"; btnM.disabled = false; }
+      
       modoEdicion = false; obraEditandoId = null;
       
     } catch (err) {
       alert("Error: " + err.message);
       if(btn) { btn.textContent = "Guardar Obra"; btn.disabled = false; }
-      if(btnM) { btnM.textContent = "Guardar Obra"; btnM.disabled = false; }
     }
   }, "image/png");
 }

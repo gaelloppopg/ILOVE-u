@@ -35,38 +35,41 @@
       touch-action: none; -webkit-user-select: none; user-select: none;
       display: flex; justify-content: center; align-items: center;
       background: #e5e5e5; width: 100%; overflow: hidden;
-      /* Aseguramos que el lienzo siempre quepa */
-      max-height: 100vh;
+      flex: 1; /* Para que ocupe el espacio sobrante en móvil */
     }
     .canvas-stack {
       position: relative; max-width: 100%; max-height: 100%;
       aspect-ratio: 3 / 2; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin: 0 auto;
-      /* Ajuste para que no se deforme */
-      width: 100%; height: auto;
     }
     .canvas-stack canvas {
       position: absolute; top: 0; left: 0;
       width: 100% !important; height: 100% !important; touch-action: none;
     }
 
-    /* Menú móvil */
-    .btn-menu-movil-flotante { display: none; }
-    #overlayMenu { display: none; }
+    /* Ocultos en PC por defecto */
+    .btn-menu-movil-flotante, #overlayMenu { display: none; }
 
     /* Botón de Editar en Museo */
     .btn-museo.editar { background: #3b82f6; color: white; border: 1px solid #3b82f6; }
     .btn-museo.editar:hover { background: #2563eb; }
 
+    /* ==========================================
+       DISEÑO EXCLUSIVO PARA MÓVILES Y TABLETS
+       ========================================== */
     @media (max-width: 1024px) {
-      .btn-menu-movil-flotante {
-        display: flex; align-items: center; justify-content: center;
-        position: absolute; top: 15px; right: 15px; z-index: 100;
-        background: var(--dorado, #c9a050); color: #fff; border: none;
-        width: 45px; height: 45px; border-radius: 50%;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
+      /* Pantalla completa para el estudio */
+      .estudio-overlay { padding: 0 !important; }
+      .estudio { 
+        width: 100vw !important; height: 100vh !important; max-height: 100vh !important;
+        margin: 0 !important; border-radius: 0 !important; 
+        display: flex !important; flex-direction: column !important;
       }
 
-      .estudio-toolbar {
+      /* Ocultamos la barra superior clásica */
+      .estudio-topbar { display: none !important; }
+      
+      /* Ocultamos la barra de herramientas clásica (se usará el menú lateral) */
+      .estudio-toolbar { 
         position: fixed !important; top: 0 !important; right: -100% !important;
         width: 85vw !important; max-width: 350px !important; height: 100vh !important;
         background: #1a1a1a !important; color: #fff !important;
@@ -75,11 +78,22 @@
       }
       .estudio-toolbar.activo { right: 0 !important; }
       
+      /* Botón para cerrar el menú */
       .btn-cerrar-toolbar {
         display: block !important; background: transparent; border: none; color: #fff;
         font-size: 1.5rem; text-align: right; cursor: pointer; margin-bottom: 5px;
       }
 
+      /* Botón flotante para abrir el menú */
+      .btn-menu-movil-flotante {
+        display: flex; align-items: center; justify-content: center;
+        position: absolute; top: 15px; right: 15px; z-index: 100;
+        background: var(--dorado, #c9a050); color: #fff; border: none;
+        width: 45px; height: 45px; border-radius: 50%;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
+      }
+
+      /* Adaptación de los controles para que sean táctiles en el menú lateral */
       .estudio-toolbar .tool-group { display: flex !important; flex-direction: column !important; gap: 8px !important; }
       .estudio-toolbar .tool-label { font-size: 0.9rem !important; color: var(--dorado) !important; font-weight: 700 !important; }
       .estudio-toolbar .tool-btn {
@@ -99,21 +113,21 @@
       
       .btn-accion { width: 100% !important; padding: 15px !important; border-radius: 8px !important; font-size: 1rem !important; margin-top: 5px; }
       
-      /* El menú inferior original se oculta en móvil para no duplicar */
+      /* Ocultamos el footer original porque se mueve al menú lateral */
       .estudio-footer { display: none !important; }
       
       #overlayMenu.activo { display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9998; backdrop-filter: blur(3px); }
     }
 
-    /* Ajuste específico para orientación vertical */
+    /* Ajuste específico para orientación vertical en móviles/tablets */
     @media (max-width: 1024px) and (orientation: portrait) {
       .estudio-canvas-wrapper {
-        align-items: flex-start; /* Alinea arriba para aprovechar el espacio */
+        align-items: flex-start;
         padding-top: 20px;
       }
       .canvas-stack {
-        max-height: 60vh; /* Limita la altura en vertical para que no se salga de la pantalla */
-        width: auto; /* Mantiene la proporción */
+        max-height: 60vh; /* Limita la altura para que no se desborde */
+        width: auto;
         max-width: 90vw;
       }
     }
@@ -270,19 +284,16 @@
         </button>
       </div>
 
+      <!-- Menú móvil (oculto en PC) -->
       <div id="overlayMenu"></div>
       <button class="btn-menu-movil-flotante" id="btnAbrirMenuM">
         <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
       </button>
 
+      <!-- Contenedor de herramientas original -->
       <div class="estudio-toolbar" id="estudioToolbar">
         <button class="btn-cerrar-toolbar" id="btnCerrarMenuM" style="display:none;">✕</button>
         
-        <div class="tool-group" id="grupoTituloM">
-          <span class="tool-label">Título de la Obra</span>
-          <input type="text" id="tituloObraM" placeholder="Título de tu obra..." maxlength="40" />
-        </div>
-
         <div class="tool-group herramientas">
           <span class="tool-label">Herramientas</span>
           <button type="button" class="tool-btn active" data-tool="pincel">Pincel</button>
@@ -312,20 +323,6 @@
             <button type="button" class="color-btn" data-color="#f28ca6" style="--c:#f28ca6"></button>
           </div>
           <div class="color-custom"><input type="color" id="colorPicker" value="#1a1a1a" /></div>
-        </div>
-
-        <div class="tool-group" id="grupoFondoM">
-          <span class="tool-label">Fondo</span>
-          <div class="fondo-controles">
-            <input type="color" id="fondoColorM" value="#ffffff" />
-            <button type="button" id="btnSubirFondoM">Subir Foto</button>
-            <button type="button" id="btnQuitarFondoM">Quitar</button>
-          </div>
-        </div>
-
-        <div class="tool-group" id="grupoAccionesM" style="margin-top: 15px; gap: 10px;">
-          <button type="button" class="btn-accion secundario" id="btnLimpiarM">Limpiar Lienzo</button>
-          <button type="button" class="btn-accion primario" id="btnGuardarM">Guardar Obra</button>
         </div>
       </div>
 
@@ -388,10 +385,8 @@
       const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
       const toolbar = document.getElementById('estudioToolbar');
       const overlay = document.getElementById('overlayMenu');
-      const grupoTituloM = document.getElementById('grupoTituloM');
 
       if (window.innerWidth <= 1024) {
-        if(grupoTituloM) grupoTituloM.style.display = 'flex';
         if(btnCerrarMenu) btnCerrarMenu.style.display = 'block';
       }
 
@@ -413,37 +408,6 @@
           }
         });
       });
-
-      // 3. Sincronizar los controles móviles con los de PC
-      const btnGuardar = document.getElementById('btnGuardar');
-      const btnGuardarM = document.getElementById('btnGuardarM');
-      if(btnGuardar && btnGuardarM) btnGuardarM.addEventListener('click', () => btnGuardar.click());
-
-      const btnLimpiar = document.getElementById('btnLimpiar');
-      const btnLimpiarM = document.getElementById('btnLimpiarM');
-      if(btnLimpiar && btnLimpiarM) btnLimpiarM.addEventListener('click', () => btnLimpiar.click());
-
-      const btnSubirFondo = document.getElementById('btnSubirFondo');
-      const btnSubirFondoM = document.getElementById('btnSubirFondoM');
-      if(btnSubirFondo && btnSubirFondoM) btnSubirFondoM.addEventListener('click', () => btnSubirFondo.click());
-
-      const btnQuitarFondo = document.getElementById('btnQuitarFondo');
-      const btnQuitarFondoM = document.getElementById('btnQuitarFondoM');
-      if(btnQuitarFondo && btnQuitarFondoM) btnQuitarFondoM.addEventListener('click', () => btnQuitarFondo.click());
-
-      const fondoColor = document.getElementById('fondoColor');
-      const fondoColorM = document.getElementById('fondoColorM');
-      if(fondoColor && fondoColorM) {
-        fondoColor.addEventListener('input', (e) => fondoColorM.value = e.target.value);
-        fondoColorM.addEventListener('input', (e) => { fondoColor.value = e.target.value; fondoColor.dispatchEvent(new Event('input')); });
-      }
-
-      const tituloObra = document.getElementById('tituloObra');
-      const tituloObraM = document.getElementById('tituloObraM');
-      if(tituloObra && tituloObraM) {
-        tituloObra.addEventListener('input', (e) => tituloObraM.value = e.target.value);
-        tituloObraM.addEventListener('input', (e) => tituloObra.value = e.target.value);
-      }
     });
   </script>
 
