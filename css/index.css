@@ -337,3 +337,84 @@ a:hover { color: var(--dorado); }
   .bento-item.grande { grid-column: span 1; }
   .floating-vinyl-container { bottom: 140px; right: 14px; }
 }
+/* =========================================================
+   BOTÓN DE DESCARGAR APP (PWA ÚNICO)
+   ========================================================= */
+.btn-pwa-unico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px 48px;
+  background: linear-gradient(135deg, var(--dorado), var(--rosa-fuerte));
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 25px rgba(166, 124, 82, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de brillo al pasar el ratón */
+.btn-pwa-unico::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-25deg);
+  transition: left 0.6s ease;
+}
+
+.btn-pwa-unico:hover::before {
+  left: 200%;
+}
+
+.btn-pwa-unico:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 35px rgba(166, 124, 82, 0.5);
+  color: #ffffff;
+}
+
+.btn-pwa-unico:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 15px rgba(166, 124, 82, 0.3);
+}
+
+.btn-pwa-unico svg {
+  transition: transform 0.3s ease;
+}
+
+.btn-pwa-unico:hover svg {
+  transform: translateY(-2px);
+}
+
+/* Modo Noche: Ajuste para que el botón siga brillando */
+body.modo-noche .btn-pwa-unico {
+  background: linear-gradient(135deg, var(--dorado), var(--rosa-fuerte));
+  box-shadow: 0 10px 25px rgba(226, 186, 137, 0.2);
+}
+
+body.modo-noche .btn-pwa-unico:hover {
+  box-shadow: 0 15px 35px rgba(226, 186, 137, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .btn-pwa-unico {
+    padding: 16px 36px;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    width: calc(100% - 40px);
+    max-width: 320px;
+  }
+}
