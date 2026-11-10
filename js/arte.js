@@ -17,8 +17,11 @@ const OBRAS_POR_PAGINA = 4;
 let obraActualEnMuseo = null;
 let modoEdicion = false;
 let obraEditandoId = null;
-let fondoEditandoId = null; // ID único del fondo que estamos editando
+let fondoEditandoId = null;
 let preferenciaDispositivo = 'auto';
+
+// Variable para guardar la pintura copiada (Capa superior)
+let pinturaCopiada = null; 
 
 // ============================================================
 //  UTILIDADES
@@ -132,7 +135,7 @@ function reorganizarUI(dispositivo) {
 }
 
 // ============================================================
-//  EVENTOS DE DIBUJO
+//  EVENTOS DE DIBUJO Y COPIAR/PEGAR
 // ============================================================
 function configurarEventosDibujo() {
   canvas.addEventListener("mousedown", empezarDibujo);
@@ -167,6 +170,43 @@ function configurarEventosDibujo() {
     document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
   };
 
+  // ---- LÓGICA DE COPIAR / PEGAR PINTURA ----
+  const btnCopiar = document.getElementById("btnCopiarPintura");
+  const btnPegar = document.getElementById("btnPegarPintura");
+
+  if (btnCopiar) {
+    btnCopiar.onclick = () => {
+      if (!canvas) return;
+      // Creamos un canvas temporal solo con la pintura
+      pinturaCopiada = document.createElement("canvas");
+      pinturaCopiada.width = canvas.width;
+      pinturaCopiada.height = canvas.height;
+      const pCtx = pinturaCopiada.getContext("2d");
+      pCtx.drawImage(canvas, 0, 0); 
+      
+      // Feedback visual
+      const textoOriginal = btnCopiar.textContent;
+      btnCopiar.textContent = "¡Copiado!";
+      setTimeout(() => btnCopiar.textContent = textoOriginal, 1500);
+    };
+  }
+
+  if (btnPegar) {
+    btnPegar.onclick = () => {
+      if (!pinturaCopiada) {
+        alert("No hay pintura copiada. Usa 'Copiar Pintura' primero.");
+        return;
+      }
+      // Pega la pintura en la capa superior. El fondo de abajo no se toca.
+      ctx.drawImage(pinturaCopiada, 0, 0);
+      
+      // Feedback visual
+      const textoOriginal = btnPegar.textContent;
+      btnPegar.textContent = "¡Pegado!";
+      setTimeout(() => btnPegar.textContent = textoOriginal, 1500);
+    };
+  }
+
   // ---- FONDO (Capa bloqueada) ----
   document.getElementById("fondoColor").oninput = (e) => { 
     fondoColor = e.target.value; 
@@ -198,7 +238,6 @@ function configurarEventosDibujo() {
   // ---- LIMPIAR LIENZO: SOLO BORRA LA PINTURA ----
   document.getElementById("btnLimpiar").onclick = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // El fondo (canvasFondo) no se toca.
   };
   
   document.getElementById("btnGuardar").onclick = guardarObra;
@@ -246,7 +285,7 @@ function configurarEventosUI() {
 function abrirEstudio() {
   modoEdicion = false;
   obraEditandoId = null;
-  fondoEditandoId = generarUUID(); // ID único para el nuevo fondo
+  fondoEditandoId = generarUUID();
   
   document.getElementById("estudioOverlay").classList.add("activo");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -256,6 +295,7 @@ function abrirEstudio() {
   fondoColor = "#ffffff";
   fondoOpacidad = 100;
   document.getElementById("fondoColor").value = "#ffffff";
+  pinturaCopiada = null; // Limpiamos el portapapeles al abrir un lienzo nuevo
   dibujarFondo();
 }
 
@@ -488,14 +528,11 @@ async function editarObraDesdeMuseo() {
 
   modoEdicion = true;
   obraEditandoId = obraActualEnMuseo.id;
-  
-  // Asignamos el ID del fondo (si no tiene, creamos uno nuevo)
   fondoEditandoId = obraActualEnMuseo.fondo_id || generarUUID();
 
   document.getElementById("estudioOverlay").classList.add("activo");
   document.getElementById("tituloObra").value = obraActualEnMuseo.titulo || "";
 
-  // Reset local
   fondoImagen = null;
   fondoColor = "#ffffff";
   fondoOpacidad = 100;
@@ -504,12 +541,10 @@ async function editarObraDesdeMuseo() {
   ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
   ctxFondo.fillStyle = "#ffffff";
   ctxFondo.fillRect(0, 0, canvasFondo.width, canvasFondo.height);
+  pinturaCopiada = null;
 
   const obra = obraActualEnMuseo;
 
-  // ------------------------------------------------------------
-  // CASO A: Obra moderna (Ya tiene las capas separadas)
-  // ------------------------------------------------------------
   if (obra.capa_fondo_url && obra.capa_dibujo_url && obra.capas_version === 2) {
     try {
       const [imgFondo, imgDibujo] = await Promise.all([
@@ -517,12 +552,10 @@ async function editarObraDesdeMuseo() {
         cargarImagen(obra.capa_dibujo_url)
       ]);
 
-      // Fondo intacto en la capa inferior
       ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
       ctxFondo.drawImage(imgFondo, 0, 0, canvasFondo.width, canvasFondo.height);
       fondoImagen = imgFondo;
 
-      // Pintura en la capa superior (borrable)
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(imgDibujo, 0, 0, canvas.width, canvas.height);
       return;
@@ -531,26 +564,17 @@ async function editarObraDesdeMuseo() {
     }
   }
 
-  // ------------------------------------------------------------
-  // CASO B: Obra antigua (capas_version = 0, fondo y pintura juntos)
-  // ------------------------------------------------------------
+  // CASO B: Obra antigua (todo quemado)
   try {
     const imgFull = await cargarImagen(obra.imagen_url);
-
-    // 1. Ponemos TODA la imagen antigua en la CAPA DE PINTURA (para que se pueda borrar)
+    // Ponemos la imagen completa en la capa de pintura superior
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imgFull, 0, 0, canvas.width, canvas.height);
 
-    // 2. El fondo se queda como un lienzo blanco limpio
+    // El fondo es un lienzo blanco limpio
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
     ctxFondo.fillStyle = "#ffffff";
     ctxFondo.fillRect(0, 0, canvasFondo.width, canvasFondo.height);
-
-    console.log("Obra antigua preparada. Fondo separado (blanco), pintura en capa superior editable.");
-    
-    // NOTA: No guardamos en la BD todavía. Si el usuario presiona "Guardar", 
-    // se crearán las capas correctamente en el paso de guardado.
-
   } catch (err) {
     console.error("No se pudo cargar la obra:", err);
     alert("No se pudo cargar la obra para editar.");
@@ -611,7 +635,6 @@ function empezarDibujo(e) {
   ctx.lineCap = "round"; ctx.lineJoin = "round";
   
   if (herramienta === "borrador") {
-    // ESTO ES CLAVE: El borrador SOLO afecta a 'canvas', no a 'canvasFondo'
     ctx.globalCompositeOperation = "destination-out";
     ctx.lineWidth = grosor * 2;
     ctx.shadowBlur = 0;
@@ -696,7 +719,6 @@ async function guardarObra() {
     const blobFondo = await canvasABlob(canvasFondo);
     const blobDibujo = await canvasABlob(canvas);
     
-    // Usamos el ID del fondo generado para nombrar los archivos y evitar colisiones
     const fileFondo = new File([blobFondo], `fondo_${fondoEditandoId}.png`, { type: "image/png" });
     const fileDibujo = new File([blobDibujo], `dibujo_${Date.now()}.png`, { type: "image/png" });
 
@@ -711,14 +733,13 @@ async function guardarObra() {
       imagen_url: urlFinal,
       capa_fondo_url: urlFondo,
       capa_dibujo_url: urlDibujo,
-      fondo_id: fondoEditandoId, // ID ÚNICO DEL FONDO GUARDADO
-      fondo_color: fondoColor,   // Guardamos el color por si acaso
-      capas_version: 2           // 2 = Versión nueva con capas separadas
+      fondo_id: fondoEditandoId,
+      fondo_color: fondoColor,
+      capas_version: 2
     };
 
     let obraGuardada;
     if (modoEdicion && obraEditandoId) {
-      // Si editamos, borramos las capas viejas de Storage para no acumular basura
       const vieja = obras.find(o => o.id === obraEditandoId);
       if (vieja) {
         const paths = [];
