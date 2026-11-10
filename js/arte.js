@@ -20,7 +20,7 @@ let obraEditandoId = null;
 let fondoEditandoId = null;
 let preferenciaDispositivo = 'auto';
 
-// Variable GLOBAL para guardar la pintura copiada
+// Variable GLOBAL para guardar la imagen o canvas copiado
 let pinturaCopiada = null; 
 
 // ============================================================
@@ -29,7 +29,8 @@ let pinturaCopiada = null;
 function cargarImagen(src) {
   return new Promise((res, rej) => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    // No usamos crossOrigin para evitar bloqueos al copiar en memoria. 
+    // Al no usar toDataURL, no necesitamos permisos CORS para pintar en el lienzo.
     img.onload = () => res(img);
     img.onerror = () => rej(new Error("No se pudo cargar imagen: " + src));
     img.src = src;
@@ -177,6 +178,7 @@ function configurarEventosDibujo() {
   if (btnCopiar) {
     btnCopiar.onclick = () => {
       if (!canvas) return;
+      // Copiamos el canvas de pintura a un canvas temporal en memoria
       pinturaCopiada = document.createElement("canvas");
       pinturaCopiada.width = canvas.width;
       pinturaCopiada.height = canvas.height;
@@ -192,10 +194,11 @@ function configurarEventosDibujo() {
   if (btnPegar) {
     btnPegar.onclick = () => {
       if (!pinturaCopiada) {
-        alert("No hay pintura copiada. Usa 'Copiar Pintura' primero.");
+        alert("No hay pintura copiada. Copia una obra desde el museo o usa 'Copiar Pintura'.");
         return;
       }
-      ctx.drawImage(pinturaCopiada, 0, 0);
+      // Pegamos la imagen o canvas en la capa superior (pintura)
+      ctx.drawImage(pinturaCopiada, 0, 0, canvas.width, canvas.height);
       
       const textoOriginal = btnPegar.textContent;
       btnPegar.textContent = "¡Pegado!";
@@ -295,7 +298,7 @@ function abrirEstudio() {
   fondoOpacidad = 100;
   document.getElementById("fondoColor").value = "#ffffff";
   
-  // NOTA: Ya NO reseteamos 'pinturaCopiada' para que puedas pegar lo que copiaste.
+  // NO reseteamos 'pinturaCopiada' para que puedas pegar inmediatamente si copiaste algo
   
   dibujarFondo();
 }
@@ -521,7 +524,7 @@ window.abrirMuseo = function(id) {
 }
 
 // ============================================================
-//  COPIAR DESDE EL MUSEO
+//  COPIAR DESDE EL MUSEO Y ABRIR ESTUDIO
 // ============================================================
 async function copiarObraDesdeMuseo() {
   if (!obraActualEnMuseo) return;
@@ -530,17 +533,24 @@ async function copiarObraDesdeMuseo() {
   btn.textContent = "Copiando...";
 
   try {
+    // 1. Cargamos la imagen en memoria
     const img = await cargarImagen(obraActualEnMuseo.imagen_url);
-    pinturaCopiada = document.createElement("canvas");
-    pinturaCopiada.width = 900;
-    pinturaCopiada.height = 600;
-    const pCtx = pinturaCopiada.getContext("2d");
     
-    // Dibujamos la imagen de la obra en el lienzo virtual
-    pCtx.drawImage(img, 0, 0, 900, 600);
+    // 2. La guardamos en la variable global (usamos el objeto img directamente)
+    pinturaCopiada = img;
     
     btn.textContent = "¡Copiado!";
-    setTimeout(() => btn.textContent = textoOriginal, 1500);
+    
+    // 3. Cerramos el museo y abrimos el estudio automáticamente
+    document.getElementById("museoOverlay").classList.remove("activo");
+    abrirEstudio(); 
+    
+    // 4. Damos tiempo al usuario a ver la alerta
+    setTimeout(() => {
+      btn.textContent = textoOriginal;
+      alert("Pintura copiada. Ahora puedes presionar 'Pegar Pintura' en el panel de la izquierda.");
+    }, 500);
+
   } catch (err) {
     console.error("Error al copiar obra:", err);
     alert("No se pudo copiar la obra.");
