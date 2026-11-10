@@ -258,7 +258,6 @@
 
   <div class="estudio-overlay" id="estudioOverlay">
     <div class="estudio" id="estudio">
-      
       <div class="estudio-topbar" id="estudioTopbar">
         <div class="estudio-titulo-app"><span class="app-logo">🎨</span><span>Estudio Creativo</span></div>
         <input type="text" id="tituloObra" placeholder="Título de tu obra maestra..." maxlength="40" />
@@ -368,10 +367,8 @@
       const footer = document.getElementById('estudioFooter');
 
       if (isMobile) {
-        // Ocultar la barra superior de PC
         if(topbar) topbar.style.display = 'none';
 
-        // Mover el título al menú lateral
         const tituloObra = document.getElementById('tituloObra');
         if(tituloObra) {
           const divTitulo = document.createElement('div');
@@ -382,7 +379,6 @@
           toolbar.insertBefore(divTitulo, toolbar.firstChild);
         }
 
-        // Mover el footer (Fondo, Limpiar, Guardar) al menú
         if(footer) {
           const divAcciones = document.createElement('div');
           divAcciones.className = 'tool-group';
@@ -395,7 +391,6 @@
           footer.style.gap = '10px';
         }
 
-        // 3. Lógica de abrir/cerrar menú móvil
         const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
         const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
         const overlay = document.getElementById('overlayMenu');
