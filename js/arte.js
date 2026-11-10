@@ -94,7 +94,7 @@ function configurarEventosDibujo() {
     dibujarFondo(); 
   };
   
-  // Limpiar SIEMPRE afecta al fondo y al dibujo
+  // 🛑 El limpiar borra el fondo y la pintura
   document.getElementById("btnLimpiar").onclick = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
@@ -354,13 +354,16 @@ async function editarObraDesdeMuseo() {
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.onload = () => {
-    // 🛑 Cargamos la imagen en la capa de FONDO (no se puede borrar con pincel)
-    ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-    ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
-    fondoImagen = img;
-    
-    // Limpiamos la capa de dibujo para que no haya duplicados
+    // 🛑 Cargamos la imagen original en la CAPA DE DIBUJO (lienzo)
+    // Esto hace que la pintura sea 100% editable/borrable.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    
+    // Limpiamos la capa de fondo para que no haya duplicados
+    ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+    fondoImagen = null;
+    fondoColor = "#ffffff";
+    document.getElementById("fondoColor").value = "#ffffff";
   };
   img.src = obraActualEnMuseo.imagen_url;
 }
