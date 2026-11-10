@@ -274,20 +274,18 @@ function abrirEstudio() {
   obraEditandoId = null;
   fondoEditandoId = generarUUID();
   
+  // LIMPIAMOS EL LIENZO POR COMPLETO PARA NUEVO PROYECTO
+  trazos = []; 
+  renderizarTrazos();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  fondoImagen = null;
+  fondoColor = "#ffffff";
+  document.getElementById("fondoColor").value = "#ffffff";
+  dibujarFondo();
+  
   document.getElementById("estudioOverlay").classList.add("activo");
-  
-  if (trazos.length === 0) {
-    renderizarTrazos();
-  }
-
   document.getElementById("tituloObra").value = "";
-  
-  if (!portapapeles.fondo) {
-    fondoImagen = null;
-    fondoColor = "#ffffff";
-    document.getElementById("fondoColor").value = "#ffffff";
-    dibujarFondo();
-  }
 }
 
 function dibujarFondo() {
@@ -608,23 +606,23 @@ async function copiarObraDesdeMuseo() {
   try {
     const obra = obraActualEnMuseo;
     
+    // 1. COPIAR COMPONENTE FONDO
     if (obra.capa_fondo_url) {
-      portapapeles.fondo = await cargarImagen(obra.capa_fondo_url, true); // true activa CORS
+      portapapeles.fondo = await cargarImagen(obra.capa_fondo_url, true); 
     } else {
       const canvasFondoTemp = document.createElement("canvas");
       canvasFondoTemp.width = 900; canvasFondoTemp.height = 600;
       const ctxF = canvasFondoTemp.getContext("2d");
-      ctxF.fillStyle = "#ffffff";
+      ctxF.fillStyle = obra.fondo_color || "#ffffff";
       ctxF.fillRect(0, 0, 900, 600);
       portapapeles.fondo = canvasFondoTemp;
     }
 
+    // 2. COPIAR COMPONENTES TRAZOS
     if (obra.capa_trazos && obra.capa_trazos.length > 0) {
       portapapeles.trazos = obra.capa_trazos;
     } else {
-      // Fallback para obras viejas
       portapapeles.trazos = [];
-      alert("Esta es una obra antigua. Sus trazos no se pueden separar, pero el fondo ha sido copiado.");
     }
     
     btn.textContent = "¡Copiado!";
@@ -633,7 +631,6 @@ async function copiarObraDesdeMuseo() {
     
     setTimeout(() => {
       btn.textContent = textoOriginal;
-      alert("Componentes copiados. Presiona 'Pegar Trazos' en el panel de la izquierda.");
     }, 500);
 
   } catch (err) {
@@ -669,7 +666,7 @@ async function editarObraDesdeMuseo() {
     renderizarTrazos();
     
     if (obra.capa_fondo_url) {
-      fondoImagen = await cargarImagen(obra.capa_fondo_url, true); // CORS activo
+      fondoImagen = await cargarImagen(obra.capa_fondo_url, true);
       dibujarFondo();
     }
     return;
@@ -679,7 +676,7 @@ async function editarObraDesdeMuseo() {
   trazos = []; 
   renderizarTrazos();
   try {
-    const imgFull = await cargarImagen(obra.imagen_url, true); // CORS activo
+    const imgFull = await cargarImagen(obra.imagen_url, true);
     ctx.drawImage(imgFull, 0, 0, canvas.width, canvas.height);
   } catch (err) {
     console.error("No se pudo cargar la obra:", err);
@@ -732,12 +729,11 @@ async function guardarObra() {
   tempCtx.drawImage(canvas, 0, 0);
 
   try {
-    // Evitamos el error de exportación con try-catch
     let blobFinal;
     try {
       blobFinal = await canvasABlob(tempCanvas);
     } catch (error) {
-      throw new Error("El lienzo está contaminado por CORS. Asegúrate de que el bucket de Supabase sea público.");
+      throw new Error("El lienzo está contaminado por CORS. Asegúrate de que el bucket sea público.");
     }
 
     const fileFinal = new File([blobFinal], `obra_${Date.now()}.png`, { type: "image/png" });
@@ -756,7 +752,7 @@ async function guardarObra() {
       titulo,
       imagen_url: urlFinal,
       capa_fondo_url: urlFondo,
-      capa_trazos: trazos, // <-- Guardamos los componentes
+      capa_trazos: trazos,
       fondo_id: fondoEditandoId,
       fondo_color: fondoColor,
       capas_version: 3
