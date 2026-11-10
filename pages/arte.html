@@ -239,7 +239,8 @@
         </div>
       </div>
       <div class="estudio-canvas-wrapper">
-        <div class="canvas-stack">
+        <!-- 🛑 AQUÍ ESTÁ LA CORRECCIÓN PARA MÓVILES Y TABLETS 🛑 -->
+        <div class="canvas-stack" style="touch-action: none; -webkit-user-select: none; user-select: none; overscroll-behavior: contain;">
           <canvas id="lienzoFondo" width="900" height="600"></canvas>
           <canvas id="lienzo" width="900" height="600"></canvas>
         </div>
