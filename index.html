@@ -15,7 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Poppins:wght@300;400;600&family=Caveat:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
 
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#f28ca6" />
+  <meta name="theme-color" content="#a67c52" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>" />
 
   <!-- Librería 3D -->
@@ -150,7 +150,7 @@
     </div>
   </section>
 
-  <!-- 4. SECCIÓN ADMIN (Justo debajo de las tarjetas) -->
+  <!-- 4. SECCIÓN ADMIN -->
   <section class="admin-seccion" id="seccionAdmin" style="display: none;">
     <a href="admin.html" id="btnAdmin" class="btn-admin-engranaje" title="Consola de Administración">
       <svg viewBox="0 0 24 24">
@@ -180,25 +180,21 @@
     </a>
   </section>
 
-  <!-- 7. BOTÓN DE DESCARGAR APP (PWA) -->
+  <!-- 7. BOTÓN PWA -->
   <div style="text-align: center; margin-bottom: 60px;">
     <button id="btnInstalarPWAUnico" class="btn-pwa-unico" style="display: none;">
-      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-      </svg>
-      Descargar Nuestra App
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Instalar Nuestra App
     </button>
   </div>
 
   <!-- FOOTER -->
   <footer class="footer">Hecho con amor, solo para ti.</footer>
 
-  <!-- CONTENEDOR MODO CINE -->
+  <!-- MODO CINE -->
   <div class="cine-container" id="cineContainer"></div>
 
-  <!-- BOTÓN RECUERDO -->
+  <!-- RECUERDO FLOTANTE -->
   <button class="btn-recuerdo-flotante" id="btnVerRecuerdo" title="Recuerdo del Día">📸</button>
 
   <!-- MODAL RECUERDO -->
@@ -469,32 +465,6 @@
       const escucharEsc = (e) => { if (e.key === 'Escape') cerrarCine(); };
       document.addEventListener('keydown', escucharEsc);
     }
-  </script>
-
-   <!-- Lógica del Botón PWA Único -->
-  <script>
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      window.deferredPrompt = e;
-      const btn = document.getElementById('btnInstalarPWAUnico');
-      if (btn) btn.style.display = 'inline-flex';
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        const pwaBtn = document.getElementById('btnInstalarPWAUnico');
-        if (pwaBtn) {
-            pwaBtn.addEventListener('click', async () => {
-                if (!window.deferredPrompt) {
-                  alert("Para instalar la app, usa el menú de tu navegador y selecciona 'Añadir a pantalla de inicio'.");
-                  return;
-                }
-                window.deferredPrompt.prompt();
-                const { outcome } = await window.deferredPrompt.userChoice;
-                if (outcome === 'accepted') { pwaBtn.style.display = 'none'; }
-                window.deferredPrompt = null;
-            });
-        }
-    });
   </script>
 </body>
 </html>

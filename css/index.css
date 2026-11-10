@@ -23,7 +23,6 @@
   
   --sombra: 0 8px 24px rgba(42, 36, 38, 0.04);
   --sombra-hover: 0 16px 40px rgba(42, 36, 38, 0.08);
-
   --nube-color: rgba(255, 255, 255, 0.6);
 }
 
@@ -31,9 +30,9 @@
    MODO OSCURO GLOBAL — MEZCLA DE CAFÉ Y NOCHE PROFUNDA
    ========================================================= */
 body.modo-noche {
-  --bg-claro: #121012; /* Más oscuro para que se sienta noche */
+  --bg-claro: #121012;
   --bg-secundario: #1a1719;
-  --bg-tarjeta: #241e21; /* Tono café vino */
+  --bg-tarjeta: #241e21;
   --bg-tarjeta-hover: #2e262a;
   --bg-overlay: rgba(18, 16, 18, 0.9);
   --bg-modal: rgba(0, 0, 0, 0.85);
@@ -42,7 +41,7 @@ body.modo-noche {
   --texto-secundario: #bca7ae;
   --texto-terciario: #8a7d84;
 
-  --dorado: #e2ba89; /* Dorado más brillante */
+  --dorado: #e2ba89;
   --dorado-suave: rgba(226, 186, 137, 0.15);
   --rosa: #e8a1a1;
   --rosa-suave: rgba(232, 161, 161, 0.15);
@@ -59,7 +58,6 @@ body.modo-noche {
    RESET Y BASE
    ========================================================= */
 * { box-sizing: border-box; }
-
 body {
   background-color: var(--bg-claro);
   color: var(--texto-principal);
@@ -70,13 +68,12 @@ body {
   margin: 0;
   line-height: 1.6;
 }
-
 h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; margin: 0; }
 a { color: var(--rosa-fuerte); text-decoration: none; transition: color 0.3s; }
 a:hover { color: var(--dorado); }
 
 /* =========================================================
-   FONDO DE NUBES (SUAVE)
+   FONDO DE NUBES
    ========================================================= */
 .fondo-nubes {
   position: fixed; inset: 0; z-index: -1; overflow: hidden;
@@ -91,7 +88,6 @@ a:hover { color: var(--dorado); }
 .nube:nth-child(3) { width: 300px; height: 150px; top: 65%; left: -15%; animation-delay: -10s; }
 .nube:nth-child(4) { width: 450px; height: 200px; top: 15%; right: -15%; animation-delay: -2s; }
 .nube:nth-child(5) { width: 250px; height: 100px; top: 75%; right: -10%; animation-delay: -15s; }
-
 @keyframes flotarNubes {
   0%   { transform: translateX(0) translateY(0); }
   100% { transform: translateX(50px) translateY(-30px); }
@@ -316,6 +312,12 @@ a:hover { color: var(--dorado); }
 .btn-tema { top: 22px; left: 22px; }
 .btn-modo-cine:hover, .btn-recuerdo-flotante:hover, .btn-tema:hover { background: var(--dorado); color: #fff; border-color: var(--dorado); transform: scale(1.1); }
 
+.btn-tema svg { position: absolute; width: 20px; height: 20px; transition: opacity 0.4s ease, transform 0.5s ease; }
+.btn-tema .icono-luna { opacity: 1; transform: rotate(0) scale(1); }
+.btn-tema .icono-sol { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+body.modo-noche .btn-tema .icono-luna { opacity: 0; transform: rotate(90deg) scale(0.6); }
+body.modo-noche .btn-tema .icono-sol { opacity: 1; transform: rotate(0) scale(1); }
+
 #modalRecuerdo { position: fixed; inset: 0; background: var(--bg-modal); backdrop-filter: blur(8px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 24px; }
 #modalRecuerdo > div { background: var(--bg-tarjeta); border-radius: 4px; padding: 24px; max-width: 480px; width: 100%; position: relative; text-align: center; box-shadow: var(--sombra-hover); border: 1px solid var(--borde); }
 #btnCerrarRecuerdo { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--texto-secundario); }
@@ -336,85 +338,4 @@ a:hover { color: var(--dorado); }
 @media (max-width: 768px) {
   .bento-item.grande { grid-column: span 1; }
   .floating-vinyl-container { bottom: 140px; right: 14px; }
-}
-/* =========================================================
-   BOTÓN DE DESCARGAR APP (PWA ÚNICO)
-   ========================================================= */
-.btn-pwa-unico {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 18px 48px;
-  background: linear-gradient(135deg, var(--dorado), var(--rosa-fuerte));
-  color: #ffffff;
-  border: none;
-  border-radius: 50px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 10px 25px rgba(166, 124, 82, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Efecto de brillo al pasar el ratón */
-.btn-pwa-unico::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transform: skewX(-25deg);
-  transition: left 0.6s ease;
-}
-
-.btn-pwa-unico:hover::before {
-  left: 200%;
-}
-
-.btn-pwa-unico:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 15px 35px rgba(166, 124, 82, 0.5);
-  color: #ffffff;
-}
-
-.btn-pwa-unico:active {
-  transform: translateY(0);
-  box-shadow: 0 5px 15px rgba(166, 124, 82, 0.3);
-}
-
-.btn-pwa-unico svg {
-  transition: transform 0.3s ease;
-}
-
-.btn-pwa-unico:hover svg {
-  transform: translateY(-2px);
-}
-
-/* Modo Noche: Ajuste para que el botón siga brillando */
-body.modo-noche .btn-pwa-unico {
-  background: linear-gradient(135deg, var(--dorado), var(--rosa-fuerte));
-  box-shadow: 0 10px 25px rgba(226, 186, 137, 0.2);
-}
-
-body.modo-noche .btn-pwa-unico:hover {
-  box-shadow: 0 15px 35px rgba(226, 186, 137, 0.4);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .btn-pwa-unico {
-    padding: 16px 36px;
-    font-size: 0.85rem;
-    letter-spacing: 0.1em;
-    width: calc(100% - 40px);
-    max-width: 320px;
-  }
 }
