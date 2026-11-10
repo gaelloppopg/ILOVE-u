@@ -12,7 +12,7 @@ let herramienta = "pincel";
 let color = "#1a1a1a";
 let grosor = 8;
 
-// Variables del Fondo
+// Variables del Fondo (Componente Independiente)
 let fondoImagen = null;
 let fondoOpacidad = 100;
 let fondoColor = "#ffffff";
@@ -29,7 +29,7 @@ let obraEditandoId = null;
 let fondoEditandoId = null;
 let preferenciaDispositivo = 'auto';
 
-// Variables de Componentes y Portapapeles
+// Variables de Componentes (Pintura) y Portapapeles
 let trazos = []; 
 let trazoActual = null;
 let portapapeles = { fondo: null, trazos: [] }; 
@@ -40,7 +40,6 @@ let portapapeles = { fondo: null, trazos: [] };
 function cargarImagen(src, isCORS = false) {
   return new Promise((res, rej) => {
     const img = new Image();
-    // Si esCORS es true, intenta cargar sin bloquear el canvas. Si falla el servidor, no rompe el script.
     if (isCORS) img.crossOrigin = "anonymous"; 
     img.onload = () => res(img);
     img.onerror = () => {
@@ -94,7 +93,6 @@ async function initArte() {
   canvas = document.getElementById("lienzo");
   ctx = canvas.getContext("2d");
   
-  // Inicializamos el fondo
   dibujarFondo();
 
   configurarEventosDibujo();
@@ -186,16 +184,14 @@ function configurarEventosDibujo() {
     document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
   };
 
-  // ---- COPIAR Y PEGAR ----
+  // ---- COPIAR Y PEGAR COMPONENTES ----
   const btnCopiar = document.getElementById("btnCopiarPintura");
   const btnPegar = document.getElementById("btnPegarPintura");
 
   if (btnCopiar) {
     btnCopiar.onclick = () => {
-      // Copia profunda de los trazos actuales al portapapeles
       portapapeles.trazos = JSON.parse(JSON.stringify(trazos)); 
       
-      // Copia el fondo actual al portapapeles (como componente independiente)
       if (fondoImagen) {
         portapapeles.fondo = fondoImagen;
       } else {
@@ -216,7 +212,6 @@ function configurarEventosDibujo() {
 
   if (btnPegar) {
     btnPegar.onclick = () => {
-      // PEGAR TRAZOS
       if (portapapeles.trazos && portapapeles.trazos.length > 0) {
         portapapeles.trazos.forEach(trazoCopiado => {
           const nuevoTrazo = JSON.parse(JSON.stringify(trazoCopiado));
@@ -225,7 +220,6 @@ function configurarEventosDibujo() {
         renderizarTrazos();
       }
       
-      // PEGAR FONDO (Componente independiente)
       if (portapapeles.fondo) {
         fondoImagen = portapapeles.fondo;
         dibujarFondo();
@@ -237,7 +231,7 @@ function configurarEventosDibujo() {
     };
   }
 
-  // ---- FONDO (Controles Manuales) ----
+  // ---- CONTROLES DEL FONDO MANUAL ----
   document.getElementById("fondoColor").oninput = (e) => { 
     fondoColor = e.target.value; 
     fondoImagen = null; 
@@ -310,34 +304,26 @@ function configurarEventosUI() {
 }
 
 // ============================================================
-//  ABRIR ESTUDIO (NUEVO LIENZO TOTALMENTE BLANCO)
+//  ABRIR ESTUDIO (NUEVO LIENZO EN BLANCO)
 // ============================================================
 function abrirEstudio() {
-  // 1. Resetear estados de edición
   modoEdicion = false;
   obraEditandoId = null;
   fondoEditandoId = generarUUID();
   
-  // 2. Destruir trazos de la sesión anterior
   trazos = []; 
   trazoActual = null;
   
-  // 3. Limpiar el lienzo de dibujo (pintura)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   renderizarTrazos();
   
-  // 4. Limpiar el lienzo de fondo
   fondoImagen = null;
   fondoColor = "#ffffff";
   document.getElementById("fondoColor").value = "#ffffff";
-  dibujarFondo(); // Lo pinta de blanco puro
+  dibujarFondo(); 
   
-  // 5. Mostrar UI
   document.getElementById("estudioOverlay").classList.add("activo");
   document.getElementById("tituloObra").value = "";
-  
-  // NOTA: El portapapeles NO se limpia aquí para que puedas ir a otra obra y pegar. 
-  // Pero al no llamar a "Pegar", el lienzo estará en blanco.
 }
 
 function dibujarFondo() {
@@ -354,7 +340,7 @@ function dibujarFondo() {
 }
 
 // ============================================================
-//  LÓGICA DE DIBUJO
+//  LÓGICA DE DIBUJO (TRAZOS)
 // ============================================================
 function getPos(e) {
   const rect = canvas.getBoundingClientRect();
@@ -406,6 +392,7 @@ function terminarDibujo() {
 }
 
 function renderizarTrazos() {
+  // Limpiamos solo la capa de pintura (lienzo superior)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
   trazos.forEach((trazo) => {
@@ -414,6 +401,7 @@ function renderizarTrazos() {
     ctx.lineJoin = "round";
     
     if (trazo.tipo === "borrador") {
+      // El borrador SOLO afecta a esta capa superior, el fondo es intocable
       ctx.globalCompositeOperation = "destination-out";
       ctx.lineWidth = trazo.grosor * 2;
     } else {
@@ -455,7 +443,115 @@ function renderizarTrazos() {
 }
 
 // ============================================================
-//  RESTO DE FUNCIONES (MUSEO, TEMAS, LIBRO, GUARDAR)
+//  EDICIÓN DE OBRA (FONDO Y PINTURA SEPARADOS Y BLINDADOS)
+// ============================================================
+async function editarObraDesdeMuseo() {
+  if (!obraActualEnMuseo) return;
+  document.getElementById("museoOverlay").classList.remove("activo");
+
+  modoEdicion = true;
+  obraEditandoId = obraActualEnMuseo.id;
+  fondoEditandoId = obraActualEnMuseo.fondo_id || generarUUID();
+
+  document.getElementById("estudioOverlay").classList.add("activo");
+  document.getElementById("tituloObra").value = obraActualEnMuseo.titulo || "";
+
+  // 1. RESET TOTAL ANTES DE CARGAR
+  fondoImagen = null;
+  fondoColor = "#ffffff";
+  fondoOpacidad = 100;
+  document.getElementById("fondoColor").value = "#ffffff";
+  
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+  
+  const obra = obraActualEnMuseo;
+
+  // 2. CARGAR COMPONENTE FONDO (Capa Inferior Intocable)
+  if (obra.capa_fondo_url) {
+    try {
+      fondoImagen = await cargarImagen(obra.capa_fondo_url, true);
+      dibujarFondo();
+    } catch (err) {
+      console.warn("Fondo no disponible, usando color sólido.");
+      fondoColor = obra.fondo_color || "#ffffff";
+      document.getElementById("fondoColor").value = fondoColor;
+      dibujarFondo();
+    }
+  } else {
+    fondoColor = obra.fondo_color || "#ffffff";
+    document.getElementById("fondoColor").value = fondoColor;
+    dibujarFondo();
+  }
+
+  // 3. CARGAR COMPONENTE PINTURA (Trazos)
+  if (obra.capa_trazos && Array.isArray(obra.capa_trazos)) {
+    trazos = JSON.parse(JSON.stringify(obra.capa_trazos));
+    renderizarTrazos();
+  } else {
+    // CASO B: Obra antigua que no tiene trazos guardados.
+    // Se coloca la imagen completa en la capa superior (pintura) para que puedas borrarla.
+    // El fondo se queda limpio (blanco o color plano).
+    trazos = []; 
+    renderizarTrazos();
+    try {
+      const imgFull = await cargarImagen(obra.imagen_url, true);
+      ctx.drawImage(imgFull, 0, 0, canvas.width, canvas.height);
+    } catch (err) {
+      console.error("No se pudo cargar la obra antigua:", err);
+      alert("No se pudo cargar la obra para editar.");
+    }
+  }
+}
+
+// ============================================================
+//  COPIAR OBRA DESDE EL MUSEO
+// ============================================================
+async function copiarObraDesdeMuseo() {
+  if (!obraActualEnMuseo) return;
+  const btn = document.getElementById("btnCopiarObraMuseo");
+  const textoOriginal = btn.textContent;
+  btn.textContent = "Copiando...";
+
+  try {
+    const obra = obraActualEnMuseo;
+    
+    // Copiar Fondo
+    if (obra.capa_fondo_url) {
+      portapapeles.fondo = await cargarImagen(obra.capa_fondo_url, true); 
+    } else {
+      const canvasFondoTemp = document.createElement("canvas");
+      canvasFondoTemp.width = 900; canvasFondoTemp.height = 600;
+      const ctxF = canvasFondoTemp.getContext("2d");
+      ctxF.fillStyle = obra.fondo_color || "#ffffff";
+      ctxF.fillRect(0, 0, 900, 600);
+      portapapeles.fondo = canvasFondoTemp;
+    }
+
+    // Copiar Trazos
+    if (obra.capa_trazos && obra.capa_trazos.length > 0) {
+      portapapeles.trazos = obra.capa_trazos;
+    } else {
+      portapapeles.trazos = [];
+    }
+    
+    btn.textContent = "¡Copiado!";
+    document.getElementById("museoOverlay").classList.remove("activo");
+    abrirEstudio(); 
+    
+    setTimeout(() => {
+      btn.textContent = textoOriginal;
+    }, 500);
+
+  } catch (err) {
+    console.error("Error al copiar obra:", err);
+    alert("No se pudo copiar la obra.");
+    btn.textContent = textoOriginal;
+  }
+}
+
+// ============================================================
+//  RESTO DE FUNCIONES
 // ============================================================
 function initPanelTemas() {
   const btnAbrir = document.getElementById('btnAbrirPanelTemas');
@@ -649,122 +745,6 @@ window.abrirMuseo = function(id) {
   document.getElementById("museoOverlay").classList.add("activo");
 }
 
-// ============================================================
-//  COPIAR OBRA DESDE EL MUSEO
-// ============================================================
-async function copiarObraDesdeMuseo() {
-  if (!obraActualEnMuseo) return;
-  const btn = document.getElementById("btnCopiarObraMuseo");
-  const textoOriginal = btn.textContent;
-  btn.textContent = "Copiando...";
-
-  try {
-    const obra = obraActualEnMuseo;
-    
-    // 1. COPIAR COMPONENTE FONDO
-    if (obra.capa_fondo_url) {
-      portapapeles.fondo = await cargarImagen(obra.capa_fondo_url, true); 
-    } else {
-      const canvasFondoTemp = document.createElement("canvas");
-      canvasFondoTemp.width = 900; canvasFondoTemp.height = 600;
-      const ctxF = canvasFondoTemp.getContext("2d");
-      ctxF.fillStyle = obra.fondo_color || "#ffffff";
-      ctxF.fillRect(0, 0, 900, 600);
-      portapapeles.fondo = canvasFondoTemp;
-    }
-
-    // 2. COPIAR COMPONENTES TRAZOS
-    if (obra.capa_trazos && obra.capa_trazos.length > 0) {
-      portapapeles.trazos = obra.capa_trazos;
-    } else {
-      portapapeles.trazos = [];
-    }
-    
-    btn.textContent = "¡Copiado!";
-    document.getElementById("museoOverlay").classList.remove("activo");
-    
-    // Al abrir el estudio, se limpiará todo, pero los datos están a salvo en portapapeles.
-    abrirEstudio(); 
-    
-    setTimeout(() => {
-      btn.textContent = textoOriginal;
-      // Alerta informativa (opcional)
-      // alert("Obra copiada al portapapeles. Presiona 'Pegar Trazos' si deseas restaurarla aquí.");
-    }, 500);
-
-  } catch (err) {
-    console.error("Error al copiar obra:", err);
-    alert("No se pudo copiar la obra.");
-    btn.textContent = textoOriginal;
-  }
-}
-
-// ============================================================
-//  EDITAR OBRA (RESTAURACIÓN BLINDADA DE FONDO Y TRAZOS)
-// ============================================================
-async function editarObraDesdeMuseo() {
-  if (!obraActualEnMuseo) return;
-  document.getElementById("museoOverlay").classList.remove("activo");
-
-  modoEdicion = true;
-  obraEditandoId = obraActualEnMuseo.id;
-  fondoEditandoId = obraActualEnMuseo.fondo_id || generarUUID();
-
-  document.getElementById("estudioOverlay").classList.add("activo");
-  document.getElementById("tituloObra").value = obraActualEnMuseo.titulo || "";
-
-  // 1. Limpieza profunda antes de cargar
-  fondoImagen = null;
-  fondoColor = "#ffffff";
-  fondoOpacidad = 100;
-  document.getElementById("fondoColor").value = "#ffffff";
-  
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-  ctxFondo.fillStyle = "#ffffff";
-  ctxFondo.fillRect(0, 0, canvasFondo.width, canvasFondo.height);
-
-  const obra = obraActualEnMuseo;
-
-  // 2. RESTAURAR TRAZOS
-  if (obra.capa_trazos && Array.isArray(obra.capa_trazos)) {
-    trazos = JSON.parse(JSON.stringify(obra.capa_trazos));
-  } else {
-    trazos = []; // Si es obra vieja, no hay trazos
-  }
-  renderizarTrazos();
-
-  // 3. RESTAURAR FONDO (Blindado para que no desaparezca)
-  if (obra.capa_fondo_url) {
-    try {
-      // Cargamos con CORS, pero si falla, el catch de cargarImagen hace un fallback sin CORS
-      fondoImagen = await cargarImagen(obra.capa_fondo_url, true);
-      dibujarFondo();
-    } catch (err) {
-      console.warn("No se pudo cargar la imagen del fondo. Usando color plano de respaldo.");
-      fondoColor = obra.fondo_color || "#ffffff";
-      document.getElementById("fondoColor").value = fondoColor;
-      dibujarFondo();
-    }
-  } else {
-    // Si la obra no tiene imagen de fondo guardada, usamos el color guardado
-    fondoColor = obra.fondo_color || "#ffffff";
-    document.getElementById("fondoColor").value = fondoColor;
-    dibujarFondo();
-  }
-
-  // 4. CASO ESPECIAL: OBRA ANTIGUA (Sin trazos registrados)
-  if (trazos.length === 0 && obra.imagen_url) {
-    try {
-      const imgFull = await cargarImagen(obra.imagen_url, true);
-      ctx.drawImage(imgFull, 0, 0, canvas.width, canvas.height);
-    } catch (err) {
-      console.error("No se pudo cargar la imagen de la obra antigua:", err);
-      alert("No se pudo cargar la obra antigua para editar.");
-    }
-  }
-}
-
 async function descargarObraComoPNG() {
   if (!obraActualEnMuseo || !obraActualEnMuseo.imagen_url) return;
   try {
@@ -798,9 +778,6 @@ async function borrarObraDesdeMuseo() {
   } catch (err) { alert("Error al eliminar: " + err.message); }
 }
 
-// ============================================================
-//  GUARDAR OBRA
-// ============================================================
 async function guardarObra() {
   const titulo = document.getElementById("tituloObra").value.trim() || "Sin título";
   const btn = document.getElementById("btnGuardar");
