@@ -30,11 +30,13 @@ let deferredPrompt = null;
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  console.log("🔥 beforeinstallprompt detectado. Botón PWA listo.");
   const btn = document.getElementById("btnInstalarPWAUnico");
   if (btn) btn.style.display = "inline-flex";
 });
 
 window.addEventListener("appinstalled", () => {
+  console.log("🎉 App instalada correctamente.");
   const btn = document.getElementById("btnInstalarPWAUnico");
   if (btn) btn.style.display = "none";
   if (window.lanzarConfeti) window.lanzarConfeti(1500);
@@ -42,16 +44,28 @@ window.addEventListener("appinstalled", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("btnInstalarPWAUnico");
-  if (btn) {
-    btn.addEventListener("click", async () => {
-      if (!deferredPrompt) {
-        alert("Para instalar la app:\n\n1. Toca el menú ⋮ de tu navegador\n2. Selecciona 'Añadir a pantalla de inicio' o 'Instalar app'");
-        return;
-      }
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === "accepted") btn.style.display = "none";
-      deferredPrompt = null;
-    });
+  if (!btn) {
+    console.warn("⚠️ No se encontró el botón PWA (id='btnInstalarPWAUnico')");
+    return;
   }
+
+  // Forzamos que se vea SIEMPRE, independientemente del evento
+  btn.style.display = "inline-flex";
+
+  btn.addEventListener("click", async () => {
+    if (!deferredPrompt) {
+      alert(
+        "Para instalar la app:\n\n" +
+        "1. Toca el menú ⋮ de tu navegador\n" +
+        "2. Selecciona 'Añadir a pantalla de inicio' o 'Instalar app'\n\n" +
+        "Si ya está instalada, este mensaje no aparecerá más."
+      );
+      return;
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log("Resultado de la instalación:", outcome);
+    if (outcome === "accepted") btn.style.display = "none";
+    deferredPrompt = null;
+  });
 });
