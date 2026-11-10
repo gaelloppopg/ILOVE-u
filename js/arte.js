@@ -350,40 +350,18 @@ async function editarObraDesdeMuseo() {
   const titulo = obraActualEnMuseo.titulo || "";
   document.getElementById("tituloObra").value = titulo;
   
-  // Cargar fondo original
-  if (obraActualEnMuseo.capa_fondo) {
-    const imgFondo = new Image();
-    imgFondo.crossOrigin = "anonymous";
-    imgFondo.onload = () => {
-      ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-      ctxFondo.drawImage(imgFondo, 0, 0, canvasFondo.width, canvasFondo.height);
-      fondoImagen = imgFondo;
-    };
-    imgFondo.src = obraActualEnMuseo.capa_fondo;
-  } else {
-    // Fallback para obras antiguas: cargar todo en el fondo
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-      ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
-      fondoImagen = img;
-    };
-    img.src = obraActualEnMuseo.imagen_url;
-  }
-
-  // Cargar dibujo original
-  if (obraActualEnMuseo.capa_dibujo) {
-    const imgDibujo = new Image();
-    imgDibujo.crossOrigin = "anonymous";
-    imgDibujo.onload = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(imgDibujo, 0, 0, canvas.width, canvas.height);
-    };
-    imgDibujo.src = obraActualEnMuseo.capa_dibujo;
-  } else {
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = () => {
+    // 🛑 Cargamos la imagen en la capa de FONDO (bloqueada para el borrador)
+    ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+    ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
+    fondoImagen = img;
+    
+    // Limpiamos la capa de dibujo para que empiece limpia (pero sobre el fondo)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
+  };
+  img.src = obraActualEnMuseo.imagen_url;
 }
 
 async function descargarObraComoPNG() {
@@ -468,7 +446,6 @@ async function guardarObra() {
   const btn = document.getElementById("btnGuardar");
   if(btn) { btn.textContent = "Subiendo..."; btn.disabled = true; }
 
-  // Combinar para la miniatura
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
   const tempCtx = tempCanvas.getContext("2d");
@@ -480,7 +457,6 @@ async function guardarObra() {
       const file = new File([blob], "obra.png", { type: "image/png" });
       const { url } = await subirArchivo(file, "arte");
       
-      // Obtener los datos de las capas (Base64)
       const capaFondoB64 = canvasFondo.toDataURL();
       const capaDibujoB64 = canvas.toDataURL();
 
