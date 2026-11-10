@@ -177,7 +177,7 @@ a:hover { color: var(--dorado); }
 .btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
 /* ================================
-   HERO / PORTADA
+   HERO / PORTADA (PÁGINAS INTERNAS)
    ================================ */
 .hero {
   position: relative;
@@ -327,7 +327,7 @@ a:hover { color: var(--dorado); }
   padding: 12px;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  max-width: 280px; /* Más pequeño */
+  max-width: 280px;
   width: 100%;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
   cursor: pointer;
@@ -341,7 +341,7 @@ a:hover { color: var(--dorado); }
 }
 .recuerdo-mini-img-wrapper {
   width: 100%;
-  height: 180px; /* Altura reducida */
+  height: 180px;
   overflow: hidden;
   border-radius: 8px;
   position: relative;
@@ -940,7 +940,7 @@ a:hover { color: var(--dorado); }
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-    opacity: 1 !important;
+  opacity: 1 !important;
   transform: none !important;
 }
 .cupon::before, .cupon::after {
@@ -1197,6 +1197,7 @@ a:hover { color: var(--dorado); }
 .hud-item, .saldo-card, .cartas-status, .razones-contador {
   transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
 }
+
 /* ================================
    BOTÓN AGREGAR GALERÍA
    ================================ */
@@ -1511,6 +1512,7 @@ input[type="file"] {
   color: #7a5c8c;
   font-size: 0.9rem;
 }
+
 /* ================================
    FILTROS DE RECUERDOS
    ================================ */
@@ -1673,8 +1675,6 @@ input[type="file"] {
     width: 100%;
   }
 }
-
-
 
 /* ================================
    GALERÍA DE RECUERDOS — Diseño tipo tarjeta
@@ -1843,7 +1843,7 @@ input[type="file"] {
    BOTÓN BORRAR RAZONES (SIEMPRE VISIBLE)
    ================================ */
 .petalo {
-  position: relative; /* Asegura que el botón se posicione respecto a la tarjeta */
+  position: relative;
 }
 
 .petalo-delete {
@@ -2092,6 +2092,7 @@ input[type="file"] {
     height: 80px;
   }
 }
+
 /* MODO NOCHE (Se activa automáticamente de noche) */
 body.modo-noche {
   background-color: #0f0c10 !important;
