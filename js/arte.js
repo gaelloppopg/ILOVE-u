@@ -67,7 +67,12 @@ function configurarEventosDibujo() {
     document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
   };
 
-  document.getElementById("fondoColor").oninput = (e) => { fondoColor = e.target.value; fondoImagen = null; dibujarFondo(); };
+  document.getElementById("fondoColor").oninput = (e) => { 
+    fondoColor = e.target.value; 
+    fondoImagen = null; 
+    dibujarFondo(); 
+  };
+  
   document.getElementById("btnSubirFondo").onclick = () => document.getElementById("inputFondo").click();
   document.getElementById("inputFondo").onchange = (e) => {
     const file = e.target.files[0];
@@ -81,8 +86,15 @@ function configurarEventosDibujo() {
       reader.readAsDataURL(file);
     }
   };
-  document.getElementById("btnQuitarFondo").onclick = () => { fondoImagen = null; fondoColor = "#ffffff"; dibujarFondo(); };
   
+  document.getElementById("btnQuitarFondo").onclick = () => { 
+    fondoImagen = null; 
+    fondoColor = "#ffffff"; 
+    document.getElementById("fondoColor").value = "#ffffff";
+    dibujarFondo(); 
+  };
+  
+  // Limpiar SIEMPRE afecta al fondo y al dibujo
   document.getElementById("btnLimpiar").onclick = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
@@ -342,7 +354,7 @@ async function editarObraDesdeMuseo() {
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.onload = () => {
-    // Cargamos la imagen en la capa de FONDO
+    // 🛑 Cargamos la imagen en la capa de FONDO (no se puede borrar con pincel)
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
     ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
     fondoImagen = img;
