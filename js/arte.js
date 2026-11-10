@@ -59,8 +59,6 @@ function configurarEventosDibujo() {
       btn.classList.add("active");
       color = btn.dataset.color;
       document.getElementById("colorPicker").value = color;
-      const colorM = document.getElementById('fondoColorM');
-      if(colorM) colorM.value = color;
     };
   });
 
@@ -110,6 +108,7 @@ function abrirEstudio() {
   
   document.getElementById("estudioOverlay").classList.add("activo");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
   document.getElementById("tituloObra").value = "";
   fondoImagen = null;
   fondoColor = "#ffffff";
@@ -327,35 +326,17 @@ async function editarObraDesdeMuseo() {
   document.getElementById("estudioOverlay").classList.add("activo");
   document.getElementById("tituloObra").value = obraActualEnMuseo.titulo || "";
   
-  // Si tenemos las capas guardadas, las cargamos exacto
-  if (obraActualEnMuseo.capa_fondo && obraActualEnMuseo.capa_dibujo) {
-    const imgFondo = new Image();
-    imgFondo.crossOrigin = "anonymous";
-    imgFondo.onload = () => { 
-      ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-      ctxFondo.drawImage(imgFondo, 0, 0, canvasFondo.width, canvasFondo.height); 
-      fondoImagen = imgFondo; 
-    };
-    imgFondo.src = obraActualEnMuseo.capa_fondo;
-    
-    const imgDibujo = new Image();
-    imgDibujo.crossOrigin = "anonymous";
-    imgDibujo.onload = () => { 
-      ctx.clearRect(0, 0, canvas.width, canvas.height); 
-      ctx.drawImage(imgDibujo, 0, 0, canvas.width, canvas.height); 
-    };
-    imgDibujo.src = obraActualEnMuseo.capa_dibujo;
-  } else {
-    // Fallback para obras viejas (sin capas)
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-      ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
-      fondoImagen = img;
-    };
-    img.src = obraActualEnMuseo.imagen_url;
-  }
+  // Cargar la imagen de la obra en el fondo del lienzo para poder dibujar encima
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.onload = () => {
+    ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+    ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
+    fondoImagen = img;
+    // Limpiamos la capa de dibujo para que empiece limpia
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+  img.src = obraActualEnMuseo.imagen_url;
 }
 
 async function descargarObraComoPNG() {
@@ -456,9 +437,7 @@ async function guardarObra() {
       let payload = { 
         couple_id: coupleId, 
         titulo, 
-        imagen_url: url,
-        capa_fondo: canvasFondo.toDataURL(),
-        capa_dibujo: canvas.toDataURL()
+        imagen_url: url
       };
 
       if (modoEdicion && obraEditandoId) {

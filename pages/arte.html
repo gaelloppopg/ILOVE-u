@@ -30,122 +30,75 @@
   </script>
 
   <style>
-    /* ==========================================
-       ESTILOS BASE DEL LIENZO (PC)
-       ========================================== */
+    /* Lienzo adaptable */
     .estudio-canvas-wrapper {
-      display: flex; justify-content: center; align-items: center;
-      width: 100%; flex: 1; overflow: hidden; background: #e5e5e5;
       touch-action: none; -webkit-user-select: none; user-select: none;
+      display: flex; justify-content: center; align-items: center;
+      background: #e5e5e5; width: 100%; overflow: hidden;
     }
-    
     .canvas-stack {
       position: relative; max-width: 100%; max-height: 100%;
-      aspect-ratio: 3 / 2; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      aspect-ratio: 3 / 2; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin: 0 auto;
     }
     .canvas-stack canvas {
       position: absolute; top: 0; left: 0;
       width: 100% !important; height: 100% !important; touch-action: none;
     }
 
-    /* Ocultos en PC */
-    #hudEstado, #overlayMenu { display: none; }
+    /* Menú móvil */
+    .btn-menu-movil-flotante { display: none; }
+    #overlayMenu { display: none; }
 
-    /* Botón de Editar en el Museo */
+    /* Botón de Editar en Museo */
     .btn-museo.editar { background: #3b82f6; color: white; border: 1px solid #3b82f6; }
     .btn-museo.editar:hover { background: #2563eb; }
 
-    /* ==========================================
-       DISEÑO TÁCTIL Y PANTALLA COMPLETA (Móviles/Tablets)
-       ========================================== */
     @media (max-width: 1024px) {
-      /* Convertimos el estudio en pantalla completa */
-      .estudio-overlay {
-        padding: 0 !important;
-      }
-      .estudio {
-        width: 100vw !important; height: 100vh !important; max-height: 100vh !important;
-        margin: 0 !important; border-radius: 0 !important;
-        display: flex !important; flex-direction: column !important;
-        background: #1a1a1a;
+      .btn-menu-movil-flotante {
+        display: flex; align-items: center; justify-content: center;
+        position: absolute; top: 15px; right: 15px; z-index: 100;
+        background: var(--dorado, #c9a050); color: #fff; border: none;
+        width: 45px; height: 45px; border-radius: 50%;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer;
       }
 
-      /* Ocultamos la barra superior de PC */
-      .estudio-topbar { display: none !important; }
-
-      /* Mostramos la barra de estado superior (HUD) */
-      #hudEstado {
-        display: flex; align-items: center; justify-content: space-between;
-        height: 55px; padding: 0 15px; background: #111; color: #fff;
-        z-index: 100; flex-shrink: 0; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-      }
-      #hudEstado .hud-info { display: flex; align-items: center; gap: 8px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 500; }
-      #hudEstado .hud-color-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; background: #1a1a1a; }
-      #btnMenuMovil {
-        display: flex; align-items: center; gap: 6px; background: var(--dorado, #c9a050);
-        color: #fff; border: none; padding: 8px 16px; border-radius: 20px;
-        font-weight: 600; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      }
-
-      /* El lienzo ocupa el 100% del espacio restante */
-      .estudio-canvas-wrapper {
-        flex: 1 1 auto !important;
-        padding: 0 !important;
-        background: #000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .canvas-stack {
-        width: 100%; max-height: 100%; aspect-ratio: auto; box-shadow: none;
-      }
-
-      /* CONVERTIMOS LA TOOLBAR EN UN PANEL LATERAL DESLIZANTE */
       .estudio-toolbar {
-        display: flex !important;
-        flex-direction: column !important;
-        position: fixed !important;
-        top: 0 !important; right: -100% !important;
+        position: fixed !important; top: 0 !important; right: -100% !important;
         width: 85vw !important; max-width: 350px !important; height: 100vh !important;
         background: #1a1a1a !important; color: #fff !important;
-        z-index: 9999 !important; padding: 20px !important;
-        overflow-y: auto !important; transition: right 0.3s ease !important;
-        box-shadow: -5px 0 30px rgba(0,0,0,0.8) !important;
+        z-index: 9999 !important; padding: 20px !important; overflow-y: auto !important;
+        transition: right 0.3s ease !important; display: flex !important; flex-direction: column !important; gap: 15px !important;
       }
       .estudio-toolbar.activo { right: 0 !important; }
-
-      /* Botón de cerrar en el menú lateral */
-      .estudio-toolbar .btn-cerrar-menu-movil {
-        display: block !important; width: 100%; text-align: right; margin-bottom: 20px;
-        background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;
+      
+      .btn-cerrar-toolbar {
+        display: block !important; background: transparent; border: none; color: #fff;
+        font-size: 1.5rem; text-align: right; cursor: pointer; margin-bottom: 5px;
       }
 
-      /* Adaptación de los controles para que sean táctiles (botones grandes) */
-      .estudio-toolbar .tool-group {
-        margin-bottom: 20px !important; display: flex !important; flex-direction: column !important; gap: 10px !important;
-      }
-      .estudio-toolbar .tool-label {
-        font-size: 1rem !important; color: var(--dorado, #c9a050) !important; font-weight: 700 !important;
-      }
+      .estudio-toolbar .tool-group { display: flex !important; flex-direction: column !important; gap: 8px !important; }
+      .estudio-toolbar .tool-label { font-size: 0.9rem !important; color: var(--dorado) !important; font-weight: 700 !important; }
       .estudio-toolbar .tool-btn {
-        width: 100% !important; padding: 14px !important; background: #333 !important;
-        color: #fff !important; border: 1px solid #444 !important; border-radius: 8px !important;
-        font-size: 1rem !important; text-align: left !important;
+        width: 100% !important; padding: 12px !important; background: #333 !important; color: #fff !important;
+        border: 1px solid #444 !important; border-radius: 8px !important; text-align: left !important; font-size: 1rem !important;
       }
-      .estudio-toolbar .tool-btn.active { background: var(--dorado, #c9a050) !important; border-color: var(--dorado, #c9a050) !important; color: #000 !important; }
+      .estudio-toolbar .tool-btn.active { background: var(--dorado) !important; color: #000 !important; border-color: var(--dorado) !important; }
       
       .estudio-toolbar .colores-grid { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; }
       .estudio-toolbar .color-btn { width: 100% !important; aspect-ratio: 1 !important; border-radius: 50% !important; border: 2px solid #555 !important; }
-
+      
       .estudio-toolbar input[type="text"] { width: 100% !important; padding: 12px !important; background: #333 !important; border: 1px solid #555 !important; color: #fff !important; border-radius: 8px !important; font-size: 1rem !important; }
-      .estudio-toolbar .footer-right { display: flex !important; flex-direction: column !important; gap: 10px !important; margin-top: 20px !important; }
-      .estudio-toolbar .btn-accion { width: 100% !important; padding: 16px !important; border-radius: 8px !important; font-size: 1rem !important; }
-
-      /* Ocultamos el footer original porque lo movemos al menú */
+      
+      .estudio-toolbar .fondo-controles { display: flex !important; flex-wrap: wrap !important; gap: 10px !important; }
+      .estudio-toolbar .fondo-controles input[type="color"] { height: 40px !important; width: 60px !important; border-radius: 8px !important; border: none !important; }
+      .estudio-toolbar .fondo-controles button { flex: 1 !important; padding: 10px !important; border-radius: 8px !important; font-size: 0.9rem !important; background: #333 !important; color: #fff !important; border: 1px solid #444 !important; }
+      
+      .btn-accion { width: 100% !important; padding: 15px !important; border-radius: 8px !important; font-size: 1rem !important; margin-top: 5px; }
+      
+      /* El menú inferior original se oculta en móvil para no duplicar */
       .estudio-footer { display: none !important; }
       
-      /* Overlay oscuro al abrir el menú */
-      #overlayMenu.activo { display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; backdrop-filter: blur(2px); }
+      #overlayMenu.activo { display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9998; backdrop-filter: blur(3px); }
     }
   </style>
 </head>
@@ -292,20 +245,6 @@
 
   <div class="estudio-overlay" id="estudioOverlay">
     <div class="estudio" id="estudio">
-      
-      <!-- HUD TÁCTIL -->
-      <div id="hudEstado">
-        <div class="hud-info">
-          <div class="hud-color-dot" id="hudColorDot"></div>
-          <span id="hudTexto">Pincel • Negro</span>
-        </div>
-        <button id="btnMenuMovil">
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-          Menú
-        </button>
-      </div>
-      <div id="overlayMenu"></div>
-
       <div class="estudio-topbar">
         <div class="estudio-titulo-app"><span class="app-logo">🎨</span><span>Estudio Creativo</span></div>
         <input type="text" id="tituloObra" placeholder="Título de tu obra maestra..." maxlength="40" />
@@ -314,16 +253,20 @@
         </button>
       </div>
 
-      <div class="estudio-toolbar" id="estudioToolbar">
-        <button class="btn-cerrar-menu-movil" id="btnCerrarMenuMovil" style="display: none;">
-          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
+      <div id="overlayMenu"></div>
+      <button class="btn-menu-movil-flotante" id="btnAbrirMenuM">
+        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
 
-        <div class="tool-group" id="grupoTituloMovil" style="display:none;">
-           <span class="tool-label">Título de la Obra</span>
-           <input type="text" id="tituloObraMovil" placeholder="Título de tu obra..." maxlength="40" />
-        </div>
+      <div class="estudio-toolbar" id="estudioToolbar">
+        <button class="btn-cerrar-toolbar" id="btnCerrarMenuM" style="display:none;">✕</button>
         
+        <!-- Título dentro del menú (Móvil) -->
+        <div class="tool-group" id="grupoTituloM">
+          <span class="tool-label">Título de la Obra</span>
+          <input type="text" id="tituloObraM" placeholder="Título de tu obra..." maxlength="40" />
+        </div>
+
         <div class="tool-group herramientas">
           <span class="tool-label">Herramientas</span>
           <button type="button" class="tool-btn active" data-tool="pincel">Pincel</button>
@@ -355,14 +298,20 @@
           <div class="color-custom"><input type="color" id="colorPicker" value="#1a1a1a" /></div>
         </div>
 
-        <!-- Controles de Fondo (Movidos aquí para móviles) -->
-        <div class="tool-group" id="grupoFondoMovil">
+        <!-- Controles de Fondo (Móvil) -->
+        <div class="tool-group" id="grupoFondoM">
           <span class="tool-label">Fondo</span>
-          <div class="fondo-controles" style="display:flex; gap:10px; align-items:center; margin-top: 10px;">
-            <input type="color" id="fondoColorM" value="#ffffff" style="height: 40px; width: 60px; border-radius: 8px; border: none;" />
-            <button type="button" class="btn-footer-icon" id="btnSubirFondoM" style="padding: 10px; background:#333; color:#fff; border-radius:8px; border:none;">Subir</button>
-            <button type="button" class="btn-footer-icon borrar" id="btnQuitarFondoM" style="padding: 10px; background:#c93a3a; color:#fff; border-radius:8px; border:none;">Quitar</button>
+          <div class="fondo-controles">
+            <input type="color" id="fondoColorM" value="#ffffff" />
+            <button type="button" id="btnSubirFondoM">Subir Foto</button>
+            <button type="button" id="btnQuitarFondoM">Quitar</button>
           </div>
+        </div>
+
+        <!-- Botones de Acción (Móvil) -->
+        <div class="tool-group" id="grupoAccionesM" style="margin-top: 15px; gap: 10px;">
+          <button type="button" class="btn-accion secundario" id="btnLimpiarM">Limpiar Lienzo</button>
+          <button type="button" class="btn-accion primario" id="btnGuardarM">Guardar Obra</button>
         </div>
       </div>
 
@@ -388,13 +337,6 @@
           <button type="button" class="btn-accion primario" id="btnGuardar">Guardar Obra</button>
         </div>
       </div>
-      
-      <!-- Footer móvil (para el menú lateral) -->
-      <div id="footerMovil" style="display:none; flex-direction:column; gap:10px; margin-top:20px;">
-        <button type="button" class="btn-accion secundario" id="btnLimpiarM" style="width:100%; padding:16px; border-radius:8px; font-size:1rem; background:#333; color:#fff; border:none;">Limpiar Lienzo</button>
-        <button type="button" class="btn-accion primario" id="btnGuardarM" style="width:100%; padding:16px; border-radius:8px; font-size:1rem; background:var(--dorado); color:#000; border:none; font-weight:700;">Guardar Obra</button>
-      </div>
-
     </div>
   </div>
 
@@ -407,7 +349,7 @@
       const canvas = document.getElementById('lienzo');
       const canvasFondo = document.getElementById('lienzoFondo');
       
-      // 1. Traducir eventos táctiles a eventos de ratón para el canvas
+      // 1. Traducir toques a ratón para el lienzo
       function simularEvento(tipo, touch) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -427,27 +369,20 @@
       canvas.addEventListener('touchmove', (e) => { e.preventDefault(); simularEvento('mousemove', e.touches[0]); }, { passive: false });
       canvas.addEventListener('touchend', (e) => { e.preventDefault(); simularEvento('mouseup', e.changedTouches[0]); }, { passive: false });
 
-      // 2. Lógica del menú lateral en móviles
-      const btnMenu = document.getElementById('btnMenuMovil');
-      const btnCerrarMenu = document.getElementById('btnCerrarMenuMovil');
+      // 2. Lógica del Menú Móvil
+      const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
+      const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
       const toolbar = document.getElementById('estudioToolbar');
       const overlay = document.getElementById('overlayMenu');
-      const hudColorDot = document.getElementById('hudColorDot');
-      const hudTexto = document.getElementById('hudTexto');
-      
-      // Elementos duplicados para móviles
-      const grupoTitulo = document.getElementById('grupoTituloMovil');
-      const footerMovil = document.getElementById('footerMovil');
-      const grupoFondoMovil = document.getElementById('grupoFondoMovil');
+      const grupoTituloM = document.getElementById('grupoTituloM');
 
       if (window.innerWidth <= 1024) {
-        if(grupoTitulo) grupoTitulo.style.display = 'flex';
-        if(footerMovil) footerMovil.style.display = 'flex';
+        if(grupoTituloM) grupoTituloM.style.display = 'flex';
         if(btnCerrarMenu) btnCerrarMenu.style.display = 'block';
       }
 
-      if(btnMenu && overlay) {
-        btnMenu.addEventListener('click', () => { toolbar.classList.add('activo'); overlay.classList.add('activo'); });
+      if(btnAbrirMenu && overlay) {
+        btnAbrirMenu.addEventListener('click', () => { toolbar.classList.add('activo'); overlay.classList.add('activo'); });
       }
       if(btnCerrarMenu && overlay) {
         btnCerrarMenu.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
@@ -456,88 +391,45 @@
         overlay.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
       }
 
-      // 3. Cerrar menú al elegir herramienta/color
-      document.querySelectorAll('.tool-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          actualizarHUD();
-          if (window.innerWidth <= 1024) { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); }
+      // Cerrar menú al elegir herramienta o color
+      document.querySelectorAll('.tool-btn, .color-btn').forEach(el => {
+        el.addEventListener('click', () => {
+          if (window.innerWidth <= 1024) { 
+            setTimeout(() => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); }, 150);
+          }
         });
       });
 
-      document.querySelectorAll('.color-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          actualizarHUD();
-          if (window.innerWidth <= 1024) { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); }
-        });
-      });
+      // 3. Sincronizar los controles móviles con los de PC
+      const btnGuardar = document.getElementById('btnGuardar');
+      const btnGuardarM = document.getElementById('btnGuardarM');
+      if(btnGuardar && btnGuardarM) btnGuardarM.addEventListener('click', () => btnGuardar.click());
 
-      const colorPicker = document.getElementById('colorPicker');
-      if(colorPicker) colorPicker.addEventListener('input', actualizarHUD);
+      const btnLimpiar = document.getElementById('btnLimpiar');
+      const btnLimpiarM = document.getElementById('btnLimpiarM');
+      if(btnLimpiar && btnLimpiarM) btnLimpiarM.addEventListener('click', () => btnLimpiar.click());
 
-      function actualizarHUD() {
-        if(!hudTexto || !hudColorDot) return;
-        const herramientaActiva = document.querySelector('.tool-btn.active');
-        const colorActivo = document.querySelector('.color-btn.active');
-        const textoHerramienta = herramientaActiva ? herramientaActiva.innerText : 'Pincel';
-        
-        let colorHex = '#1a1a1a';
-        if (colorActivo) colorHex = colorActivo.getAttribute('data-color');
-        else if (colorPicker) colorHex = colorPicker.value;
-        
-        const nombres = { '#1a1a1a': 'Negro', '#e63946': 'Rojo', '#f4a261': 'Naranja', '#2a9d8f': 'Verde', '#457b9d': 'Azul', '#9d4edd': 'Morado', '#f28ca6': 'Rosa' };
-        let nombreColor = nombres[colorHex] || colorHex;
-
-        hudTexto.innerText = `${textoHerramienta} • ${nombreColor}`;
-        hudColorDot.style.background = colorHex;
-      }
-
-      // Sincronizar inputs de título
-      const tituloOriginal = document.getElementById('tituloObra');
-      const tituloMovil = document.getElementById('tituloObraMovil');
-      if(tituloOriginal && tituloMovil) {
-          tituloOriginal.addEventListener('input', (e) => tituloMovil.value = e.target.value);
-          tituloMovil.addEventListener('input', (e) => tituloOriginal.value = e.target.value);
-      }
-      
-      // Sincronizar inputs de fondo
-      const fondoOriginal = document.getElementById('fondoColor');
-      const fondoMovil = document.getElementById('fondoColorM');
-      if(fondoOriginal && fondoMovil) {
-          fondoOriginal.addEventListener('input', (e) => fondoMovil.value = e.target.value);
-          fondoMovil.addEventListener('input', (e) => { fondoOriginal.value = e.target.value; fondoOriginal.dispatchEvent(new Event('input')); });
-      }
-      
-      // Sincronizar botones de Guardar y Limpiar
-      const btnGuardarOriginal = document.getElementById('btnGuardar');
-      const btnGuardarMovil = document.getElementById('btnGuardarM');
-      if(btnGuardarOriginal && btnGuardarMovil) {
-          btnGuardarMovil.addEventListener('click', () => btnGuardarOriginal.click());
-      }
-
-      const btnLimpiarOriginal = document.getElementById('btnLimpiar');
-      const btnLimpiarMovil = document.getElementById('btnLimpiarM');
-      if(btnLimpiarOriginal && btnLimpiarMovil) {
-          btnLimpiarMovil.addEventListener('click', () => btnLimpiarOriginal.click());
-      }
-
-      // Botones de fondo móvil
-      const btnSubirFondoOriginal = document.getElementById('btnSubirFondo');
+      const btnSubirFondo = document.getElementById('btnSubirFondo');
       const btnSubirFondoM = document.getElementById('btnSubirFondoM');
-      if(btnSubirFondoOriginal && btnSubirFondoM) {
-          btnSubirFondoM.addEventListener('click', () => btnSubirFondoOriginal.click());
-      }
+      if(btnSubirFondo && btnSubirFondoM) btnSubirFondoM.addEventListener('click', () => btnSubirFondo.click());
 
-      const btnQuitarFondoOriginal = document.getElementById('btnQuitarFondo');
+      const btnQuitarFondo = document.getElementById('btnQuitarFondo');
       const btnQuitarFondoM = document.getElementById('btnQuitarFondoM');
-      if(btnQuitarFondoOriginal && btnQuitarFondoM) {
-          btnQuitarFondoM.addEventListener('click', () => btnQuitarFondoOriginal.click());
+      if(btnQuitarFondo && btnQuitarFondoM) btnQuitarFondoM.addEventListener('click', () => btnQuitarFondo.click());
+
+      const fondoColor = document.getElementById('fondoColor');
+      const fondoColorM = document.getElementById('fondoColorM');
+      if(fondoColor && fondoColorM) {
+        fondoColor.addEventListener('input', (e) => fondoColorM.value = e.target.value);
+        fondoColorM.addEventListener('input', (e) => { fondoColor.value = e.target.value; fondoColor.dispatchEvent(new Event('input')); });
       }
 
-      actualizarHUD();
+      const tituloObra = document.getElementById('tituloObra');
+      const tituloObraM = document.getElementById('tituloObraM');
+      if(tituloObra && tituloObraM) {
+        tituloObra.addEventListener('input', (e) => tituloObraM.value = e.target.value);
+        tituloObraM.addEventListener('input', (e) => tituloObra.value = e.target.value);
+      }
     });
   </script>
 
