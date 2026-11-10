@@ -340,7 +340,6 @@
       const canvas = document.getElementById('lienzo');
       const canvasFondo = document.getElementById('lienzoFondo');
       
-      // 1. Traducir toques a ratón
       function simularEvento(tipo, touch) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -360,7 +359,6 @@
       canvas.addEventListener('touchmove', (e) => { e.preventDefault(); simularEvento('mousemove', e.touches[0]); }, { passive: false });
       canvas.addEventListener('touchend', (e) => { e.preventDefault(); simularEvento('mouseup', e.changedTouches[0]); }, { passive: false });
 
-      // 2. Mover controles al menú móvil SIN DUPLICARLOS
       const isMobile = window.innerWidth <= 1024;
       const toolbar = document.getElementById('estudioToolbar');
       const topbar = document.getElementById('estudioTopbar');

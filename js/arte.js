@@ -85,11 +85,11 @@ function configurarEventosDibujo() {
   
   document.getElementById("btnLimpiar").onclick = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (modoEdicion) {
-      ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-      fondoImagen = null;
-      fondoColor = "#ffffff";
-    }
+    ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+    fondoImagen = null;
+    fondoColor = "#ffffff";
+    document.getElementById("fondoColor").value = "#ffffff";
+    dibujarFondo();
   };
   
   document.getElementById("btnGuardar").onclick = guardarObra;
@@ -342,14 +342,13 @@ async function editarObraDesdeMuseo() {
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.onload = () => {
-    // Cargamos la imagen original en la CAPA DE DIBUJO (lienzo)
-    // Así se puede borrar, limpiar y se pone por encima del fondo nuevo.
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    
-    // Limpiamos la capa de fondo para que no haya duplicados
+    // Cargamos la imagen original en la capa de FONDO
     ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-    fondoImagen = null;
+    ctxFondo.drawImage(img, 0, 0, canvasFondo.width, canvasFondo.height);
+    fondoImagen = img;
+    
+    // Limpiamos la capa de dibujo para que el usuario pinte encima
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
   img.src = obraActualEnMuseo.imagen_url;
 }
@@ -396,7 +395,11 @@ function empezarDibujo(e) {
   ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
   ctx.lineCap = "round"; ctx.lineJoin = "round";
   
-  if (herramienta === "borrador") { ctx.globalCompositeOperation = "destination-out"; ctx.lineWidth = grosor * 2; ctx.shadowBlur = 0; } 
+  if (herramienta === "borrador") { 
+    ctx.globalCompositeOperation = "destination-out"; 
+    ctx.lineWidth = grosor * 2; 
+    ctx.shadowBlur = 0; 
+  } 
   else if (herramienta === "neon") { ctx.globalCompositeOperation = "source-over"; ctx.lineWidth = grosor; ctx.strokeStyle = color; ctx.shadowBlur = 25; ctx.shadowColor = color; } 
   else if (herramienta === "lapiz") { ctx.globalCompositeOperation = "source-over"; ctx.lineWidth = grosor / 2; ctx.strokeStyle = color; ctx.globalAlpha = 0.6; ctx.shadowBlur = 0; }
   else if (herramienta === "spray") { ctx.globalCompositeOperation = "source-over"; ctx.lineWidth = 1; ctx.fillStyle = color; ctx.shadowBlur = 0; dispararSpray(pos.x, pos.y); } 
