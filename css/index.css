@@ -23,41 +23,43 @@
   
   --sombra: 0 8px 24px rgba(42, 36, 38, 0.04);
   --sombra-hover: 0 16px 40px rgba(42, 36, 38, 0.08);
+
   --nube-color: rgba(255, 255, 255, 0.6);
 }
 
 /* =========================================================
-   MODO OSCURO GLOBAL
+   MODO OSCURO GLOBAL — MEZCLA DE CAFÉ Y NOCHE PROFUNDA
    ========================================================= */
 body.modo-noche {
-  --bg-claro: #1c1819;
-  --bg-secundario: #241f21;
-  --bg-tarjeta: #2a2426;
-  --bg-tarjeta-hover: #332b2e;
-  --bg-overlay: rgba(28, 24, 25, 0.9);
+  --bg-claro: #121012; /* Más oscuro para que se sienta noche */
+  --bg-secundario: #1a1719;
+  --bg-tarjeta: #241e21; /* Tono café vino */
+  --bg-tarjeta-hover: #2e262a;
+  --bg-overlay: rgba(18, 16, 18, 0.9);
   --bg-modal: rgba(0, 0, 0, 0.85);
 
-  --texto-principal: #f2e9e6;
-  --texto-secundario: #b8a8b0;
+  --texto-principal: #f4eae7;
+  --texto-secundario: #bca7ae;
   --texto-terciario: #8a7d84;
 
-  --dorado: #d4b08c;
-  --dorado-suave: rgba(212, 176, 140, 0.12);
-  --rosa: #d9a3a3;
-  --rosa-suave: rgba(217, 163, 163, 0.12);
-  --rosa-fuerte: #e87b84;
-  --borde: rgba(212, 176, 140, 0.2);
-  --borde-fuerte: rgba(212, 176, 140, 0.4);
+  --dorado: #e2ba89; /* Dorado más brillante */
+  --dorado-suave: rgba(226, 186, 137, 0.15);
+  --rosa: #e8a1a1;
+  --rosa-suave: rgba(232, 161, 161, 0.15);
+  --rosa-fuerte: #f07b85;
+  --borde: rgba(226, 186, 137, 0.2);
+  --borde-fuerte: rgba(226, 186, 137, 0.4);
   
-  --sombra: 0 8px 24px rgba(0, 0, 0, 0.3);
-  --sombra-hover: 0 16px 40px rgba(0, 0, 0, 0.5);
-  --nube-color: rgba(212, 176, 140, 0.04);
+  --sombra: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --sombra-hover: 0 16px 40px rgba(226, 186, 137, 0.15);
+  --nube-color: rgba(226, 186, 137, 0.03);
 }
 
 /* =========================================================
    RESET Y BASE
    ========================================================= */
 * { box-sizing: border-box; }
+
 body {
   background-color: var(--bg-claro);
   color: var(--texto-principal);
@@ -74,7 +76,7 @@ a { color: var(--rosa-fuerte); text-decoration: none; transition: color 0.3s; }
 a:hover { color: var(--dorado); }
 
 /* =========================================================
-   FONDO DE NUBES
+   FONDO DE NUBES (SUAVE)
    ========================================================= */
 .fondo-nubes {
   position: fixed; inset: 0; z-index: -1; overflow: hidden;
@@ -89,6 +91,7 @@ a:hover { color: var(--dorado); }
 .nube:nth-child(3) { width: 300px; height: 150px; top: 65%; left: -15%; animation-delay: -10s; }
 .nube:nth-child(4) { width: 450px; height: 200px; top: 15%; right: -15%; animation-delay: -2s; }
 .nube:nth-child(5) { width: 250px; height: 100px; top: 75%; right: -10%; animation-delay: -15s; }
+
 @keyframes flotarNubes {
   0%   { transform: translateX(0) translateY(0); }
   100% { transform: translateX(50px) translateY(-30px); }
@@ -260,12 +263,12 @@ a:hover { color: var(--dorado); }
 .btn-primary:hover { background: var(--rosa-fuerte); }
 
 /* =========================================================
-   INVITAR PAREJA (Ahora abajo)
+   INVITAR PAREJA
    ========================================================= */
 .invitar-section {
   text-align: center; padding: 40px 24px;
   background: linear-gradient(135deg, var(--bg-tarjeta), var(--dorado-suave));
-  margin: 0 auto 80px auto; max-width: 650px; border-radius: 4px;
+  margin: 0 auto 60px auto; max-width: 650px; border-radius: 4px;
   border: 1px solid var(--borde-fuerte); box-shadow: var(--sombra);
   position: relative; z-index: 2;
 }
@@ -274,6 +277,25 @@ a:hover { color: var(--dorado); }
 .btn-invitar { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
 .btn-invitar svg { transition: transform 0.3s ease; }
 .btn-invitar:hover svg { transform: translateY(-2px) scale(1.1); }
+
+/* =========================================================
+   BOTÓN DE DESCARGAR APP (PWA ÚNICO)
+   ========================================================= */
+.btn-pwa-unico {
+  display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 18px 45px; background: linear-gradient(135deg, var(--rosa-fuerte), var(--dorado)); color: #fff;
+  border: none; border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 600;
+  letter-spacing: 1px; cursor: pointer; transition: all 0.4s ease; box-shadow: 0 15px 30px rgba(166, 124, 82, 0.3);
+  position: relative; overflow: hidden;
+}
+.btn-pwa-unico::before {
+  content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s ease;
+}
+.btn-pwa-unico:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(166, 124, 82, 0.5); }
+.btn-pwa-unico:hover::before { left: 100%; }
+.btn-pwa-unico svg { width: 24px; height: 24px; fill: currentColor; }
 
 /* =========================================================
    FOOTER
@@ -294,18 +316,6 @@ a:hover { color: var(--dorado); }
 .btn-tema { top: 22px; left: 22px; }
 .btn-modo-cine:hover, .btn-recuerdo-flotante:hover, .btn-tema:hover { background: var(--dorado); color: #fff; border-color: var(--dorado); transform: scale(1.1); }
 
-/* BOTÓN DE INSTALAR APP (PWA) - Inyectado por pwa.js */
-.btn-instalar {
-  position: fixed; bottom: 22px; right: 90px;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 12px 20px; background: var(--bg-tarjeta); color: var(--dorado);
-  border: 1px solid var(--borde-fuerte); border-radius: 2px;
-  font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600;
-  cursor: pointer; box-shadow: var(--sombra); z-index: 9998;
-  transition: all 0.3s ease;
-}
-.btn-instalar:hover { background: var(--dorado); color: #fff; }
-
 #modalRecuerdo { position: fixed; inset: 0; background: var(--bg-modal); backdrop-filter: blur(8px); z-index: 99999; display: none; align-items: center; justify-content: center; padding: 24px; }
 #modalRecuerdo > div { background: var(--bg-tarjeta); border-radius: 4px; padding: 24px; max-width: 480px; width: 100%; position: relative; text-align: center; box-shadow: var(--sombra-hover); border: 1px solid var(--borde); }
 #btnCerrarRecuerdo { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; background: transparent; border: none; cursor: pointer; font-size: 1.5rem; color: var(--texto-secundario); }
@@ -325,6 +335,5 @@ a:hover { color: var(--dorado); }
 
 @media (max-width: 768px) {
   .bento-item.grande { grid-column: span 1; }
-  .btn-instalar { bottom: 80px; right: 14px; }
   .floating-vinyl-container { bottom: 140px; right: 14px; }
 }

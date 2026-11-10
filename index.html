@@ -150,7 +150,7 @@
     </div>
   </section>
 
-  <!-- SECCIÓN ADMIN (Justo debajo de los botones de páginas) -->
+  <!-- 4. SECCIÓN ADMIN (Justo debajo de las tarjetas) -->
   <section class="admin-seccion" id="seccionAdmin" style="display: none;">
     <a href="admin.html" id="btnAdmin" class="btn-admin-engranaje" title="Consola de Administración">
       <svg viewBox="0 0 24 24">
@@ -161,14 +161,14 @@
     </a>
   </section>
 
-  <!-- 4. MÚSICA -->
+  <!-- 5. MÚSICA -->
   <section class="music-section">
     <h2>Nuestra Melodía</h2>
     <div class="music-card" id="musicCard"></div>
   </section>
 
-  <!-- 5. INVITAR PAREJA (Hasta abajo, debajo de la música) -->
-  <section class="invitar-section" id="btnInvitarPareja">
+  <!-- 6. INVITAR PAREJA -->
+  <section class="invitar-section" id="btnInvitarPareja" style="display: none;">
     <h3 class="invitar-titulo">Invita a tu pareja</h3>
     <p class="invitar-desc">Genera un código único y su código QR para que se una a esta página.</p>
     <a href="invitar.html" class="btn btn-primary btn-invitar">
@@ -179,6 +179,14 @@
       Generar Código / QR
     </a>
   </section>
+
+  <!-- 7. BOTÓN DE DESCARGAR APP (PWA) -->
+  <div style="text-align: center; margin-bottom: 60px;">
+    <button id="btnInstalarPWAUnico" class="btn-pwa-unico" style="display: none;">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Instalar Nuestra App
+    </button>
+  </div>
 
   <!-- FOOTER -->
   <footer class="footer">Hecho con amor, solo para ti.</footer>
@@ -316,12 +324,16 @@
 
         const seccionAdmin = document.getElementById('seccionAdmin');
         const btnAdmin = document.getElementById('btnAdmin');
+        const seccionInvitar = document.getElementById('btnInvitarPareja');
         const esOwnerReal = datos.esOwner === true || (datos.couple && String(datos.couple.owner_id) === String(datos.user.id));
+        
         if (esOwnerReal) {
           if (seccionAdmin) seccionAdmin.style.setProperty('display', 'block', 'important');
           if (btnAdmin) btnAdmin.style.setProperty('display', 'inline-flex', 'important');
+          if (seccionInvitar) seccionInvitar.style.setProperty('display', 'block', 'important');
         } else {
           if (seccionAdmin) seccionAdmin.remove();
+          if (seccionInvitar) seccionInvitar.remove();
         }
 
         await configurarCartaSecreta(datos.couple.id);
@@ -453,6 +465,32 @@
       const escucharEsc = (e) => { if (e.key === 'Escape') cerrarCine(); };
       document.addEventListener('keydown', escucharEsc);
     }
+  </script>
+
+  <!-- Lógica del Botón PWA Único -->
+  <script>
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredPrompt = e;
+      const btn = document.getElementById('btnInstalarPWAUnico');
+      if (btn) btn.style.display = 'inline-flex';
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const pwaBtn = document.getElementById('btnInstalarPWAUnico');
+        if (pwaBtn) {
+            pwaBtn.addEventListener('click', async () => {
+                if (!window.deferredPrompt) {
+                  alert("Para instalar la app, usa el menú de tu navegador y selecciona 'Añadir a pantalla de inicio'.");
+                  return;
+                }
+                window.deferredPrompt.prompt();
+                const { outcome } = await window.deferredPrompt.userChoice;
+                if (outcome === 'accepted') { pwaBtn.style.display = 'none'; }
+                window.deferredPrompt = null;
+            });
+        }
+    });
   </script>
 </body>
 </html>
