@@ -83,7 +83,6 @@ function configurarEventosDibujo() {
   };
   document.getElementById("btnQuitarFondo").onclick = () => { fondoImagen = null; fondoColor = "#ffffff"; dibujarFondo(); };
   
-  // 🛑 Corregido: Limpiar afecta a TODO si estamos en edición
   document.getElementById("btnLimpiar").onclick = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (modoEdicion) {
@@ -337,16 +336,14 @@ async function editarObraDesdeMuseo() {
   
   document.getElementById("estudioOverlay").classList.add("activo");
   
-  // Cargar el título en los inputs (PC y Móvil)
   const titulo = obraActualEnMuseo.titulo || "";
   document.getElementById("tituloObra").value = titulo;
-  const tituloM = document.getElementById("tituloObraM");
-  if(tituloM) tituloM.value = titulo;
   
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.onload = () => {
-    // Cargamos la imagen en la capa de dibujo para que se pueda borrar
+    // Cargamos la imagen original en la CAPA DE DIBUJO (lienzo)
+    // Así se puede borrar, limpiar y se pone por encima del fondo nuevo.
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     
