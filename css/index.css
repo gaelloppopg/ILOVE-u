@@ -2,7 +2,6 @@
    VARIABLES GLOBALES — MODO CLARO
    ========================================================= */
 :root {
-  /* Fondos */
   --bg-claro: #fdfafb;
   --bg-secundario: #fceef2;
   --bg-tarjeta: rgba(255, 255, 255, 0.75);
@@ -10,28 +9,22 @@
   --bg-overlay: rgba(253, 250, 251, 0.6);
   --bg-modal: rgba(0, 0, 0, 0.75);
 
-  /* Textos */
   --texto-principal: #2c1a24;
   --texto-secundario: #7a5c8c;
   --texto-terciario: #a08bb8;
 
-  /* Acentos */
   --dorado: #c9a050;
   --dorado-suave: rgba(201, 160, 80, 0.15);
   --rosa: #d96c88;
   --rosa-suave: rgba(217, 108, 136, 0.12);
   --rosa-fuerte: #c4506e;
 
-  /* Bordes y sombras */
   --borde: rgba(217, 108, 136, 0.18);
   --borde-fuerte: rgba(217, 108, 136, 0.35);
   --sombra: 0 15px 35px rgba(217, 108, 136, 0.08);
   --sombra-hover: 0 25px 60px rgba(217, 108, 136, 0.22);
 
-  /* Nubes */
   --nube-color: rgba(255, 255, 255, 0.9);
-
-  /* Fondo del input de reproducción y otros detalles */
   --blanco-puro: #ffffff;
   --negro-vinilo: #111;
 }
@@ -63,7 +56,6 @@ body.modo-noche {
   --sombra-hover: 0 25px 60px rgba(244, 114, 182, 0.25);
 
   --nube-color: rgba(244, 114, 182, 0.04);
-
   --blanco-puro: #1a1e2a;
   --negro-vinilo: #000;
 }
@@ -71,9 +63,7 @@ body.modo-noche {
 /* =========================================================
    RESET Y BASE
    ========================================================= */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   background-color: var(--bg-claro);
@@ -85,25 +75,10 @@ body {
   line-height: 1.6;
 }
 
-h1, h2, h3 {
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  margin: 0;
-}
-
-p {
-  margin: 0;
-}
-
-a {
-  color: var(--rosa);
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-a:hover {
-  color: var(--dorado);
-}
+h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 700; margin: 0; }
+p { margin: 0; }
+a { color: var(--rosa); text-decoration: none; transition: color 0.3s ease; }
+a:hover { color: var(--dorado); }
 
 /* =========================================================
    FONDO DE NUBES
@@ -134,8 +109,8 @@ a:hover {
 .nube:nth-child(5) { width: 200px; height: 60px; top: 80%; right: -10%; animation-duration: 20s; animation-delay: -15s; animation-direction: reverse; }
 
 @keyframes flotarNubes {
-  0%   { transform: translateX(0) translateY(0); }
-  50%  { transform: translateX(30vw) translateY(-20px); }
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(30vw) translateY(-20px); }
   100% { transform: translateX(0) translateY(0); }
 }
 
@@ -204,11 +179,7 @@ a:hover {
 }
 
 .hero-title-vertical .linea:nth-child(1) { animation-delay: 0.1s; }
-.hero-title-vertical .linea:nth-child(3) {
-  animation-delay: 0.25s;
-  color: var(--rosa);
-  font-style: italic;
-}
+.hero-title-vertical .linea:nth-child(3) { animation-delay: 0.25s; color: var(--rosa); font-style: italic; }
 
 .hero-title-vertical .separador {
   width: 1px;
@@ -286,14 +257,8 @@ a:hover {
   animation: fadeInUp 0.9s ease 0.85s both;
 }
 
-.contador-label strong {
-  color: var(--dorado);
-  font-weight: 600;
-}
+.contador-label strong { color: var(--dorado); font-weight: 600; }
 
-/* =========================================================
-   SCROLL HINT
-   ========================================================= */
 .scroll-hint {
   position: absolute;
   bottom: 30px;
@@ -307,7 +272,7 @@ a:hover {
 
 @keyframes bounce {
   0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%       { transform: translateX(-50%) translateY(10px); }
+  50% { transform: translateX(-50%) translateY(10px); }
 }
 
 /* =========================================================
@@ -351,7 +316,7 @@ a:hover {
   display: inline-block;
   box-shadow: var(--sombra);
   margin: 20px 0;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, background 0.5s ease;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -392,9 +357,7 @@ a:hover {
   transition: transform 0.3s ease;
 }
 
-.sobre-btn:hover::after {
-  transform: translate(-50%, -50%) scale(1.1);
-}
+.sobre-btn:hover::after { transform: translate(-50%, -50%) scale(1.1); }
 
 .mensaje-sobre {
   max-width: 640px;
@@ -413,15 +376,8 @@ a:hover {
   -webkit-backdrop-filter: blur(14px);
 }
 
-.mensaje-sobre.visible {
-  display: block;
-  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.mensaje-sobre #textoCartaSecreta {
-  margin: 0;
-}
-
+.mensaje-sobre.visible { display: block; animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.mensaje-sobre #textoCartaSecreta { margin: 0; }
 .mensaje-sobre small {
   display: block;
   margin-top: 18px;
@@ -500,15 +456,8 @@ a:hover {
   pointer-events: none;
 }
 
-.bento-item:hover::before {
-  opacity: 1;
-}
-
-.bento-item:hover {
-  border-color: var(--borde-fuerte);
-  box-shadow: var(--sombra-hover);
-  background: var(--bg-tarjeta-hover);
-}
+.bento-item:hover::before { opacity: 1; }
+.bento-item:hover { border-color: var(--borde-fuerte); box-shadow: var(--sombra-hover); background: var(--bg-tarjeta-hover); }
 
 .bento-item svg {
   width: 40px;
@@ -521,66 +470,67 @@ a:hover {
   transition: stroke 0.3s ease, transform 0.4s ease;
 }
 
-.bento-item:hover svg {
-  stroke: var(--rosa-fuerte);
-  transform: translateZ(50px) scale(1.08);
+.bento-item:hover svg { stroke: var(--rosa-fuerte); transform: translateZ(50px) scale(1.08); }
+.bento-item h3 { font-family: 'Playfair Display', serif; font-size: 1.45rem; margin: 0 0 8px 0; transform: translateZ(25px); color: var(--texto-principal); font-weight: 700; line-height: 1.2; }
+.bento-item p { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-style: italic; color: var(--texto-secundario); margin: 0; transform: translateZ(15px); line-height: 1.5; }
+
+.bento-item.grande { grid-column: span 2; min-height: 280px; background: linear-gradient(135deg, var(--bg-tarjeta), var(--rosa-suave)); }
+.bento-item.grande h3 { font-size: 2rem; }
+.bento-item.grande p { font-size: 1.15rem; max-width: 480px; }
+.bento-item.destacado { background: linear-gradient(135deg, var(--dorado-suave), var(--rosa-suave)); border-color: var(--dorado); }
+.bento-item.destacado svg { stroke: var(--dorado); }
+
+/* =========================================================
+   SECCIÓN INVITAR PAREJA
+   ========================================================= */
+.invitar-section {
+  text-align: center;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, var(--rosa-suave), var(--dorado-suave));
+  margin: 40px auto;
+  max-width: 600px;
+  border-radius: 24px;
+  border: 1px solid var(--borde);
+  box-shadow: var(--sombra);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  position: relative;
+  z-index: 2;
 }
 
-.bento-item h3 {
+.invitar-section:hover { box-shadow: var(--sombra-hover); border-color: var(--borde-fuerte); }
+
+.invitar-titulo {
   font-family: 'Playfair Display', serif;
-  font-size: 1.45rem;
-  margin: 0 0 8px 0;
-  transform: translateZ(25px);
   color: var(--texto-principal);
+  margin-bottom: 12px;
+  font-size: 1.6rem;
   font-weight: 700;
-  line-height: 1.2;
 }
 
-.bento-item p {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1rem;
-  font-style: italic;
+.invitar-desc {
   color: var(--texto-secundario);
-  margin: 0;
-  transform: translateZ(15px);
+  font-size: 0.95rem;
+  margin-bottom: 25px;
+  font-family: 'Poppins', sans-serif;
+  max-width: 450px;
+  margin-left: auto;
+  margin-right: auto;
   line-height: 1.5;
 }
 
-.bento-item.grande {
-  grid-column: span 2;
-  min-height: 280px;
-  background: linear-gradient(135deg, var(--bg-tarjeta), var(--rosa-suave));
+.btn-invitar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
 }
 
-.bento-item.grande h3 {
-  font-size: 2rem;
-}
-
-.bento-item.grande p {
-  font-size: 1.15rem;
-  max-width: 480px;
-}
-
-.bento-item.destacado {
-  background: linear-gradient(135deg, var(--dorado-suave), var(--rosa-suave));
-  border-color: var(--dorado);
-}
-
-.bento-item.destacado svg {
-  stroke: var(--dorado);
-}
-
-@media (max-width: 768px) {
-  .bento-item.grande {
-    grid-column: span 1;
-    min-height: 220px;
-  }
-  .bento-item.grande h3 { font-size: 1.5rem; }
-  .bento-item.grande p { font-size: 1rem; }
-}
+.btn-invitar svg { transition: transform 0.3s ease; }
+.btn-invitar:hover svg { transform: translateY(-2px) scale(1.1); }
 
 /* =========================================================
-   BOTÓN ADMIN — ENGRANAJE
+   BOTÓN ADMIN — PANEL PREMIUM CON ENGRANAJE
    ========================================================= */
 .admin-seccion {
   max-width: 900px;
@@ -591,9 +541,7 @@ a:hover {
   z-index: 2;
 }
 
-#btnAdmin {
-  display: none;
-}
+#btnAdmin { display: none; }
 
 .btn-admin-engranaje {
   display: inline-flex;
@@ -634,9 +582,7 @@ a:hover {
   border-color: var(--dorado);
 }
 
-.btn-admin-engranaje:hover::before {
-  opacity: 1;
-}
+.btn-admin-engranaje:hover::before { opacity: 1; }
 
 .btn-admin-engranaje svg {
   width: 26px;
@@ -652,26 +598,10 @@ a:hover {
   flex-shrink: 0;
 }
 
-.btn-admin-engranaje:hover svg {
-  transform: rotate(180deg);
-  stroke: var(--rosa-fuerte);
-}
-
-.btn-admin-engranaje span {
-  position: relative;
-  z-index: 1;
-  color: var(--texto-principal);
-  transition: color 0.3s ease;
-}
-
-.btn-admin-engranaje span strong {
-  color: var(--dorado);
-  font-weight: 700;
-}
-
-.btn-admin-engranaje:hover span strong {
-  color: var(--rosa-fuerte);
-}
+.btn-admin-engranaje:hover svg { transform: rotate(180deg); stroke: var(--rosa-fuerte); }
+.btn-admin-engranaje span { position: relative; z-index: 1; color: var(--texto-principal); transition: color 0.3s ease; }
+.btn-admin-engranaje span strong { color: var(--dorado); font-weight: 700; }
+.btn-admin-engranaje:hover span strong { color: var(--rosa-fuerte); }
 
 /* =========================================================
    MÚSICA
@@ -704,27 +634,10 @@ a:hover {
   transition: background 0.5s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.music-card:hover {
-  box-shadow: var(--sombra-hover);
-  border-color: var(--borde-fuerte);
-}
+.music-card:hover { box-shadow: var(--sombra-hover); border-color: var(--borde-fuerte); }
+.music-iframe { border-radius: 14px; border: none; width: 100%; height: 152px; }
+.music-vacio { text-align: center; color: var(--texto-terciario); font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1rem; }
 
-.music-iframe {
-  border-radius: 14px;
-  border: none;
-  width: 100%;
-  height: 152px;
-}
-
-.music-vacio {
-  text-align: center;
-  color: var(--texto-terciario);
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1rem;
-}
-
-/* Vinilo para MP3 */
 .vinyl {
   width: 120px;
   height: 120px;
@@ -750,51 +663,15 @@ a:hover {
   font-size: 1.2rem;
 }
 
-.vinyl.playing {
-  animation: spin 4s linear infinite;
-}
+.vinyl.playing { animation: spin 4s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+.music-info h3 { font-family: 'Playfair Display', serif; font-style: italic; color: var(--rosa); margin-bottom: 6px; }
+.music-info p { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--texto-secundario); font-size: 0.95rem; margin-bottom: 18px; }
 
-.music-info h3 {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  color: var(--rosa);
-  margin-bottom: 6px;
-}
-
-.music-info p {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  color: var(--texto-secundario);
-  font-size: 0.95rem;
-  margin-bottom: 18px;
-}
-
-.btn {
-  display: inline-block;
-  padding: 12px 26px;
-  border-radius: 50px;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  border: none;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--rosa), var(--dorado));
-  color: #fff;
-  box-shadow: 0 8px 24px rgba(217, 108, 136, 0.35);
-}
-
-.btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(217, 108, 136, 0.5);
-}
+.btn { display: inline-block; padding: 12px 26px; border-radius: 50px; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 0.9rem; cursor: pointer; border: none; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.btn-primary { background: linear-gradient(135deg, var(--rosa), var(--dorado)); color: #fff; box-shadow: 0 8px 24px rgba(217, 108, 136, 0.35); }
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(217, 108, 136, 0.5); }
 
 /* =========================================================
    FOOTER
@@ -814,462 +691,131 @@ a:hover {
 }
 
 /* =========================================================
-   BOTONES FLOTANTES
+   BOTONES FLOTANTES Y MODAL
    ========================================================= */
 .btn-modo-cine {
-  position: fixed;
-  top: 22px;
-  right: 22px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--bg-tarjeta);
-  color: var(--texto-principal);
-  border: 1px solid var(--borde);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--sombra);
-  z-index: 9999;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  position: fixed; top: 22px; right: 22px; width: 52px; height: 52px; border-radius: 50%;
+  background: var(--bg-tarjeta); color: var(--texto-principal); border: 1px solid var(--borde);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: var(--sombra); z-index: 9999; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   transition: transform 0.3s ease, background 0.5s ease, color 0.3s ease, border-color 0.3s ease;
 }
-
-.btn-modo-cine:hover {
-  transform: scale(1.1) rotate(-6deg);
-  background: var(--rosa);
-  color: #fff;
-  border-color: var(--rosa);
-}
+.btn-modo-cine:hover { transform: scale(1.1) rotate(-6deg); background: var(--rosa); color: #fff; border-color: var(--rosa); }
 
 .btn-recuerdo-flotante {
-  position: fixed;
-  bottom: 22px;
-  right: 22px;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: var(--bg-tarjeta);
-  border: 1px solid var(--borde);
-  color: var(--rosa);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--sombra);
-  z-index: 9997;
-  font-size: 1.4rem;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  position: fixed; bottom: 22px; right: 22px; width: 54px; height: 54px; border-radius: 50%;
+  background: var(--bg-tarjeta); border: 1px solid var(--borde); color: var(--rosa);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: var(--sombra); z-index: 9997; font-size: 1.4rem;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   transition: transform 0.3s ease, background 0.5s ease, color 0.3s ease, border-color 0.3s ease;
 }
+.btn-recuerdo-flotante:hover { transform: translateY(-5px) scale(1.06); background: var(--rosa); color: #fff; border-color: var(--rosa); }
 
-.btn-recuerdo-flotante:hover {
-  transform: translateY(-5px) scale(1.06);
-  background: var(--rosa);
-  color: #fff;
-  border-color: var(--rosa);
-}
-
-/* Botón tema (si script.js lo inyecta) */
-/* =========================================================
-   BOTÓN MODO OSCURO (Arriba a la izquierda)
-   ========================================================= */
-.btn-tema {
-  position: fixed;
-  top: 22px;
-  left: 22px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--bg-tarjeta);
-  color: var(--texto-principal);
-  border: 1px solid var(--borde);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: var(--sombra);
-  z-index: 9999;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              background 0.5s ease,
-              color 0.3s ease,
-              border-color 0.3s ease,
-              box-shadow 0.3s ease;
-  overflow: hidden;
-}
-
-/* Halo suave detrás */
-.btn-tema::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--rosa-suave), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  z-index: -1;
-}
-
-.btn-tema:hover::before {
-  opacity: 1;
-}
-
-.btn-tema:hover {
-  transform: scale(1.1) rotate(-8deg);
-  background: var(--rosa);
-  color: #fff;
-  border-color: var(--rosa);
-  box-shadow: 0 15px 40px rgba(217, 108, 136, 0.45);
-}
-
-.btn-tema:active {
-  transform: scale(0.95);
-}
-
-/* Iconos: luna por defecto, sol cuando está en modo noche */
-.btn-tema svg {
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.btn-tema .icono-luna {
-  opacity: 1;
-  transform: rotate(0deg) scale(1);
-}
-
-.btn-tema .icono-sol {
-  opacity: 0;
-  transform: rotate(-90deg) scale(0.6);
-}
-
-/* En modo noche se invierten */
-body.modo-noche .btn-tema .icono-luna {
-  opacity: 0;
-  transform: rotate(90deg) scale(0.6);
-}
-
-body.modo-noche .btn-tema .icono-sol {
-  opacity: 1;
-  transform: rotate(0deg) scale(1);
-  color: var(--dorado);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .btn-tema {
-    width: 46px;
-    height: 46px;
-    top: 16px;
-    left: 16px;
-  }
-  .btn-tema svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-.btn-tema:hover {
-  transform: scale(1.1) rotate(15deg);
-  background: var(--rosa);
-  color: #fff;
-}
-
-/* Botón instalar PWA */
-.btn-instalar {
-  position: fixed;
-  bottom: 22px;
-  right: 90px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  background: linear-gradient(135deg, var(--rosa), var(--dorado));
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(217, 108, 136, 0.4);
-  z-index: 9998;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.btn-instalar:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 40px rgba(217, 108, 136, 0.6);
-}
-
-/* =========================================================
-   MODAL DE RECUERDO
-   ========================================================= */
 #modalRecuerdo {
-  position: fixed;
-  inset: 0;
-  background: var(--bg-modal);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  z-index: 99999;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
+  position: fixed; inset: 0; background: var(--bg-modal); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  z-index: 99999; display: none; align-items: center; justify-content: center; padding: 24px;
 }
-
 #modalRecuerdo > div {
-  background: var(--bg-tarjeta);
-  border-radius: 24px;
-  padding: 20px;
-  max-width: 460px;
-  width: 100%;
-  position: relative;
-  text-align: center;
-  box-shadow: var(--sombra-hover);
-  border: 1px solid var(--borde);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--bg-tarjeta); border-radius: 24px; padding: 20px; max-width: 460px; width: 100%;
+  position: relative; text-align: center; box-shadow: var(--sombra-hover); border: 1px solid var(--borde);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
 #btnCerrarRecuerdo {
-  position: absolute;
-  top: -15px;
-  right: -15px;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--bg-tarjeta);
-  border: 1px solid var(--borde);
-  cursor: pointer;
-  font-size: 1.1rem;
-  color: var(--texto-principal);
-  box-shadow: var(--sombra);
+  position: absolute; top: -15px; right: -15px; width: 42px; height: 42px; border-radius: 50%;
+  background: var(--bg-tarjeta); border: 1px solid var(--borde); cursor: pointer; font-size: 1.1rem;
+  color: var(--texto-principal); box-shadow: var(--sombra);
   transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
 }
+#btnCerrarRecuerdo:hover { transform: rotate(90deg) scale(1.05); background: var(--rosa); color: #fff; }
 
-#btnCerrarRecuerdo:hover {
-  transform: rotate(90deg) scale(1.05);
-  background: var(--rosa);
-  color: #fff;
-}
-
-.modal-vacio {
-  color: var(--texto-terciario);
-  text-align: center;
-  padding: 40px 20px;
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 1rem;
-}
-
-.modal-recuerdo-img {
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
-  border-radius: 14px;
-  margin-bottom: 20px;
-}
-
-.modal-recuerdo-fecha {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  color: var(--dorado);
-  font-weight: 600;
-  display: block;
-}
-
-.modal-recuerdo-titulo {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 1.8rem;
-  margin: 10px 0 12px;
-  color: var(--texto-principal);
-}
-
-.modal-recuerdo-desc {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.15rem;
-  line-height: 1.6;
-  font-style: italic;
-  color: var(--texto-secundario);
-}
+.modal-vacio { color: var(--texto-terciario); text-align: center; padding: 40px 20px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1rem; }
+.modal-recuerdo-img { width: 100%; height: 300px; object-fit: cover; border-radius: 14px; margin-bottom: 20px; }
+.modal-recuerdo-fecha { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--dorado); font-weight: 600; display: block; }
+.modal-recuerdo-titulo { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.8rem; margin: 10px 0 12px; color: var(--texto-principal); }
+.modal-recuerdo-desc { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; line-height: 1.6; font-style: italic; color: var(--texto-secundario); }
 
 /* =========================================================
-   REPRODUCTOR FLOTANTE (para musica-flotante.js)
+   REPRODUCTOR FLOTANTE (Vinilo)
    ========================================================= */
 .floating-vinyl-container {
-  position: fixed;
-  bottom: 90px;
-  right: 22px;
-  z-index: 9996;
-  cursor: pointer;
-  transition: transform 0.3s ease;
+  position: fixed; bottom: 90px; right: 22px; z-index: 9996; cursor: pointer; transition: transform 0.3s ease;
 }
-
-.floating-vinyl-container:hover {
-  transform: scale(1.05);
-}
-
+.floating-vinyl-container:hover { transform: scale(1.05); }
 .floating-vinyl {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  width: 80px; height: 80px; border-radius: 50%;
   background: repeating-radial-gradient(circle, #222 0 3px, #111 3px 6px);
-  position: relative;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.3s ease;
+  position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease;
 }
-
 .floating-vinyl::before {
-  content: "";
-  position: absolute;
-  inset: 12px;
-  border-radius: 50%;
+  content: ""; position: absolute; inset: 12px; border-radius: 50%;
   background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%);
 }
+.floating-vinyl.playing { animation: spin 4s linear infinite; }
+.floating-vinyl-hole { width: 22px; height: 22px; border-radius: 50%; background: var(--rosa); border: 4px solid var(--blanco-puro); z-index: 2; }
 
-.floating-vinyl.playing {
-  animation: spin 4s linear infinite;
-}
-
-.floating-vinyl-hole {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--rosa);
-  border: 4px solid var(--blanco-puro);
-  z-index: 2;
-}
-
-/* Mini-player (por si musica-flotante.js lo usa) */
+/* Mini-player de música */
 .mini-player {
-  position: fixed;
-  bottom: 90px;
-  right: 22px;
-  width: 300px;
-  background: var(--bg-tarjeta);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border-radius: 20px;
-  box-shadow: var(--sombra);
-  border: 1px solid var(--borde);
-  z-index: 9996;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  font-family: 'Poppins', sans-serif;
+  position: fixed; bottom: 90px; right: 22px; width: 300px; background: var(--bg-tarjeta);
+  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 20px;
+  box-shadow: var(--sombra); border: 1px solid var(--borde); z-index: 9996; overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); font-family: 'Poppins', sans-serif;
 }
-
-.mini-player.minimizado {
-  width: 200px;
-  border-radius: 50px;
-}
-
-.mini-player.minimizado .mini-player-body {
-  display: none;
-}
-
+.mini-player.minimizado { width: 200px; border-radius: 50px; }
+.mini-player.minimizado .mini-player-body { display: none; }
 .mini-player-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 18px;
-  background: linear-gradient(135deg, var(--rosa-suave), var(--dorado-suave));
-  cursor: pointer;
-  border-bottom: 1px solid var(--borde);
+  display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;
+  background: linear-gradient(135deg, var(--rosa-suave), var(--dorado-suave)); cursor: pointer; border-bottom: 1px solid var(--borde);
 }
-
-.mini-player.minimizado .mini-player-header {
-  border-bottom: none;
-  padding: 15px 20px;
-}
-
-.mini-player-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--rosa);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.mini-player-toggle {
-  background: transparent;
-  border: none;
-  color: var(--rosa);
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.mini-player-body {
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.mini-player-mp3 {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
+.mini-player.minimizado .mini-player-header { border-bottom: none; padding: 15px 20px; }
+.mini-player-title { font-size: 0.75rem; font-weight: 600; color: var(--rosa); text-transform: uppercase; letter-spacing: 1px; }
+.mini-player-toggle { background: transparent; border: none; color: var(--rosa); font-size: 1rem; cursor: pointer; }
+.mini-player-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+.mini-player-mp3 { display: flex; align-items: center; gap: 15px; }
 .mini-vinyl {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 50px; height: 50px; border-radius: 50%;
   background: repeating-radial-gradient(circle, #222 0 4px, #111 4px 6px);
-  position: relative;
-  flex-shrink: 0;
+  position: relative; flex-shrink: 0;
 }
-
 .mini-vinyl::after {
-  content: "💗";
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 20px;
-  height: 20px;
-  background: var(--rosa);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
+  content: "💗"; position: absolute; inset: 0; margin: auto; width: 20px; height: 20px;
+  background: var(--rosa); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
 }
-
-.mini-vinyl.playing {
-  animation: spin 4s linear infinite;
-}
-
+.mini-vinyl.playing { animation: spin 4s linear infinite; }
 .mini-play-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--rosa);
-  color: #fff;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-  box-shadow: 0 4px 15px rgba(217, 108, 136, 0.4);
+  width: 40px; height: 40px; border-radius: 50%; background: var(--rosa); color: #fff; border: none;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: transform 0.3s ease; box-shadow: 0 4px 15px rgba(217, 108, 136, 0.4);
 }
+.mini-play-btn:hover { transform: scale(1.1); }
 
-.mini-play-btn:hover {
-  transform: scale(1.1);
+/* =========================================================
+   BOTÓN MODO OSCURO (TEMA)
+   ========================================================= */
+.btn-tema {
+  position: fixed; top: 22px; left: 22px; width: 52px; height: 52px; border-radius: 50%;
+  background: var(--bg-tarjeta); color: var(--texto-principal); border: 1px solid var(--borde);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: var(--sombra); z-index: 9999; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.5s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
 }
+.btn-tema::before {
+  content: ""; position: absolute; inset: -4px; border-radius: 50%;
+  background: radial-gradient(circle, var(--rosa-suave), transparent 70%);
+  opacity: 0; transition: opacity 0.4s ease; z-index: -1;
+}
+.btn-tema:hover::before { opacity: 1; }
+.btn-tema:hover { transform: scale(1.1) rotate(-8deg); background: var(--rosa); color: #fff; border-color: var(--rosa); box-shadow: 0 15px 40px rgba(217, 108, 136, 0.45); }
+.btn-tema:active { transform: scale(0.95); }
+
+.btn-tema svg { position: absolute; width: 22px; height: 22px; }
+.btn-tema .icono-luna { opacity: 1; transform: rotate(0deg) scale(1); }
+.btn-tema .icono-sol { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+
+body.modo-noche .btn-tema .icono-luna { opacity: 0; transform: rotate(90deg) scale(0.6); }
+body.modo-noche .btn-tema .icono-sol { opacity: 1; transform: rotate(0deg) scale(1); color: var(--dorado); }
 
 /* =========================================================
    ANIMACIONES
@@ -1280,114 +826,50 @@ body.modo-noche .btn-tema .icono-sol {
 }
 
 /* =========================================================
-   RESPONSIVE
+   TRANSICIONES GLOBALES Y EXCEPCIONES
    ========================================================= */
-@media (max-width: 768px) {
-  .hero {
-    padding: 100px 20px 60px;
-  }
-  .contador-item {
-    padding: 14px 20px;
-    min-width: 70px;
-  }
-  .contador-item span {
-    font-size: 1.8rem;
-  }
-  .sobre-section,
-  .music-section {
-    padding: 70px 20px;
-  }
-  .bento-item {
-    padding: 28px 24px;
-    min-height: 200px;
-  }
-  .btn-modo-cine,
-  .btn-recuerdo-flotante,
-  .btn-tema {
-    width: 46px;
-    height: 46px;
-    font-size: 1.1rem;
-  }
-  .btn-instalar {
-    right: 14px;
-    bottom: 80px;
-    font-size: 0.8rem;
-    padding: 10px 16px;
-  }
-  .floating-vinyl-container {
-    bottom: 80px;
-    right: 14px;
-  }
-  .floating-vinyl {
-    width: 64px;
-    height: 64px;
-  }
-  .floating-vinyl-hole {
-    width: 18px;
-    height: 18px;
-    border-width: 3px;
-  }
-  .mensaje-sobre {
-    padding: 30px 24px;
-    font-size: 1.8rem;
-  }
-  .hero-title-vertical .separador {
-    height: 30px;
-  }
+body, body * {
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
 }
-
-@media (max-width: 480px) {
-  .hero-title-vertical .linea {
-    font-size: clamp(2.4rem, 11vw, 3.5rem);
-  }
-  .contador {
-    gap: 10px;
-  }
-  .contador-item {
-    padding: 12px 16px;
-    min-width: 64px;
-  }
-  .contador-item span {
-    font-size: 1.5rem;
-  }
-  .contador-item small {
-    font-size: 0.58rem;
-  }
-  .btn-admin-engranaje {
-    padding: 14px 22px;
-    font-size: 0.7rem;
-    gap: 10px;
-  }
-  .btn-admin-engranaje svg {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-
-/* Transición suave global al cambiar de tema */
-body,
-body * {
-  transition:
-    background-color 0.5s ease,
-    color 0.5s ease,
-    border-color 0.5s ease,
-    box-shadow 0.5s ease;
-}
-
-/* Excepciones: no transicionar animaciones que ya tienen la suya */
-.nube,
-.bento-item,
-.contador-item,
-.btn-tema svg,
-.sobre-btn,
-.btn-admin-engranaje svg {
+.nube, .bento-item, .contador-item, .btn-tema svg, .sobre-btn, .btn-admin-engranaje svg {
   transition: none;
 }
-
 .nube { transition: background 0.8s ease; }
 .bento-item { transition: border-color 0.3s ease, box-shadow 0.4s ease, background 0.5s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 .contador-item { transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.5s ease; }
 .btn-tema svg { transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 .sobre-btn { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, background 0.5s ease; }
 .btn-admin-engranaje svg { transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.3s ease; }
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+  .hero { padding: 100px 20px 60px; }
+  .contador-item { padding: 14px 20px; min-width: 70px; }
+  .contador-item span { font-size: 1.8rem; }
+  .sobre-section, .music-section { padding: 70px 20px; }
+  .bento-item { padding: 28px 24px; min-height: 200px; }
+  .bento-item.grande { grid-column: span 1; min-height: 220px; }
+  .bento-item.grande h3 { font-size: 1.5rem; }
+  .bento-item.grande p { font-size: 1rem; }
+  .btn-modo-cine, .btn-recuerdo-flotante, .btn-tema { width: 46px; height: 46px; font-size: 1.1rem; }
+  .floating-vinyl-container { bottom: 80px; right: 14px; }
+  .floating-vinyl { width: 64px; height: 64px; }
+  .floating-vinyl-hole { width: 18px; height: 18px; border-width: 3px; }
+  .mensaje-sobre { padding: 30px 24px; font-size: 1.8rem; }
+  .hero-title-vertical .separador { height: 30px; }
+  .btn-tema { top: 16px; left: 16px; }
+  .btn-tema svg { width: 20px; height: 20px; }
+}
+
+@media (max-width: 480px) {
+  .hero-title-vertical .linea { font-size: clamp(2.4rem, 11vw, 3.5rem); }
+  .contador { gap: 10px; }
+  .contador-item { padding: 12px 16px; min-width: 64px; }
+  .contador-item span { font-size: 1.5rem; }
+  .contador-item small { font-size: 0.58rem; }
+  .btn-admin-engranaje { padding: 14px 22px; font-size: 0.7rem; gap: 10px; }
+  .btn-admin-engranaje svg { width: 20px; height: 20px; }
+  .invitar-section { margin: 40px 20px; }
+}
