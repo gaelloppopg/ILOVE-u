@@ -1,6 +1,6 @@
 /* ==========================================================================
    PROYECTO: ESTUDIO DE DIBUJO (VISTA ESCRITORIO + MÓVIL INMERSIVO)
-   CORRECCIONES: Scroll permitido en la galería, lienzo adaptativo, UI móvil.
+   CORRECCIONES: Scroll en PC, Lienzo adaptativo en vertical, UI Instagram.
    ========================================================================== */
 
 /* ==========================================================================
@@ -42,10 +42,19 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* IMPORTANTE: Permitimos scroll vertical en la página principal */
-body {
-  overflow-y: auto !important; 
+/* Scroll normal en PC */
+body.layout-escritorio {
+  overflow-y: auto !important;
   position: relative;
+}
+
+/* Bloqueo de scroll en móvil/tablet (para dibujar sin interferencias) */
+body.layout-movil,
+body.layout-tablet {
+  overflow: hidden !important;
+  position: fixed;
+  inset: 0;
+  overscroll-behavior: none;
 }
 
 * {
@@ -68,20 +77,17 @@ body.layout-tablet .vista-escritorio { display: none !important; }
 /* ==========================================================================
    4. LAYOUT PRINCIPAL MÓVIL / TABLET
    ========================================================================== */
-/* El overlay del estudio sí bloquea el scroll del fondo porque es un lienzo */
 body.layout-movil .estudio-overlay,
 body.layout-tablet .estudio-overlay {
   position: fixed;
   inset: 0;
   width: 100vw;
-  height: 100dvh;
+  height: 100dvh; /* Altura real del móvil */
   background: #000 !important;
   padding: 0 !important;
-  z-index: 9999;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  /* Bloquea el scroll solo cuando el estudio está abierto */
-  overflow: hidden; 
 }
 
 body.layout-movil .estudio,
@@ -95,10 +101,11 @@ body.layout-tablet .estudio {
   margin: 0 !important;
   border-radius: 0 !important;
   overflow: hidden;
+  pointer-events: auto !important; /* Permite la interacción */
 }
 
 /* ==========================================================================
-   5. ÁREA DEL LIENZO (ADAPTACIÓN VERTICAL)
+   5. ÁREA DEL LIENZO (ADAPTACIÓN VERTICAL CORREGIDA)
    ========================================================================== */
 body.layout-movil .estudio-canvas-wrapper,
 body.layout-tablet .estudio-canvas-wrapper {
@@ -108,6 +115,7 @@ body.layout-tablet .estudio-canvas-wrapper {
   padding-bottom: 85px !important; 
   
   flex: 1 !important;
+  /* CRUCIAL: min-height 0 obliga al contenedor a encogerse y no empujar los botones */
   min-height: 0 !important; 
   
   display: flex !important;
@@ -120,21 +128,25 @@ body.layout-tablet .estudio-canvas-wrapper {
   /* CRUCIAL: Evita que el navegador interfiera al dibujar (scroll/zoom) */
   touch-action: none !important;
   -ms-touch-action: none !important;
+  pointer-events: auto !important;
 }
 
 body.layout-movil .canvas-stack,
 body.layout-tablet .canvas-stack {
+  /* El lienzo se adapta al máximo espacio disponible manteniendo proporción */
   width: 100% !important;
   height: 100% !important;
   max-width: 100% !important;
   max-height: 100% !important;
-  aspect-ratio: 3 / 2 !important; 
+  aspect-ratio: 3 / 2 !important; /* Ajusta a la proporción de tu libro */
   
   position: relative;
   box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
   border-radius: 12px !important;
   overflow: hidden !important;
   background-color: #ffffff !important;
+  
+  pointer-events: auto !important;
   z-index: 2;
 }
 
@@ -143,8 +155,9 @@ body.layout-tablet .canvas-stack canvas {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain !important; 
+  object-fit: contain !important; /* Evita que el dibujo se deforme */
   touch-action: none !important;
+  pointer-events: auto !important; /* Permite recibir los toques */
   cursor: crosshair !important;
   z-index: 3;
 }
@@ -163,7 +176,7 @@ body.layout-tablet .estudio-toolbar {
   max-height: 100dvh !important;
   background: var(--c-fondo-panel) !important;
   color: var(--c-texto) !important;
-  z-index: 10000 !important;
+  z-index: 9999 !important;
   padding: 20px !important;
   overflow-y: auto !important;
   transition: right var(--trans-normal) !important;
@@ -367,8 +380,10 @@ body.layout-tablet .barra-instagram {
   right: 0 !important;
   width: 100% !important;
   
+  /* Degradado transparente para que el lienzo se vea por detrás */
   background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0) 100%) !important;
   
+  /* Espaciado seguro para móviles con notch (iPhone) */
   padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 0px)) 15px !important;
   
   align-items: center !important;
@@ -376,6 +391,7 @@ body.layout-tablet .barra-instagram {
   z-index: 200 !important;
   gap: 10px !important;
   
+  /* El contenedor no bloquea clics, pero los hijos sí */
   pointer-events: none !important;
 }
 
@@ -486,7 +502,7 @@ body.layout-tablet .btn-accion-principal:active {
 }
 
 /* ==========================================================================
-   8. ADAPTACIÓN PARA PANTALLAS MUY BAJAS
+   8. ADAPTACIÓN PARA PANTALLAS MUY BAJAS (Teclado abierto o Landscape)
    ========================================================================== */
 @media (max-height: 600px) {
   body.layout-movil .estudio-canvas-wrapper,
@@ -517,7 +533,9 @@ body.layout-tablet .btn-accion-principal:active {
    9. ACCESIBILIDAD: MOVIMIENTO REDUCIDO
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
