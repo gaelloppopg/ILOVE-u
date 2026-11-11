@@ -1,6 +1,6 @@
 /* ==========================================================================
    PROYECTO: ESTUDIO DE DIBUJO (VISTA ESCRITORIO + MÓVIL INMERSIVO)
-   DISEÑO VISUAL MEJORADO
+   DISEÑO VISUAL MEJORADO - LIENZO FLOTANTE
    ========================================================================== */
 
 :root {
@@ -52,7 +52,7 @@ body.layout-movil .vista-escritorio,
 body.layout-tablet .vista-escritorio { display: none !important; }
 
 /* ==========================================================================
-   ESTUDIO (Fondo transparente para ver el patrón de la página)
+   ESTUDIO Y FONDO TRANSPARENTE
    ========================================================================== */
 .estudio-overlay {
   display: none;
@@ -60,7 +60,7 @@ body.layout-tablet .vista-escritorio { display: none !important; }
   inset: 0;
   width: 100vw;
   height: 100dvh;
-  background: transparent !important; /* Transparente */
+  background: transparent !important; /* Transparente para ver la página de fondo */
   padding: 0 !important;
   z-index: 9999;
   flex-direction: column;
@@ -85,13 +85,13 @@ body.layout-tablet .estudio {
 }
 
 /* ==========================================================================
-   ÁREA DEL LIENZO (Con sombra y borde para definirlo)
+   ÁREA DEL LIENZO (DISEÑO FLOTANTE REDUCIDO)
    ========================================================================== */
 body.layout-movil .estudio-canvas-wrapper,
 body.layout-tablet .estudio-canvas-wrapper {
   background: transparent !important;
   padding: 15px !important;
-  padding-bottom: 85px !important;
+  padding-bottom: 85px !important; /* Espacio para la barra inferior */
   flex: 1 !important;
   min-height: 0 !important;
   display: flex !important;
@@ -105,17 +105,19 @@ body.layout-tablet .estudio-canvas-wrapper {
 
 body.layout-movil .canvas-stack,
 body.layout-tablet .canvas-stack {
+  /* El canvas se adapta al espacio disponible pero mantiene su proporción 3:2 */
   width: 100% !important;
-  height: 100% !important;
+  height: auto !important;
   max-width: 100% !important;
   max-height: 100% !important;
   aspect-ratio: 3 / 2 !important;
+  
   position: relative;
-  /* Borde y sombra mejorada */
-  box-shadow: 0 0 0 2px #333, 0 15px 40px rgba(0,0,0,0.9) !important;
-  border-radius: 12px !important;
+  /* Sombra y borde para delimitar la hoja */
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 0 2px #333 !important;
+  border-radius: 8px !important;
   overflow: hidden !important;
-  background-color: #ffffff !important; /* El lienzo sí es blanco */
+  background-color: #ffffff !important; /* Solo el área de dibujo es blanca */
   z-index: 20;
 }
 
@@ -131,7 +133,7 @@ body.layout-tablet .canvas-stack canvas {
 }
 
 /* ==========================================================================
-   MENÚ LATERAL (DRAWER) REDISEÑADO Y VISUAL
+   MENÚ LATERAL (DRAWER) VISUAL
    ========================================================================== */
 body.layout-movil .estudio-toolbar,
 body.layout-tablet .estudio-toolbar {
@@ -180,7 +182,6 @@ body.layout-tablet .btn-cerrar-toolbar {
 
 body.layout-movil .btn-cerrar-toolbar:active { transform: scale(0.9); }
 
-/* Grupos del menú visualmente separados */
 body.layout-movil .estudio-toolbar .tool-group,
 body.layout-tablet .estudio-toolbar .tool-group {
   display: flex !important;
@@ -203,7 +204,6 @@ body.layout-tablet .estudio-toolbar .tool-label {
   margin-bottom: 2px;
 }
 
-/* Botones de herramientas estilo cápsula */
 body.layout-movil .estudio-toolbar .tool-btn,
 body.layout-tablet .estudio-toolbar .tool-btn {
   width: 100% !important;
@@ -227,7 +227,6 @@ body.layout-tablet .estudio-toolbar .tool-btn.active {
   box-shadow: 0 4px 15px rgba(201, 160, 80, 0.3);
 }
 
-/* Paleta de colores más grande y espaciada */
 body.layout-movil .estudio-toolbar .colores-grid,
 body.layout-tablet .estudio-toolbar .colores-grid {
   display: grid !important;
@@ -253,7 +252,6 @@ body.layout-tablet .estudio-toolbar .color-btn.active {
   box-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
-/* Grosor */
 body.layout-movil .estudio-toolbar .grosor-control,
 body.layout-tablet .estudio-toolbar .grosor-control {
   display: flex !important;
@@ -268,7 +266,6 @@ body.layout-tablet .estudio-toolbar input[type="range"] {
   accent-color: var(--c-acento) !important;
 }
 
-/* Fondo */
 body.layout-movil .estudio-toolbar .fondo-controles,
 body.layout-tablet .estudio-toolbar .fondo-controles {
   display: grid !important;
@@ -299,7 +296,6 @@ body.layout-tablet .estudio-toolbar .fondo-controles button {
   cursor: pointer;
 }
 
-/* Título */
 body.layout-movil .estudio-toolbar input[type="text"],
 body.layout-tablet .estudio-toolbar input[type="text"] {
   width: 100% !important;
