@@ -85,7 +85,7 @@ async function initArte() {
   canvas = document.querySelector(".lienzo-dibujo");
   ctx = canvas.getContext("2d");
   
-  // Aseguramos que el CSS no bloquee los toques en el lienzo
+  // Forzamos al CSS a recibir eventos y bloquear scroll
   if (canvas) {
     canvas.style.pointerEvents = "auto";
     canvas.style.touchAction = "none";
@@ -104,15 +104,14 @@ async function initArte() {
 // ============================================================
 function configurarEventosDibujo() {
   if (canvas) {
-    // Usamos PointerEvents: Funciona perfecto tanto para clics como para deslizar el dedo
+    // 1. Eventos Pointer (Modernos, unifican ratón y táctil)
     canvas.addEventListener("pointerdown", (e) => {
-      e.preventDefault(); // Evita comportamientos raros del navegador
-      canvas.setPointerCapture(e.pointerId); // Captura el puntero para que no se pierda si sales del canvas
+      e.preventDefault();
+      canvas.setPointerCapture(e.pointerId);
       empezarDibujo(e);
     });
 
     canvas.addEventListener("pointermove", (e) => {
-      // Solo dibuja si el puntero está presionado
       if (dibujando) {
         e.preventDefault();
         dibujar(e);
@@ -133,8 +132,9 @@ function configurarEventosDibujo() {
       }
     });
 
-    // Prevenir menú contextual en móviles (mantener presionado)
+    // 2. Bloqueo de menú contextual y arrastre
     canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+    canvas.addEventListener("dragstart", (e) => e.preventDefault());
   }
   
   // Botones de herramientas
