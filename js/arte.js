@@ -1,9 +1,6 @@
 import { supabase } from './supabase.js';
 import { subirArchivo } from './storage.js';
 
-// ============================================================
-//  VARIABLES GLOBALES
-// ============================================================
 let coupleId = null;
 let obras = [];
 let canvas, ctx, canvasFondo, ctxFondo;
@@ -30,9 +27,6 @@ let trazos = [];
 let trazoActual = null;
 let portapapeles = { fondo: null, trazos: [] }; 
 
-// ============================================================
-//  UTILIDADES
-// ============================================================
 function cargarImagen(src, isCORS = false) {
   return new Promise((res, rej) => {
     const img = new Image();
@@ -51,9 +45,6 @@ function cargarImagen(src, isCORS = false) {
 function canvasABlob(cnv) { return new Promise((res) => cnv.toBlob(res, "image/png")); }
 function generarUUID() { return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2); }
 
-// ============================================================
-//  INICIALIZACIÓN
-// ============================================================
 async function initArte() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
@@ -71,7 +62,6 @@ async function initArte() {
   if (preferenciaDispositivo === 'auto') {
     const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(lte|wap|fone))))/i.test(navigator.userAgent);
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    
     if (isTablet) preferenciaDispositivo = 'tablet';
     else if (isMobile) preferenciaDispositivo = 'movil';
     else preferenciaDispositivo = 'escritorio';
@@ -97,12 +87,8 @@ async function initArte() {
   await cargarObras();
 }
 
-// ============================================================
-//  EVENTOS TÁCTILES Y DIBUJO
-// ============================================================
 function configurarEventosDibujo() {
   if (canvas) {
-    // Eventos táctiles directos para móviles
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
       const touch = e.touches[0];
@@ -120,40 +106,29 @@ function configurarEventosDibujo() {
       terminarDibujo();
     }, { passive: false });
 
-    // Eventos de ratón para computadora
-    canvas.addEventListener('mousedown', (e) => {
-      empezarDibujo(e);
-    });
-    canvas.addEventListener('mousemove', (e) => {
-      if (dibujando) dibujar(e);
-    });
+    canvas.addEventListener('mousedown', (e) => empezarDibujo(e));
+    canvas.addEventListener('mousemove', (e) => { if (dibujando) dibujar(e); });
     canvas.addEventListener('mouseup', terminarDibujo);
     canvas.addEventListener('mouseleave', terminarDibujo);
   }
 
-  // Herramientas
   const botonesHerramienta = document.querySelectorAll(".tool-btn[data-tool]");
-  if (botonesHerramienta.length > 0) {
-    botonesHerramienta.forEach(btn => {
-      btn.onclick = (e) => {
-        e.preventDefault();
-        botonesHerramienta.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        herramienta = btn.dataset.tool;
-      };
-    });
-  }
+  botonesHerramienta.forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      botonesHerramienta.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      herramienta = btn.dataset.tool;
+    };
+  });
 
-  // Grosor
-  const inputsGrosor = document.querySelectorAll(".input-grosor");
-  inputsGrosor.forEach(inp => {
+  document.querySelectorAll(".input-grosor").forEach(inp => {
     inp.oninput = (e) => {
       grosor = parseInt(e.target.value);
       document.querySelectorAll(".grosor-badge").forEach(b => b.textContent = grosor);
     };
   });
   
-  // Colores
   const botonesColor = document.querySelectorAll(".color-btn");
   botonesColor.forEach(btn => {
     btn.onclick = (e) => {
@@ -172,7 +147,6 @@ function configurarEventosDibujo() {
     };
   });
 
-  // Portapapeles
   const copiarFn = () => {
     portapapeles.trazos = JSON.parse(JSON.stringify(trazos)); 
     if (fondoImagen) portapapeles.fondo = fondoImagen;
@@ -203,7 +177,6 @@ function configurarEventosDibujo() {
   document.querySelectorAll(".btn-limpiar").forEach(b => b.onclick = limpiarFn);
   document.querySelectorAll(".btn-guardar").forEach(b => b.onclick = guardarFn);
 
-  // Fondo
   document.querySelectorAll(".fondo-color-input").forEach(inp => {
     inp.oninput = (e) => { fondoColor = e.target.value; fondoImagen = null; dibujarFondo(); };
   });
@@ -274,9 +247,6 @@ function configurarEventosUI() {
   }
 }
 
-// ============================================================
-//  LÓGICA DE DIBUJO
-// ============================================================
 function abrirEstudio() {
   modoEdicion = false;
   obraEditandoId = null;
@@ -382,9 +352,6 @@ function renderizarTrazos() {
   ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
 }
 
-// ============================================================
-//  GUARDADO Y MUSEO
-// ============================================================
 async function guardarObra() {
   const t1 = document.getElementById("tituloObra");
   const t2 = document.getElementById("tituloObraM");
@@ -548,9 +515,6 @@ async function copiarObraDesdeMuseo() {
   }
 }
 
-// ============================================================
-//  UI DEL LIBRO Y TEMAS
-// ============================================================
 function initPanelTemas() {
   const btnAbrir = document.getElementById('btnAbrirPanelTemas');
   const btnCerrar = document.getElementById('btnCerrarPanelTemas');
