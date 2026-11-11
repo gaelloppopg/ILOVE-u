@@ -1,711 +1,312 @@
-/* ==========================================================================
-   PROYECTO: ESTUDIO DE DIBUJO MÓVIL (ESTILO INMERSIVO TIPO INSTAGRAM)
-   DESCRIPCIÓN: Reescritura completa del CSS para garantizar que el lienzo
-   nunca se corte en vertical, con controles flotantes ergonómicos.
-   ========================================================================== */
-
-/* ==========================================================================
-   1. VARIABLES GLOBALES (DESIGN TOKENS)
-   ========================================================================== */
-:root {
-  /* Paleta de Colores */
-  --c-fondo-app: #000000;
-  --c-fondo-panel: rgba(26, 26, 26, 0.95);
-  --c-fondo-control: #2a2a2a;
-  --c-fondo-control-hover: #3a3a3a;
-  --c-acento: #c9a050; /* Dorado */
-  --c-acento-hover: #e0b860;
-  --c-texto-principal: #ffffff;
-  --c-texto-secundario: #aaaaaa;
-  --c-borde: #333333;
-  --c-borde-claro: #444444;
-  --c-sombra: rgba(0, 0, 0, 0.6);
-
-  /* Espaciados y Tamaños */
-  --sp-xs: 4px;
-  --sp-sm: 8px;
-  --sp-md: 16px;
-  --sp-lg: 24px;
-  --sp-xl: 32px;
-  
-  /* Tamaños táctiles (Accesibilidad) */
-  --touch-target: 44px; 
-  --touch-target-sm: 36px;
-
-  /* Bordes */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-pill: 50px;
-
-  /* Transiciones */
-  --trans-rapida: 0.15s ease;
-  --trans-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --trans-suave: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Z-Index */
-  --z-canvas: 1;
-  --z-overlay: 10;
-  --z-floating-btn: 100;
-  --z-bottom-bar: 200;
-  --z-drawer: 500;
-  --z-drawer-overlay: 499;
-}
-
-/* ==========================================================================
-   2. RESET Y CONFIGURACIÓN BASE PARA MÓVIL
-   ========================================================================== */
-html, body {
-  width: 100%;
-  height: 100%;
-  max-width: 100vw;
-  overflow: hidden !important; /* Bloquea scroll global */
-  margin: 0;
-  padding: 0;
-  background-color: var(--c-fondo-app);
-  color: var(--c-texto-principal);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior: none; /* Evita el efecto de rebote en iOS */
-  -webkit-tap-highlight-color: transparent; /* Quita el flash azul al tocar */
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  /* Evita la selección de texto y el menú contextual al mantener pulsado en el lienzo */
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-}
-
-/* Excepciones para campos de entrada */
-input, textarea {
-  user-select: auto;
-  -webkit-user-select: auto;
-}
-
-/* ==========================================================================
-   3. SEPARACIÓN ESTRICTA DE VISTAS
-   ========================================================================== */
+/* =========================================================
+   SEPARACIÓN ESTRICTA DE VISTAS
+   ========================================================= */
 body.layout-escritorio .vista-movil { display: none !important; }
-body.layout-movil .vista-escritorio,
+body.layout-movil .vista-escritorio, 
 body.layout-tablet .vista-escritorio { display: none !important; }
 
-/* ==========================================================================
-   4. LAYOUT PRINCIPAL INMERSIVO (APP CONTAINER)
-   ========================================================================== */
+/* =========================================================
+   ESTILOS MÓVIL / TABLET
+   ========================================================= */
+body.layout-movil .estudio-overlay,
+body.layout-tablet .estudio-overlay { 
+  padding: 0 !important; 
+  background: #000 !important;
+}
+
+body.layout-movil .estudio,
+body.layout-tablet .estudio { 
+  width: 100vw !important; 
+  height: 100dvh !important; /* dvh arregla el problema de la barra de URL en móviles */
+  margin: 0 !important; 
+  border-radius: 0 !important; 
+  display: flex !important; 
+  flex-direction: column !important;
+  background: #000 !important;
+  overflow: hidden; /* Evita scroll */
+}
+
+/* Lienzo */
+body.layout-movil .estudio-canvas-wrapper,
+body.layout-tablet .estudio-canvas-wrapper {
+  background: #111 !important; 
+  padding: 10px; 
+  flex: 1; /* Ocupa todo el espacio entre el menú y la barra */
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  overflow: hidden;
+  /* Crucial para que el navegador no haga scroll al dibujar */
+  touch-action: none !important; 
+}
+
+body.layout-movil .canvas-stack,
+body.layout-tablet .canvas-stack {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+  max-width: 100%;
+  max-height: 100%;
+}
+
+body.layout-movil canvas,
+body.layout-tablet canvas {
+  touch-action: none !important;
+}
+
+/* MENÚ LATERAL (DRAWER) */
+body.layout-movil .estudio-toolbar,
+body.layout-tablet .estudio-toolbar { 
+  position: fixed !important; top: 0 !important; right: -100% !important;
+  width: 85vw !important; max-width: 320px !important; height: 100dvh !important;
+  background: #1a1a1a !important; color: #fff !important;
+  z-index: 9999 !important; padding: 20px !important; overflow-y: auto !important;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; 
+  display: flex !important; flex-direction: column !important; gap: 15px !important;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+}
+
+body.layout-movil .estudio-toolbar.activo,
+body.layout-tablet .estudio-toolbar.activo { right: 0 !important; }
+
+body.layout-movil .btn-cerrar-toolbar,
+body.layout-tablet .btn-cerrar-toolbar {
+  display: flex !important; justify-content: center; align-items: center;
+  background: #333; border: none; color: #fff; font-size: 1.2rem; font-weight: bold;
+  width: 35px; height: 35px; border-radius: 50%; cursor: pointer; 
+  align-self: flex-end; margin-bottom: 10px;
+}
+
+body.layout-movil .estudio-toolbar .tool-group,
+body.layout-tablet .estudio-toolbar .tool-group { 
+  display: flex !important; flex-direction: column !important; gap: 10px !important; 
+  width: 100% !important; border-bottom: 1px solid #333; padding-bottom: 15px;
+}
+body.layout-movil .estudio-toolbar .tool-group:last-child,
+body.layout-tablet .estudio-toolbar .tool-group:last-child { border-bottom: none; padding-bottom: 0; }
+
+body.layout-movil .estudio-toolbar .tool-label,
+body.layout-tablet .estudio-toolbar .tool-label { 
+  font-size: 0.85rem !important; color: #c9a050 !important; font-weight: 700 !important; text-transform: uppercase;
+}
+
+/* Botones del menú */
+body.layout-movil .estudio-toolbar .tool-btn,
+body.layout-tablet .estudio-toolbar .tool-btn {
+  width: 100% !important; padding: 14px !important; background: #2a2a2a !important; color: #fff !important;
+  border: 1px solid #444 !important; border-radius: 10px !important; text-align: center !important; font-size: 1rem !important;
+}
+body.layout-movil .estudio-toolbar .tool-btn.active,
+body.layout-tablet .estudio-toolbar .tool-btn.active { 
+  background: #c9a050 !important; color: #000 !important; border-color: #c9a050 !important; font-weight: bold;
+}
+
+/* Colores en menú */
+body.layout-movil .estudio-toolbar .colores-grid,
+body.layout-tablet .estudio-toolbar .colores-grid { 
+  display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 12px !important; width: 100%; 
+}
+body.layout-movil .estudio-toolbar .color-btn,
+body.layout-tablet .estudio-toolbar .color-btn { 
+  width: 100% !important; aspect-ratio: 1 !important; border-radius: 50% !important; border: 2px solid transparent !important; 
+}
+body.layout-movil .estudio-toolbar .color-btn.active,
+body.layout-tablet .estudio-toolbar .color-btn.active { border-color: #fff !important; transform: scale(1.1); }
+
+/* Grosor */
+body.layout-movil .estudio-toolbar .grosor-control,
+body.layout-tablet .estudio-toolbar .grosor-control { display: flex !important; width: 100% !important; justify-content: space-between; align-items: center; }
+body.layout-movil .estudio-toolbar input[type="range"],
+body.layout-tablet .estudio-toolbar input[type="range"] { width: 75% !important; accent-color: #c9a050; }
+
+/* Fondo */
+body.layout-movil .estudio-toolbar .fondo-controles,
+body.layout-tablet .estudio-toolbar .fondo-controles { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px !important; width: 100%; margin-top: 5px; }
+body.layout-movil .estudio-toolbar .fondo-controles input[type="color"],
+body.layout-tablet .estudio-toolbar .fondo-controles input[type="color"] { width: 100% !important; height: 45px !important; border-radius: 10px !important; border: none; cursor: pointer; }
+body.layout-movil .estudio-toolbar .fondo-controles button,
+body.layout-tablet .estudio-toolbar .fondo-controles button { width: 100% !important; padding: 12px !important; border-radius: 10px !important; background: #2a2a2a; border: 1px solid #444; color: #fff; font-size: 0.9rem;}
+
+/* Título */
+body.layout-movil .estudio-toolbar input[type="text"],
+body.layout-tablet .estudio-toolbar input[type="text"] { 
+  width: 100% !important; padding: 12px !important; background: #2a2a2a !important; 
+  border: 1px solid #444 !important; color: #fff !important; border-radius: 10px !important; font-size: 1rem !important; 
+}
+
+body.layout-movil #overlayMenu.activo,
+body.layout-tablet #overlayMenu.activo { 
+  display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; backdrop-filter: blur(2px); 
+}
+
+body.layout-movil .btn-menu-movil-flotante,
+body.layout-tablet .btn-menu-movil-flotante {
+  display: flex; align-items: center; justify-content: center;
+  position: absolute; top: 15px; right: 15px; z-index: 100;
+  background: rgba(51, 51, 51, 0.8); color: #fff; border: none;
+  width: 44px; height: 44px; border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5); cursor: pointer; backdrop-filter: blur(5px);
+  font-size: 1.2rem;
+}
+
+/* =========================================================
+   BARRA INFERIOR TIPO INSTAGRAM (Optimizada para no cortarse)
+   ========================================================= */
+body.layout-movil .barra-instagram,
+body.layout-tablet .barra-instagram {
+  display: flex !important; 
+  position: relative; /* Ya no es absolute, es parte del flex */
+  width: 100%;
+  background: #000; 
+  padding: 10px 15px; 
+  align-items: center; 
+  justify-content: space-between;
+  border-top: 1px solid #222;
+  flex-shrink: 0; /* Evita que se encoja */
+  gap: 10px;
+}
+
+body.layout-movil .barra-instagram .acciones-izq,
+body.layout-tablet .barra-instagram .acciones-izq {
+  display: flex; gap: 5px; align-items: center; flex-shrink: 0;
+}
+
+body.layout-movil .barra-instagram .acciones-izq .tool-btn,
+body.layout-tablet .barra-instagram .acciones-izq .tool-btn {
+  background: #1a1a1a; border: none; color: #fff; padding: 10px; border-radius: 10px; 
+  display: flex; justify-content: center; align-items: center; cursor: pointer;
+}
+body.layout-movil .barra-instagram .acciones-izq .tool-btn svg,
+body.layout-tablet .barra-instagram .acciones-izq .tool-btn svg { width: 22px; height: 22px; }
+
+body.layout-movil .paleta-rapida,
+body.layout-tablet .paleta-rapida {
+  display: flex; gap: 8px; overflow-x: auto; align-items: center; 
+  flex: 1; margin: 0 5px; scrollbar-width: none; 
+}
+body.layout-movil .paleta-rapida::-webkit-scrollbar,
+body.layout-tablet .paleta-rapida::-webkit-scrollbar { display: none; }
+
+body.layout-movil .paleta-rapida .color-btn,
+body.layout-tablet .paleta-rapida .color-btn {
+  width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; flex-shrink: 0; cursor: pointer;
+}
+body.layout-movil .paleta-rapida .color-btn.active,
+body.layout-tablet .paleta-rapida .color-btn.active { border-color: #fff; transform: scale(1.15); }
+
+body.layout-movil .btn-accion-principal,
+body.layout-tablet .btn-accion-principal {
+  background: #c9a050; color: #000; border: none; padding: 12px 18px; border-radius: 25px;
+  font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(201, 160, 80, 0.3);
+}
+/* =========================================================
+   ADAPTACIÓN GLOBAL DE LA PÁGINA Y EL LIENZO
+   ========================================================= */
+
+/* Evitar scroll horizontal en toda la página */
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Asegurar que el estudio ocupe exactamente el tamaño de la pantalla */
 body.layout-movil .estudio-overlay,
 body.layout-tablet .estudio-overlay {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100dvh; /* Dynamic Viewport Height: soluciona el problema de la barra de URL */
-  background: var(--c-fondo-app);
-  z-index: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  width: 100vw !important;
+  height: 100dvh !important; /* dvh evita problemas con la barra de URL del móvil */
+  overflow: hidden !important;
 }
 
 body.layout-movil .estudio,
 body.layout-tablet .estudio {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: var(--c-fondo-app);
-  overflow: hidden;
-}
-
-/* ==========================================================================
-   5. ÁREA DEL LIENZO (CANVAS WRAPPER)
-   ========================================================================== */
-/* El wrapper ocupa todo el espacio disponible y centra el canvas */
-body.layout-movil .estudio-canvas-wrapper,
-body.layout-tablet .estudio-canvas-wrapper {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  width: 100%;
-  position: relative;
-  background-color: #0a0a0a; /* Fondo ligeramente más claro que el body para contraste */
-  touch-action: none !important; /* CRUCIAL: Evita que el navegador haga scroll/zoom al dibujar */
-  z-index: var(--z-canvas);
-  padding: var(--sp-sm); /* Margen mínimo para que no toque los bordes */
-}
-
-/* Contenedor del canvas que mantiene la proporción */
-body.layout-movil .canvas-stack,
-body.layout-tablet .canvas-stack {
-  position: relative;
-  max-width: 100%;
-  max-height: 100%;
-  aspect-ratio: 4 / 3; /* Ajusta según la proporción de tu lienzo base */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background-color: #ffffff; /* Fondo blanco por defecto para el lienzo */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* El canvas real */
-body.layout-movil .canvas-stack canvas,
-body.layout-tablet .canvas-stack canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain; /* Asegura que el dibujo no se deforme */
-  touch-action: none !important;
-  cursor: crosshair;
-}
-
-/* ==========================================================================
-   6. BARRA INFERIOR FLOTANTE (ESTILO INSTAGRAM)
-   ========================================================================== */
-/* Envuelve los controles principales en la parte inferior */
-body.layout-movil .barra-instagram,
-body.layout-tablet .barra-instagram {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  padding: var(--sp-md) var(--sp-md) calc(var(--sp-md) + env(safe-area-inset-bottom)); /* Safe area para iPhone */
-  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-sm);
-  z-index: var(--z-bottom-bar);
-  pointer-events: none; /* Permite dibujar a través del gradiente, pero los hijos sí reciben eventos */
-}
-
-/* Los hijos de la barra recuperan los eventos */
-body.layout-movil .barra-instagram > *,
-body.layout-tablet .barra-instagram > * {
-  pointer-events: auto;
-}
-
-/* --- Fila de Colores Rápidos (Scroll Horizontal) --- */
-body.layout-movil .paleta-rapida,
-body.layout-tablet .paleta-rapida {
-  display: flex;
-  gap: var(--sp-sm);
-  overflow-x: auto;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-  max-width: 100vw;
-  padding: var(--sp-xs) var(--sp-sm);
-  scrollbar-width: none; /* Firefox */
-  -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
-  scroll-snap-type: x proximity;
-}
-
-body.layout-movil .paleta-rapida::-webkit-scrollbar,
-body.layout-tablet .paleta-rapida::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-body.layout-movil .paleta-rapida .color-btn,
-body.layout-tablet .paleta-rapida .color-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  flex-shrink: 0;
-  cursor: pointer;
-  transition: transform var(--trans-rapida), border-color var(--trans-rapida);
-  scroll-snap-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-}
-
-body.layout-movil .paleta-rapida .color-btn.active,
-body.layout-tablet .paleta-rapida .color-btn.active {
-  border-color: var(--c-texto-principal);
-  transform: scale(1.15);
-  box-shadow: 0 0 10px rgba(255,255,255,0.3);
-}
-
-/* --- Fila de Acciones Principales --- */
-body.layout-movil .acciones-principales,
-body.layout-tablet .acciones-principales {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: var(--sp-md);
-  background: var(--c-fondo-panel);
-  backdrop-filter: blur(10px); /* Efecto cristal */
-  -webkit-backdrop-filter: blur(10px);
-  padding: var(--sp-sm) var(--sp-md);
-  border-radius: var(--radius-pill);
-  box-shadow: 0 4px 15px var(--c-sombra);
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-/* Botones de acción izquierdos (Herramientas) */
-body.layout-movil .acciones-izq,
-body.layout-tablet .acciones-izq {
-  display: flex;
-  gap: var(--sp-xs);
-  align-items: center;
-  flex-shrink: 0;
-}
-
-body.layout-movil .acciones-izq .tool-btn,
-body.layout-tablet .acciones-izq .tool-btn {
-  width: var(--touch-target);
-  height: var(--touch-target);
-  background: transparent;
-  border: none;
-  color: var(--c-texto-principal);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: background-color var(--trans-rapida), transform var(--trans-rapida);
-}
-
-body.layout-movil .acciones-izq .tool-btn:active,
-body.layout-tablet .acciones-izq .tool-btn:active {
-  background: rgba(255,255,255,0.1);
-  transform: scale(0.95);
-}
-
-body.layout-movil .acciones-izq .tool-btn.active,
-body.layout-tablet .acciones-izq .tool-btn.active {
-  background: rgba(201, 160, 80, 0.2);
-  color: var(--c-acento);
-}
-
-body.layout-movil .acciones-izq .tool-btn svg,
-body.layout-tablet .acciones-izq .tool-btn svg {
-  width: 24px;
-  height: 24px;
-  fill: currentColor;
-}
-
-/* Botón de Acción Principal (Guardar / Siguiente) */
-body.layout-movil .btn-accion-principal,
-body.layout-tablet .btn-accion-principal {
-  background: var(--c-acento);
-  color: #000000;
-  border: none;
-  padding: 0 var(--sp-md);
-  height: var(--touch-target);
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-  font-size: 0.95rem;
-  cursor: pointer;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color var(--trans-rapida), transform var(--trans-rapida);
-  box-shadow: 0 2px 10px rgba(201, 160, 80, 0.4);
-}
-
-body.layout-movil .btn-accion-principal:active,
-body.layout-tablet .btn-accion-principal:active {
-  background: var(--c-acento-hover);
-  transform: scale(0.98);
-}
-
-/* ==========================================================================
-   7. BOTÓN DE MENÚ FLOTANTE (ENGANCHE PARA EL DRAWER)
-   ========================================================================== */
-/* Botón flotante en la esquina superior derecha, sobre el canvas */
-body.layout-movil .btn-menu-movil-flotante,
-body.layout-tablet .btn-menu-movil-flotante {
-  position: absolute;
-  top: calc(var(--sp-md) + env(safe-area-inset-top));
-  right: var(--sp-md);
-  z-index: var(--z-floating-btn);
-  background: var(--c-fondo-panel);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: var(--c-texto-principal);
-  border: 1px solid rgba(255,255,255,0.1);
-  width: var(--touch-target);
-  height: var(--touch-target);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px var(--c-sombra);
-  cursor: pointer;
-  transition: background-color var(--trans-rapida), transform var(--trans-rapida);
-}
-
-body.layout-movil .btn-menu-movil-flotante:active,
-body.layout-tablet .btn-menu-movil-flotante:active {
-  transform: scale(0.92);
-  background: var(--c-fondo-control);
-}
-
-/* ==========================================================================
-   8. MENÚ LATERAL (DRAWER) - AJUSTES Y HERRAMIENTAS
-   ========================================================================== */
-/* Fondo oscuro semitransparente que cubre la pantalla al abrir el menú */
-body.layout-movil #overlayMenu.activo,
-body.layout-tablet #overlayMenu.activo {
-  display: block;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: var(--z-drawer-overlay);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-  animation: fadeIn var(--trans-normal);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Panel lateral (Drawer) */
-body.layout-movil .estudio-toolbar,
-body.layout-tablet .estudio-toolbar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 85vw;
-  max-width: 340px;
-  height: 100dvh;
-  background: var(--c-fondo-panel);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  color: var(--c-texto-principal);
-  z-index: var(--z-drawer);
-  padding: var(--sp-lg);
-  padding-top: calc(var(--sp-lg) + env(safe-area-inset-top)); /* Safe area */
-  padding-bottom: calc(var(--sp-lg) + env(safe-area-inset-bottom));
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-md);
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
-  
-  /* Animación: Deslizar desde la derecha */
-  transform: translateX(100%);
-  transition: transform var(--trans-normal);
-}
-
-body.layout-movil .estudio-toolbar.activo,
-body.layout-tablet .estudio-toolbar.activo {
-  transform: translateX(0);
-}
-
-/* Botón de Cerrar (X) dentro del menú */
-body.layout-movil .btn-cerrar-toolbar,
-body.layout-tablet .btn-cerrar-toolbar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--c-fondo-control);
-  border: 1px solid var(--c-borde);
-  color: var(--c-texto-principal);
-  width: var(--touch-target);
-  height: var(--touch-target);
-  border-radius: 50%;
-  cursor: pointer;
-  align-self: flex-end;
-  margin-bottom: var(--sp-xs);
-  transition: background-color var(--trans-rapida);
-}
-
-body.layout-movil .btn-cerrar-toolbar:active,
-body.layout-tablet .btn-cerrar-toolbar:active {
-  background: var(--c-borde-claro);
-}
-
-/* ==========================================================================
-   9. CONTROLES DENTRO DEL MENÚ (AGRUPACIONES)
-   ========================================================================== */
-body.layout-movil .estudio-toolbar .tool-group,
-body.layout-tablet .estudio-toolbar .tool-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-sm);
-  width: 100%;
-  border-bottom: 1px solid var(--c-borde);
-  padding-bottom: var(--sp-md);
-}
-
-body.layout-movil .estudio-toolbar .tool-group:last-child,
-body.layout-tablet .estudio-toolbar .tool-group:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-body.layout-movil .estudio-toolbar .tool-label,
-body.layout-tablet .estudio-toolbar .tool-label {
-  font-size: 0.8rem;
-  color: var(--c-acento);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: var(--sp-xs);
-}
-
-/* ==========================================================================
-   10. BOTONES DE HERRAMIENTAS EN EL MENÚ (TOOL BTN)
-   ========================================================================== */
-body.layout-movil .estudio-toolbar .tool-btn,
-body.layout-tablet .estudio-toolbar .tool-btn {
-  width: 100%;
-  min-height: var(--touch-target);
-  padding: var(--sp-sm) var(--sp-md);
-  background: var(--c-fondo-control);
-  color: var(--c-texto-principal);
-  border: 1px solid var(--c-borde-claro);
-  border-radius: var(--radius-md);
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--sp-sm);
-  transition: background-color var(--trans-rapida), border-color var(--trans-rapida);
-}
-
-body.layout-movil .estudio-toolbar .tool-btn:active,
-body.layout-tablet .estudio-toolbar .tool-btn:active {
-  background: var(--c-borde);
-}
-
-body.layout-movil .estudio-toolbar .tool-btn.active,
-body.layout-tablet .estudio-toolbar .tool-btn.active {
-  background: var(--c-acento);
-  color: #000000;
-  border-color: var(--c-acento);
-  font-weight: 700;
-}
-
-/* ==========================================================================
-   11. GRID DE COLORES EN EL MENÚ
-   ========================================================================== */
-body.layout-movil .estudio-toolbar .colores-grid,
-body.layout-tablet .estudio-toolbar .colores-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--sp-md);
-  width: 100%;
-  padding: var(--sp-xs) 0;
-}
-
-body.layout-movil .estudio-toolbar .color-btn,
-body.layout-tablet .estudio-toolbar .color-btn {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  cursor: pointer;
-  transition: transform var(--trans-rapida), border-color var(--trans-rapida);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-}
-
-body.layout-movil .estudio-toolbar .color-btn.active,
-body.layout-tablet .estudio-toolbar .color-btn.active {
-  border-color: var(--c-texto-principal);
-  transform: scale(1.1);
-  box-shadow: 0 0 12px rgba(255,255,255,0.4);
-}
-
-/* ==========================================================================
-   12. CONTROLES DE GROSOR (SLIDER)
-   ========================================================================== */
-body.layout-movil .estudio-toolbar .grosor-control,
-body.layout-tablet .estudio-toolbar .grosor-control {
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--sp-md);
-}
-
-body.layout-movil .estudio-toolbar .grosor-control span,
-body.layout-tablet .estudio-toolbar .grosor-control span {
-  font-size: 0.9rem;
-  color: var(--c-texto-secundario);
-  min-width: 20px;
-  text-align: right;
-}
-
-body.layout-movil .estudio-toolbar input[type="range"],
-body.layout-tablet .estudio-toolbar input[type="range"] {
-  flex: 1;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  background: var(--c-fondo-control);
-  border-radius: var(--radius-pill);
-  outline: none;
-  accent-color: var(--c-acento);
-}
-
-body.layout-movil .estudio-toolbar input[type="range"]::-webkit-slider-thumb,
-body.layout-tablet .estudio-toolbar input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--c-acento);
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-  border: 2px solid #fff;
-}
-
-/* ==========================================================================
-   13. CONTROLES DE FONDO
-   ========================================================================== */
-body.layout-movil .estudio-toolbar .fondo-controles,
-body.layout-tablet .estudio-toolbar .fondo-controles {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--sp-sm);
-  width: 100%;
-  margin-top: var(--sp-xs);
-}
-
-body.layout-movil .estudio-toolbar .fondo-controles input[type="color"],
-body.layout-tablet .estudio-toolbar .fondo-controles input[type="color"] {
-  width: 100%;
-  height: var(--touch-target);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--c-borde-claro);
-  background: var(--c-fondo-control);
-  cursor: pointer;
-  padding: 0;
-}
-
-body.layout-movil .estudio-toolbar .fondo-controles button,
-body.layout-tablet .estudio-toolbar .fondo-controles button {
-  width: 100%;
-  height: var(--touch-target);
-  border-radius: var(--radius-md);
-  background: var(--c-fondo-control);
-  border: 1px solid var(--c-borde-claro);
-  color: var(--c-texto-principal);
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background-color var(--trans-rapida);
-}
-
-body.layout-movil .estudio-toolbar .fondo-controles button:active,
-body.layout-tablet .estudio-toolbar .fondo-controles button:active {
-  background: var(--c-borde);
-}
-
-/* ==========================================================================
-   14. CAMPO DE TEXTO (TÍTULO DEL PROYECTO)
-   ========================================================================== */
-body.layout-movil .estudio-toolbar input[type="text"],
-body.layout-tablet .estudio-toolbar input[type="text"] {
-  width: 100%;
-  height: var(--touch-target);
-  padding: 0 var(--sp-md);
-  background: var(--c-fondo-control);
-  border: 1px solid var(--c-borde-claro);
-  color: var(--c-texto-principal);
-  border-radius: var(--radius-md);
-  font-size: 1rem;
-  transition: border-color var(--trans-rapida);
-}
-
-body.layout-movil .estudio-toolbar input[type="text"]:focus,
-body.layout-tablet .estudio-toolbar input[type="text"]:focus {
-  outline: none;
-  border-color: var(--c-acento);
-}
-
-/* ==========================================================================
-   15. UTILIDADES Y ANIMACIONES EXTRA
-   ========================================================================== */
-/* Animación para el botón flotante al hacer scroll o interactuar */
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-/* Clase de utilidad para ocultar elementos */
-.hidden {
-  display: none !important;
-}
-
-/* Clase para deshabilitar eventos en el fondo cuando el menú está abierto */
-body.menu-abierto {
+  width: 100vw !important;
+  height: 100dvh !important;
   overflow: hidden !important;
 }
 
-/* Mejoras para pantallas muy pequeñas (iPhone SE, etc.) */
-@media (max-width: 380px) {
-  :root {
-    --sp-md: 12px;
-    --sp-lg: 16px;
-  }
-  
-  body.layout-movil .paleta-rapida .color-btn,
-  body.layout-tablet .paleta-rapida .color-btn {
-    width: 28px;
-    height: 28px;
-  }
-  
-  body.layout-movil .btn-accion-principal,
-  body.layout-tablet .btn-accion-principal {
-    padding: 0 var(--sp-sm);
-    font-size: 0.85rem;
-  }
+/* Forzar al contenedor del canvas a adaptar el lienzo al espacio disponible */
+body.layout-movil .estudio-canvas-wrapper,
+body.layout-tablet .estudio-canvas-wrapper {
+  flex: 1 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  padding: 5px !important; /* Un pequeño margen para que no toque los bordes */
 }
 
-/* Mejoras para tablets en modo horizontal (más espacio) */
-@media (min-width: 768px) and (orientation: landscape) {
-  body.layout-tablet .estudio-toolbar {
-    width: 40vw;
-    max-width: 400px;
-  }
+/* El lienzo se adapta manteniendo su proporción (aspect-ratio 3/2) */
+body.layout-movil .canvas-stack,
+body.layout-tablet .canvas-stack {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 100% !important;
+  aspect-ratio: 3 / 2 !important;
+  position: relative;
 }
 
-/* ==========================================================================
-   16. ACCESIBILIDAD: PREFERENCIAS DE MOVIMIENTO REDUCIDO
-   ========================================================================== */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --trans-rapida: 0.01s;
-    --trans-normal: 0.01s;
-    --trans-suave: 0.01s;
-  }
-  
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+body.layout-movil .canvas-stack canvas,
+body.layout-tablet .canvas-stack canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
 }
 
-/* ==========================================================================
-   17. ESTADOS DE FOCO PARA ACCESIBILIDAD (TECLADO)
-   ========================================================================== */
-:focus-visible {
-  outline: 2px solid var(--c-acento);
-  outline-offset: 2px;
+/* Asegurar que los menús laterales no generen scroll en el body */
+body.layout-movil .estudio-toolbar,
+body.layout-tablet .estudio-toolbar {
+  max-height: 100dvh !important;
+}
+/* =========================================================
+   ADAPTACIÓN DEL LIBRO (ÁLBUM) PARA MÓVILES Y TABLETS
+   ========================================================= */
+
+/* Ajustar el contenedor del libro para que no se desborde */
+.libro-escenario {
+  width: 100vw !important;
+  height: 100dvh !important;
+  overflow: hidden !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px !important;
+}
+
+/* Ajustar el tamaño del libro según la pantalla (Se adapta al 90% del ancho máximo) */
+.libro-wrapper {
+  width: clamp(280px, 90vw, 800px) !important; /* Se encoge en celular, crece en PC */
+  height: auto !important;
+  aspect-ratio: 3 / 2 !important; /* Mantiene la proporción del libro */
+  position: relative;
+  margin: 0 auto;
+  transform: scale(1) !important; /* Evita que se salga de cuadro */
+}
+
+/* Ajustar la portada y las páginas internas para que sigan el tamaño del wrapper */
+.libro-portada, 
+.libro-paginas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Asegurarse de que los controles (botones anterior/siguiente) se vean bien */
+.libro-controles {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  z-index: 10;
+}
+
+/* Ajustar el tamaño de las letras o elementos internos del libro si se ven muy grandes */
+.portada-titulo {
+  font-size: clamp(1.5rem, 5vw, 2.5rem) !important;
+}
+.portada-subtitulo {
+  font-size: clamp(0.8rem, 3vw, 1.2rem) !important;
 }
