@@ -81,13 +81,11 @@ async function initArte() {
   document.body.classList.add(`layout-${preferenciaDispositivo}`);
 
   canvasFondo = document.querySelector(".lienzo-fondo");
-  ctxFondo = canvasFondo.getContext("2d");
   canvas = document.querySelector(".lienzo-dibujo");
-  ctx = canvas.getContext("2d");
   
-  // Forzamos al CSS a recibir eventos y bloquear scroll
+  if (canvasFondo) ctxFondo = canvasFondo.getContext("2d");
   if (canvas) {
-    canvas.style.pointerEvents = "auto";
+    ctx = canvas.getContext("2d");
     canvas.style.touchAction = "none";
   }
 
@@ -100,55 +98,55 @@ async function initArte() {
 }
 
 // ============================================================
-//  EVENTOS Y HERRAMIENTAS (BLINDADO PARA TÁCTIL Y RATÓN)
+//  EVENTOS TÁCTILES Y DIBUJO
 // ============================================================
 function configurarEventosDibujo() {
   if (canvas) {
-    // 1. Eventos Pointer (Modernos, unifican ratón y táctil)
-    canvas.addEventListener("pointerdown", (e) => {
+    // Eventos táctiles directos para móviles
+    canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      canvas.setPointerCapture(e.pointerId);
+      const touch = e.touches[0];
+      empezarDibujo(touch);
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      dibujar(touch);
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      terminarDibujo();
+    }, { passive: false });
+
+    // Eventos de ratón para computadora
+    canvas.addEventListener('mousedown', (e) => {
       empezarDibujo(e);
     });
-
-    canvas.addEventListener("pointermove", (e) => {
-      if (dibujando) {
-        e.preventDefault();
-        dibujar(e);
-      }
+    canvas.addEventListener('mousemove', (e) => {
+      if (dibujando) dibujar(e);
     });
-
-    canvas.addEventListener("pointerup", (e) => {
-      terminarDibujo();
-      if (canvas.hasPointerCapture(e.pointerId)) {
-        canvas.releasePointerCapture(e.pointerId);
-      }
-    });
-
-    canvas.addEventListener("pointercancel", (e) => {
-      terminarDibujo();
-      if (canvas.hasPointerCapture(e.pointerId)) {
-        canvas.releasePointerCapture(e.pointerId);
-      }
-    });
-
-    // 2. Bloqueo de menú contextual y arrastre
-    canvas.addEventListener("contextmenu", (e) => e.preventDefault());
-    canvas.addEventListener("dragstart", (e) => e.preventDefault());
+    canvas.addEventListener('mouseup', terminarDibujo);
+    canvas.addEventListener('mouseleave', terminarDibujo);
   }
-  
-  // Botones de herramientas
-  document.querySelectorAll(".tool-btn[data-tool]").forEach(btn => {
-    btn.onclick = (e) => {
-      e.preventDefault();
-      document.querySelectorAll(".tool-btn[data-tool]").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      herramienta = btn.dataset.tool;
-    };
-  });
+
+  // Herramientas
+  const botonesHerramienta = document.querySelectorAll(".tool-btn[data-tool]");
+  if (botonesHerramienta.length > 0) {
+    botonesHerramienta.forEach(btn => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        botonesHerramienta.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        herramienta = btn.dataset.tool;
+      };
+    });
+  }
 
   // Grosor
-  document.querySelectorAll(".input-grosor").forEach(inp => {
+  const inputsGrosor = document.querySelectorAll(".input-grosor");
+  inputsGrosor.forEach(inp => {
     inp.oninput = (e) => {
       grosor = parseInt(e.target.value);
       document.querySelectorAll(".grosor-badge").forEach(b => b.textContent = grosor);
@@ -156,10 +154,11 @@ function configurarEventosDibujo() {
   });
   
   // Colores
-  document.querySelectorAll(".color-btn").forEach(btn => {
+  const botonesColor = document.querySelectorAll(".color-btn");
+  botonesColor.forEach(btn => {
     btn.onclick = (e) => {
       e.preventDefault();
-      document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
+      botonesColor.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       color = btn.dataset.color;
       document.querySelectorAll(".colorPicker").forEach(cp => cp.value = color);
@@ -169,11 +168,11 @@ function configurarEventosDibujo() {
   document.querySelectorAll(".colorPicker").forEach(cp => {
     cp.oninput = (e) => {
       color = e.target.value;
-      document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
+      botonesColor.forEach(b => b.classList.remove("active"));
     };
   });
 
-  // --- Lógica del Portapapeles ---
+  // Portapapeles
   const copiarFn = () => {
     portapapeles.trazos = JSON.parse(JSON.stringify(trazos)); 
     if (fondoImagen) portapapeles.fondo = fondoImagen;
@@ -204,12 +203,15 @@ function configurarEventosDibujo() {
   document.querySelectorAll(".btn-limpiar").forEach(b => b.onclick = limpiarFn);
   document.querySelectorAll(".btn-guardar").forEach(b => b.onclick = guardarFn);
 
-  // Controles de Fondo
+  // Fondo
   document.querySelectorAll(".fondo-color-input").forEach(inp => {
     inp.oninput = (e) => { fondoColor = e.target.value; fondoImagen = null; dibujarFondo(); };
   });
   
-  document.querySelectorAll(".btn-subir-fondo").forEach(b => b.onclick = () => document.getElementById("inputFondo").click());
+  document.querySelectorAll(".btn-subir-fondo").forEach(b => b.onclick = () => {
+    const el = document.getElementById("inputFondo");
+    if (el) el.click();
+  });
   
   document.querySelectorAll(".btn-quitar-fondo").forEach(b => b.onclick = () => { 
     fondoImagen = null; fondoColor = "#ffffff"; 
@@ -236,15 +238,24 @@ function configurarEventosDibujo() {
 
 function configurarEventosUI() {
   document.querySelectorAll("#btnNuevaObra").forEach(b => b.onclick = abrirEstudio);
-  document.querySelectorAll("#cerrarEstudio").forEach(b => b.onclick = () => document.getElementById("estudioOverlay").classList.remove("activo"));
+  document.querySelectorAll("#cerrarEstudio").forEach(b => b.onclick = () => {
+    const el = document.getElementById("estudioOverlay");
+    if (el) el.classList.remove("activo");
+  });
   
   document.querySelectorAll("#btnCerrarLibro").forEach(b => b.onclick = cerrarLibro);
   document.querySelectorAll("#libroPortada").forEach(b => b.onclick = abrirLibro);
   document.querySelectorAll("#btnPrev").forEach(b => b.onclick = paginaAnterior);
   document.querySelectorAll("#btnNext").forEach(b => b.onclick = paginaSiguiente);
 
-  document.querySelectorAll("#btnCerrarMuseo").forEach(b => b.onclick = () => document.getElementById("museoOverlay").classList.remove("activo"));
-  document.querySelectorAll("#museoOverlay").forEach(m => m.onclick = (e) => { if (e.target.id === 'museoOverlay') m.classList.remove("activo"); });
+  document.querySelectorAll("#btnCerrarMuseo").forEach(b => b.onclick = () => {
+    const el = document.getElementById("museoOverlay");
+    if (el) el.classList.remove("activo");
+  });
+  
+  document.querySelectorAll("#museoOverlay").forEach(m => m.onclick = (e) => { 
+    if (e.target.id === 'museoOverlay') m.classList.remove("activo"); 
+  });
 
   document.querySelectorAll("#btnBorrarObra").forEach(b => b.onclick = borrarObraDesdeMuseo);
   document.querySelectorAll("#btnEditarObra").forEach(b => b.onclick = editarObraDesdeMuseo);
@@ -282,7 +293,9 @@ function abrirEstudio() {
   document.querySelectorAll("#tituloObra, #tituloObraM").forEach(inp => inp.value = "");
   
   dibujarFondo(); 
-  document.getElementById("estudioOverlay").classList.add("activo");
+  
+  const overlay = document.getElementById("estudioOverlay");
+  if (overlay) overlay.classList.add("activo");
 }
 
 function dibujarFondo() {
@@ -429,7 +442,8 @@ async function guardarObra() {
       if (idx !== -1) obras[idx] = obraGuardada;
     }
 
-    document.getElementById("estudioOverlay").classList.remove("activo");
+    const elOverlay = document.getElementById("estudioOverlay");
+    if(elOverlay) elOverlay.classList.remove("activo");
     cerrarLibro();
     await cargarObras();
     
@@ -445,21 +459,23 @@ async function guardarObra() {
 
 async function editarObraDesdeMuseo() {
   if (!obraActualEnMuseo) return;
-  document.getElementById("museoOverlay").classList.remove("activo");
+  const mo = document.getElementById("museoOverlay");
+  if(mo) mo.classList.remove("activo");
 
   modoEdicion = true;
   obraEditandoId = obraActualEnMuseo.id;
   fondoEditandoId = obraActualEnMuseo.fondo_id || generarUUID();
 
-  document.getElementById("estudioOverlay").classList.add("activo");
+  const eo = document.getElementById("estudioOverlay");
+  if(eo) eo.classList.add("activo");
   document.querySelectorAll("#tituloObra, #tituloObraM").forEach(inp => inp.value = obraActualEnMuseo.titulo || "");
 
   fondoImagen = null;
   fondoColor = "#ffffff";
   document.querySelectorAll(".fondo-color-input").forEach(inp => inp.value = "#ffffff");
   
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+  if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if(ctxFondo) ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
   
   const obra = obraActualEnMuseo;
 
@@ -520,7 +536,8 @@ async function copiarObraDesdeMuseo() {
     }
     
     btn.textContent = "¡Copiado!";
-    document.getElementById("museoOverlay").classList.remove("activo");
+    const mo = document.getElementById("museoOverlay");
+    if(mo) mo.classList.remove("activo");
     abrirEstudio(); 
     
     setTimeout(() => { btn.textContent = textoOriginal; }, 500);
@@ -601,6 +618,7 @@ async function cargarObras() {
 
 function generarLibro() {
   const contenedor = document.getElementById("libroPaginas");
+  if(!contenedor) return;
   contenedor.innerHTML = "";
   paginas = [];
 
@@ -655,19 +673,27 @@ function crearEstampaHTML(obra) {
 }
 
 function abrirLibro() {
-  document.getElementById("libroWrapper").classList.add("abierto");
-  document.getElementById("libroControles").classList.add("activo");
-  document.getElementById("btnCerrarLibro").style.display = "flex";
+  const lw = document.getElementById("libroWrapper");
+  const lc = document.getElementById("libroControles");
+  const bc = document.getElementById("btnCerrarLibro");
+  
+  if(lw) lw.classList.add("abierto");
+  if(lc) lc.classList.add("activo");
+  if(bc) bc.style.display = "flex";
+  
   paginaActual = 1;
   actualizarPaginas();
 }
 
 function cerrarLibro() {
-  const wrapper = document.getElementById("libroWrapper");
-  wrapper.classList.remove("abierto");
-  wrapper.style.transform = ""; 
-  document.getElementById("libroControles").classList.remove("activo");
-  document.getElementById("btnCerrarLibro").style.display = "none";
+  const lw = document.getElementById("libroWrapper");
+  const lc = document.getElementById("libroControles");
+  const bc = document.getElementById("btnCerrarLibro");
+  
+  if(lw) { lw.classList.remove("abierto"); lw.style.transform = ""; }
+  if(lc) lc.classList.remove("activo");
+  if(bc) bc.style.display = "none";
+  
   paginaActual = 0;
   const hojas = document.querySelectorAll(".hoja");
   hojas.forEach(hoja => hoja.classList.remove("volteada"));
@@ -680,9 +706,9 @@ function paginaSiguiente() { if (paginaActual < paginas.length) { paginaActual++
 
 function animarPagina() {
   const wrapper = document.getElementById("libroWrapper");
-  wrapper.classList.add("girando");
+  if(wrapper) wrapper.classList.add("girando");
   actualizarPaginas();
-  setTimeout(() => wrapper.classList.remove("girando"), 1200);
+  setTimeout(() => { if(wrapper) wrapper.classList.remove("girando"); }, 1200);
 }
 
 function actualizarPaginas() {
