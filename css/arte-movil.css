@@ -1,262 +1,543 @@
-/* =========================================================
-   SEPARACIÓN ESTRICTA DE VISTAS
-   ========================================================= */
-body.layout-escritorio .vista-movil { display: none !important; }
-body.layout-movil .vista-escritorio, 
-body.layout-tablet .vista-escritorio { display: none !important; }
+/* ==========================================================================
+   PROYECTO: ESTUDIO DE DIBUJO (VISTA ESCRITORIO + MÓVIL INMERSIVO)
+   CORRECCIONES: Scroll en PC, Lienzo adaptativo en vertical, UI Instagram.
+   ========================================================================== */
 
-/* =========================================================
-   ESTILOS MÓVIL / TABLET
-   ========================================================= */
-body.layout-movil .estudio-overlay,
-body.layout-tablet .estudio-overlay { 
-  padding: 0 !important; 
-  background: #000 !important;
+/* ==========================================================================
+   1. VARIABLES GLOBALES
+   ========================================================================== */
+:root {
+  --c-fondo-app: #000000;
+  --c-fondo-panel: #1a1a1a;
+  --c-fondo-control: #2a2a2a;
+  --c-acento: #c9a050;
+  --c-acento-hover: #e0b860;
+  --c-texto: #ffffff;
+  --c-borde: #444444;
+  
+  --sp-sm: 8px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  
+  --radius-md: 10px;
+  --radius-pill: 25px;
+  
+  --trans-rapida: 0.15s ease;
+  --trans-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body.layout-movil .estudio,
-body.layout-tablet .estudio { 
-  width: 100vw !important; 
-  height: 100dvh !important; /* dvh arregla el problema de la barra de URL en móviles */
-  margin: 0 !important; 
-  border-radius: 0 !important; 
-  display: flex !important; 
-  flex-direction: column !important;
-  background: #000 !important;
-  overflow: hidden; /* Evita scroll */
-}
-
-/* Lienzo */
-body.layout-movil .estudio-canvas-wrapper,
-body.layout-tablet .estudio-canvas-wrapper {
-  background: #111 !important; 
-  padding: 10px; 
-  flex: 1; /* Ocupa todo el espacio entre el menú y la barra */
-  display: flex; 
-  justify-content: center; 
-  align-items: center;
-  overflow: hidden;
-  /* Crucial para que el navegador no haga scroll al dibujar */
-  touch-action: none !important; 
-}
-
-body.layout-movil .canvas-stack,
-body.layout-tablet .canvas-stack {
-  box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-  max-width: 100%;
-  max-height: 100%;
-}
-
-body.layout-movil canvas,
-body.layout-tablet canvas {
-  touch-action: none !important;
-}
-
-/* MENÚ LATERAL (DRAWER) */
-body.layout-movil .estudio-toolbar,
-body.layout-tablet .estudio-toolbar { 
-  position: fixed !important; top: 0 !important; right: -100% !important;
-  width: 85vw !important; max-width: 320px !important; height: 100dvh !important;
-  background: #1a1a1a !important; color: #fff !important;
-  z-index: 9999 !important; padding: 20px !important; overflow-y: auto !important;
-  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; 
-  display: flex !important; flex-direction: column !important; gap: 15px !important;
-  box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-}
-
-body.layout-movil .estudio-toolbar.activo,
-body.layout-tablet .estudio-toolbar.activo { right: 0 !important; }
-
-body.layout-movil .btn-cerrar-toolbar,
-body.layout-tablet .btn-cerrar-toolbar {
-  display: flex !important; justify-content: center; align-items: center;
-  background: #333; border: none; color: #fff; font-size: 1.2rem; font-weight: bold;
-  width: 35px; height: 35px; border-radius: 50%; cursor: pointer; 
-  align-self: flex-end; margin-bottom: 10px;
-}
-
-body.layout-movil .estudio-toolbar .tool-group,
-body.layout-tablet .estudio-toolbar .tool-group { 
-  display: flex !important; flex-direction: column !important; gap: 10px !important; 
-  width: 100% !important; border-bottom: 1px solid #333; padding-bottom: 15px;
-}
-body.layout-movil .estudio-toolbar .tool-group:last-child,
-body.layout-tablet .estudio-toolbar .tool-group:last-child { border-bottom: none; padding-bottom: 0; }
-
-body.layout-movil .estudio-toolbar .tool-label,
-body.layout-tablet .estudio-toolbar .tool-label { 
-  font-size: 0.85rem !important; color: #c9a050 !important; font-weight: 700 !important; text-transform: uppercase;
-}
-
-/* Botones del menú */
-body.layout-movil .estudio-toolbar .tool-btn,
-body.layout-tablet .estudio-toolbar .tool-btn {
-  width: 100% !important; padding: 14px !important; background: #2a2a2a !important; color: #fff !important;
-  border: 1px solid #444 !important; border-radius: 10px !important; text-align: center !important; font-size: 1rem !important;
-}
-body.layout-movil .estudio-toolbar .tool-btn.active,
-body.layout-tablet .estudio-toolbar .tool-btn.active { 
-  background: #c9a050 !important; color: #000 !important; border-color: #c9a050 !important; font-weight: bold;
-}
-
-/* Colores en menú */
-body.layout-movil .estudio-toolbar .colores-grid,
-body.layout-tablet .estudio-toolbar .colores-grid { 
-  display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 12px !important; width: 100%; 
-}
-body.layout-movil .estudio-toolbar .color-btn,
-body.layout-tablet .estudio-toolbar .color-btn { 
-  width: 100% !important; aspect-ratio: 1 !important; border-radius: 50% !important; border: 2px solid transparent !important; 
-}
-body.layout-movil .estudio-toolbar .color-btn.active,
-body.layout-tablet .estudio-toolbar .color-btn.active { border-color: #fff !important; transform: scale(1.1); }
-
-/* Grosor */
-body.layout-movil .estudio-toolbar .grosor-control,
-body.layout-tablet .estudio-toolbar .grosor-control { display: flex !important; width: 100% !important; justify-content: space-between; align-items: center; }
-body.layout-movil .estudio-toolbar input[type="range"],
-body.layout-tablet .estudio-toolbar input[type="range"] { width: 75% !important; accent-color: #c9a050; }
-
-/* Fondo */
-body.layout-movil .estudio-toolbar .fondo-controles,
-body.layout-tablet .estudio-toolbar .fondo-controles { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px !important; width: 100%; margin-top: 5px; }
-body.layout-movil .estudio-toolbar .fondo-controles input[type="color"],
-body.layout-tablet .estudio-toolbar .fondo-controles input[type="color"] { width: 100% !important; height: 45px !important; border-radius: 10px !important; border: none; cursor: pointer; }
-body.layout-movil .estudio-toolbar .fondo-controles button,
-body.layout-tablet .estudio-toolbar .fondo-controles button { width: 100% !important; padding: 12px !important; border-radius: 10px !important; background: #2a2a2a; border: 1px solid #444; color: #fff; font-size: 0.9rem;}
-
-/* Título */
-body.layout-movil .estudio-toolbar input[type="text"],
-body.layout-tablet .estudio-toolbar input[type="text"] { 
-  width: 100% !important; padding: 12px !important; background: #2a2a2a !important; 
-  border: 1px solid #444 !important; color: #fff !important; border-radius: 10px !important; font-size: 1rem !important; 
-}
-
-body.layout-movil #overlayMenu.activo,
-body.layout-tablet #overlayMenu.activo { 
-  display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; backdrop-filter: blur(2px); 
-}
-
-body.layout-movil .btn-menu-movil-flotante,
-body.layout-tablet .btn-menu-movil-flotante {
-  display: flex; align-items: center; justify-content: center;
-  position: absolute; top: 15px; right: 15px; z-index: 100;
-  background: rgba(51, 51, 51, 0.8); color: #fff; border: none;
-  width: 44px; height: 44px; border-radius: 50%;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.5); cursor: pointer; backdrop-filter: blur(5px);
-  font-size: 1.2rem;
-}
-
-/* =========================================================
-   BARRA INFERIOR TIPO INSTAGRAM (Optimizada para no cortarse)
-   ========================================================= */
-body.layout-movil .barra-instagram,
-body.layout-tablet .barra-instagram {
-  display: flex !important; 
-  position: relative; /* Ya no es absolute, es parte del flex */
-  width: 100%;
-  background: #000; 
-  padding: 10px 15px; 
-  align-items: center; 
-  justify-content: space-between;
-  border-top: 1px solid #222;
-  flex-shrink: 0; /* Evita que se encoja */
-  gap: 10px;
-}
-
-body.layout-movil .barra-instagram .acciones-izq,
-body.layout-tablet .barra-instagram .acciones-izq {
-  display: flex; gap: 5px; align-items: center; flex-shrink: 0;
-}
-
-body.layout-movil .barra-instagram .acciones-izq .tool-btn,
-body.layout-tablet .barra-instagram .acciones-izq .tool-btn {
-  background: #1a1a1a; border: none; color: #fff; padding: 10px; border-radius: 10px; 
-  display: flex; justify-content: center; align-items: center; cursor: pointer;
-}
-body.layout-movil .barra-instagram .acciones-izq .tool-btn svg,
-body.layout-tablet .barra-instagram .acciones-izq .tool-btn svg { width: 22px; height: 22px; }
-
-body.layout-movil .paleta-rapida,
-body.layout-tablet .paleta-rapida {
-  display: flex; gap: 8px; overflow-x: auto; align-items: center; 
-  flex: 1; margin: 0 5px; scrollbar-width: none; 
-}
-body.layout-movil .paleta-rapida::-webkit-scrollbar,
-body.layout-tablet .paleta-rapida::-webkit-scrollbar { display: none; }
-
-body.layout-movil .paleta-rapida .color-btn,
-body.layout-tablet .paleta-rapida .color-btn {
-  width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; flex-shrink: 0; cursor: pointer;
-}
-body.layout-movil .paleta-rapida .color-btn.active,
-body.layout-tablet .paleta-rapida .color-btn.active { border-color: #fff; transform: scale(1.15); }
-
-body.layout-movil .btn-accion-principal,
-body.layout-tablet .btn-accion-principal {
-  background: #c9a050; color: #000; border: none; padding: 12px 18px; border-radius: 25px;
-  font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(201, 160, 80, 0.3);
-}
-/* =========================================================
-   ADAPTACIÓN GLOBAL DE LA PÁGINA Y EL LIENZO
-   ========================================================= */
-
-/* Evitar scroll horizontal en toda la página */
+/* ==========================================================================
+   2. RESET Y CONFIGURACIÓN BASE
+   ========================================================================== */
 html, body {
   width: 100%;
   max-width: 100vw;
-  overflow-x: hidden !important;
   margin: 0;
   padding: 0;
+  overflow-x: hidden !important; /* Evita scroll horizontal siempre */
+  background-color: var(--c-fondo-app);
+  color: var(--c-texto);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Asegurar que el estudio ocupe exactamente el tamaño de la pantalla */
+/* Scroll normal en PC */
+body.layout-escritorio {
+  overflow-y: auto !important;
+  position: relative;
+}
+
+/* Bloqueo de scroll en móvil/tablet (para dibujar sin interferencias) */
+body.layout-movil,
+body.layout-tablet {
+  overflow: hidden !important;
+  position: fixed;
+  inset: 0;
+  overscroll-behavior: none;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-touch-callout: none;
+}
+
+input, textarea {
+  user-select: auto;
+  -webkit-user-select: auto;
+}
+
+/* ==========================================================================
+   3. SEPARACIÓN ESTRICTA DE VISTAS
+   ========================================================================== */
+body.layout-escritorio .vista-movil { display: none !important; }
+body.layout-movil .vista-escritorio,
+body.layout-tablet .vista-escritorio { display: none !important; }
+
+/* ==========================================================================
+   4. LAYOUT PRINCIPAL MÓVIL / TABLET
+   ========================================================================== */
 body.layout-movil .estudio-overlay,
 body.layout-tablet .estudio-overlay {
-  width: 100vw !important;
-  height: 100dvh !important; /* dvh evita problemas con la barra de URL del móvil */
-  overflow: hidden !important;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh; /* Altura real del móvil */
+  background: #000 !important;
+  padding: 0 !important;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 body.layout-movil .estudio,
 body.layout-tablet .estudio {
-  width: 100vw !important;
-  height: 100dvh !important;
-  overflow: hidden !important;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #000 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+  pointer-events: auto !important; /* Permite la interacción */
 }
 
-/* Forzar al contenedor del canvas a adaptar el lienzo al espacio disponible */
+/* ==========================================================================
+   5. ÁREA DEL LIENZO (ADAPTACIÓN VERTICAL CORREGIDA)
+   ========================================================================== */
 body.layout-movil .estudio-canvas-wrapper,
 body.layout-tablet .estudio-canvas-wrapper {
+  background: #0a0a0a !important;
+  padding: 10px !important;
+  /* Reserva espacio para la barra flotante inferior */
+  padding-bottom: 85px !important; 
+  
   flex: 1 !important;
+  /* CRUCIAL: min-height 0 obliga al contenedor a encogerse y no empujar los botones */
+  min-height: 0 !important; 
+  
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
   overflow: hidden !important;
-  width: 100% !important;
-  padding: 5px !important; /* Un pequeño margen para que no toque los bordes */
+  position: relative;
+  z-index: 1;
+  
+  /* CRUCIAL: Evita que el navegador interfiera al dibujar (scroll/zoom) */
+  touch-action: none !important;
+  -ms-touch-action: none !important;
+  pointer-events: auto !important;
 }
 
-/* El lienzo se adapta manteniendo su proporción (aspect-ratio 3/2) */
 body.layout-movil .canvas-stack,
 body.layout-tablet .canvas-stack {
+  /* El lienzo se adapta al máximo espacio disponible manteniendo proporción */
   width: 100% !important;
-  height: auto !important;
+  height: 100% !important;
+  max-width: 100% !important;
   max-height: 100% !important;
-  aspect-ratio: 3 / 2 !important;
+  aspect-ratio: 3 / 2 !important; /* Ajusta a la proporción de tu libro */
+  
   position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background-color: #ffffff !important;
+  
+  pointer-events: auto !important;
+  z-index: 2;
 }
 
 body.layout-movil .canvas-stack canvas,
 body.layout-tablet .canvas-stack canvas {
+  display: block !important;
   width: 100% !important;
   height: 100% !important;
-  object-fit: contain;
+  object-fit: contain !important; /* Evita que el dibujo se deforme */
+  touch-action: none !important;
+  pointer-events: auto !important; /* Permite recibir los toques */
+  cursor: crosshair !important;
+  z-index: 3;
 }
 
-/* Asegurar que los menús laterales no generen scroll en el body */
+/* ==========================================================================
+   6. MENÚ LATERAL (DRAWER)
+   ========================================================================== */
 body.layout-movil .estudio-toolbar,
 body.layout-tablet .estudio-toolbar {
+  position: fixed !important;
+  top: 0 !important;
+  right: -100% !important;
+  width: 85vw !important;
+  max-width: 320px !important;
+  height: 100dvh !important;
   max-height: 100dvh !important;
+  background: var(--c-fondo-panel) !important;
+  color: var(--c-texto) !important;
+  z-index: 9999 !important;
+  padding: 20px !important;
+  overflow-y: auto !important;
+  transition: right var(--trans-normal) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 15px !important;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+}
+
+body.layout-movil .estudio-toolbar.activo,
+body.layout-tablet .estudio-toolbar.activo {
+  right: 0 !important;
+}
+
+body.layout-movil .btn-cerrar-toolbar,
+body.layout-tablet .btn-cerrar-toolbar {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  background: #333 !important;
+  border: none !important;
+  color: #fff !important;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  width: 35px !important;
+  height: 35px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  align-self: flex-end !important;
+  margin-bottom: 10px !important;
+}
+
+body.layout-movil .estudio-toolbar .tool-group,
+body.layout-tablet .estudio-toolbar .tool-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  width: 100% !important;
+  border-bottom: 1px solid #333 !important;
+  padding-bottom: 15px !important;
+}
+
+body.layout-movil .estudio-toolbar .tool-group:last-child,
+body.layout-tablet .estudio-toolbar .tool-group:last-child {
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+body.layout-movil .estudio-toolbar .tool-label,
+body.layout-tablet .estudio-toolbar .tool-label {
+  font-size: 0.85rem !important;
+  color: var(--c-acento) !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+}
+
+body.layout-movil .estudio-toolbar .tool-btn,
+body.layout-tablet .estudio-toolbar .tool-btn {
+  width: 100% !important;
+  padding: 14px !important;
+  background: var(--c-fondo-control) !important;
+  color: var(--c-texto) !important;
+  border: 1px solid var(--c-borde) !important;
+  border-radius: var(--radius-md) !important;
+  text-align: center !important;
+  font-size: 1rem !important;
+  cursor: pointer;
+}
+
+body.layout-movil .estudio-toolbar .tool-btn.active,
+body.layout-tablet .estudio-toolbar .tool-btn.active {
+  background: var(--c-acento) !important;
+  color: #000 !important;
+  border-color: var(--c-acento) !important;
+  font-weight: bold !important;
+}
+
+body.layout-movil .estudio-toolbar .colores-grid,
+body.layout-tablet .estudio-toolbar .colores-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+body.layout-movil .estudio-toolbar .color-btn,
+body.layout-tablet .estudio-toolbar .color-btn {
+  width: 100% !important;
+  aspect-ratio: 1 !important;
+  border-radius: 50% !important;
+  border: 2px solid transparent !important;
+  cursor: pointer;
+}
+
+body.layout-movil .estudio-toolbar .color-btn.active,
+body.layout-tablet .estudio-toolbar .color-btn.active {
+  border-color: #fff !important;
+  transform: scale(1.1);
+}
+
+body.layout-movil .estudio-toolbar .grosor-control,
+body.layout-tablet .estudio-toolbar .grosor-control {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+body.layout-movil .estudio-toolbar input[type="range"],
+body.layout-tablet .estudio-toolbar input[type="range"] {
+  width: 75% !important;
+  accent-color: var(--c-acento) !important;
+}
+
+body.layout-movil .estudio-toolbar .fondo-controles,
+body.layout-tablet .estudio-toolbar .fondo-controles {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin-top: 5px !important;
+}
+
+body.layout-movil .estudio-toolbar .fondo-controles input[type="color"],
+body.layout-tablet .estudio-toolbar .fondo-controles input[type="color"] {
+  width: 100% !important;
+  height: 45px !important;
+  border-radius: var(--radius-md) !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+body.layout-movil .estudio-toolbar .fondo-controles button,
+body.layout-tablet .estudio-toolbar .fondo-controles button {
+  width: 100% !important;
+  padding: 12px !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--c-fondo-control) !important;
+  border: 1px solid var(--c-borde) !important;
+  color: var(--c-texto) !important;
+  font-size: 0.9rem !important;
+  cursor: pointer;
+}
+
+body.layout-movil .estudio-toolbar input[type="text"],
+body.layout-tablet .estudio-toolbar input[type="text"] {
+  width: 100% !important;
+  padding: 12px !important;
+  background: var(--c-fondo-control) !important;
+  border: 1px solid var(--c-borde) !important;
+  color: var(--c-texto) !important;
+  border-radius: var(--radius-md) !important;
+  font-size: 1rem !important;
+}
+
+body.layout-movil #overlayMenu,
+body.layout-tablet #overlayMenu {
+  display: none;
+}
+
+body.layout-movil #overlayMenu.activo,
+body.layout-tablet #overlayMenu.activo {
+  display: block !important;
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0,0,0,0.6) !important;
+  z-index: 9998 !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+body.layout-movil .btn-menu-movil-flotante,
+body.layout-tablet .btn-menu-movil-flotante {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  top: 15px !important;
+  right: 15px !important;
+  z-index: 100 !important;
+  background: rgba(51, 51, 51, 0.8) !important;
+  color: #fff !important;
+  border: none !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
+  cursor: pointer !important;
+  backdrop-filter: blur(5px) !important;
+  font-size: 1.2rem !important;
+}
+
+/* ==========================================================================
+   7. BARRA INFERIOR FLOTANTE (ESTILO INSTAGRAM)
+   ========================================================================== */
+body.layout-movil .barra-instagram,
+body.layout-tablet .barra-instagram {
+  display: flex !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  
+  /* Degradado transparente para que el lienzo se vea por detrás */
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0) 100%) !important;
+  
+  /* Espaciado seguro para móviles con notch (iPhone) */
+  padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 0px)) 15px !important;
+  
+  align-items: center !important;
+  justify-content: space-between !important;
+  z-index: 200 !important;
+  gap: 10px !important;
+  
+  /* El contenedor no bloquea clics, pero los hijos sí */
+  pointer-events: none !important;
+}
+
+body.layout-movil .barra-instagram > *,
+body.layout-tablet .barra-instagram > * {
+  pointer-events: auto !important;
+}
+
+body.layout-movil .barra-instagram .acciones-izq,
+body.layout-tablet .barra-instagram .acciones-izq {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+body.layout-movil .barra-instagram .acciones-izq .tool-btn,
+body.layout-tablet .barra-instagram .acciones-izq .tool-btn {
+  background: rgba(26, 26, 26, 0.9) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: #fff !important;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  transition: transform 0.1s !important;
+}
+
+body.layout-movil .barra-instagram .acciones-izq .tool-btn:active,
+body.layout-tablet .barra-instagram .acciones-izq .tool-btn:active {
+  transform: scale(0.92) !important;
+}
+
+body.layout-movil .barra-instagram .acciones-izq .tool-btn svg,
+body.layout-tablet .barra-instagram .acciones-izq .tool-btn svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+body.layout-movil .paleta-rapida,
+body.layout-tablet .paleta-rapida {
+  display: flex !important;
+  gap: 10px !important;
+  overflow-x: auto !important;
+  align-items: center !important;
+  flex: 1 !important;
+  margin: 0 10px !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+  scroll-snap-type: x proximity !important;
+  pointer-events: auto !important;
+}
+
+body.layout-movil .paleta-rapida::-webkit-scrollbar,
+body.layout-tablet .paleta-rapida::-webkit-scrollbar {
+  display: none !important;
+}
+
+body.layout-movil .paleta-rapida .color-btn,
+body.layout-tablet .paleta-rapida .color-btn {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  border: 2px solid transparent !important;
+  flex-shrink: 0 !important;
+  cursor: pointer !important;
+  scroll-snap-align: center !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5) !important;
+  transition: transform 0.15s !important;
+}
+
+body.layout-movil .paleta-rapida .color-btn.active,
+body.layout-tablet .paleta-rapida .color-btn.active {
+  border-color: #fff !important;
+  transform: scale(1.15) !important;
+  box-shadow: 0 0 10px rgba(255,255,255,0.4) !important;
+}
+
+body.layout-movil .btn-accion-principal,
+body.layout-tablet .btn-accion-principal {
+  background: var(--c-acento) !important;
+  color: #000 !important;
+  border: none !important;
+  padding: 0 20px !important;
+  height: 44px !important;
+  border-radius: var(--radius-pill) !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 4px 12px rgba(201, 160, 80, 0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.1s !important;
+  pointer-events: auto !important;
+}
+
+body.layout-movil .btn-accion-principal:active,
+body.layout-tablet .btn-accion-principal:active {
+  transform: scale(0.96) !important;
+}
+
+/* ==========================================================================
+   8. ADAPTACIÓN PARA PANTALLAS MUY BAJAS (Teclado abierto o Landscape)
+   ========================================================================== */
+@media (max-height: 600px) {
+  body.layout-movil .estudio-canvas-wrapper,
+  body.layout-tablet .estudio-canvas-wrapper {
+    padding-bottom: 70px !important;
+  }
+  
+  body.layout-movil .barra-instagram,
+  body.layout-tablet .barra-instagram {
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom, 0px)) 10px !important;
+  }
+  
+  body.layout-movil .barra-instagram .acciones-izq .tool-btn,
+  body.layout-tablet .barra-instagram .acciones-izq .tool-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  body.layout-movil .btn-accion-principal,
+  body.layout-tablet .btn-accion-principal {
+    height: 36px !important;
+    padding: 0 14px !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* ==========================================================================
+   9. ACCESIBILIDAD: MOVIMIENTO REDUCIDO
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
