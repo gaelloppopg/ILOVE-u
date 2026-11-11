@@ -1,6 +1,5 @@
 /* ==========================================================================
    PROYECTO: ESTUDIO DE DIBUJO (VISTA ESCRITORIO + MÓVIL INMERSIVO)
-   DISEÑO VISUAL MEJORADO - LIENZO FLOTANTE
    ========================================================================== */
 
 :root {
@@ -29,8 +28,9 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* PERMITIR SCROLL EN LA PÁGINA PRINCIPAL */
 body {
-  overflow-y: auto !important;
+  overflow-y: auto !important; 
   position: relative;
 }
 
@@ -52,7 +52,20 @@ body.layout-movil .vista-escritorio,
 body.layout-tablet .vista-escritorio { display: none !important; }
 
 /* ==========================================================================
-   ESTUDIO Y FONDO TRANSPARENTE
+   LIBRO (Asegurar que fluya y no bloquee)
+   ========================================================================== */
+.libro-escenario {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* ==========================================================================
+   ESTUDIO (SOLO SE BLOQUEA CUANDO ESTÁ ABIERTO)
    ========================================================================== */
 .estudio-overlay {
   display: none;
@@ -60,7 +73,7 @@ body.layout-tablet .vista-escritorio { display: none !important; }
   inset: 0;
   width: 100vw;
   height: 100dvh;
-  background: transparent !important; /* Transparente para ver la página de fondo */
+  background: transparent !important;
   padding: 0 !important;
   z-index: 9999;
   flex-direction: column;
@@ -85,13 +98,13 @@ body.layout-tablet .estudio {
 }
 
 /* ==========================================================================
-   ÁREA DEL LIENZO (DISEÑO FLOTANTE REDUCIDO)
+   ÁREA DEL LIENZO
    ========================================================================== */
 body.layout-movil .estudio-canvas-wrapper,
 body.layout-tablet .estudio-canvas-wrapper {
   background: transparent !important;
   padding: 15px !important;
-  padding-bottom: 85px !important; /* Espacio para la barra inferior */
+  padding-bottom: 85px !important;
   flex: 1 !important;
   min-height: 0 !important;
   display: flex !important;
@@ -105,19 +118,16 @@ body.layout-tablet .estudio-canvas-wrapper {
 
 body.layout-movil .canvas-stack,
 body.layout-tablet .canvas-stack {
-  /* El canvas se adapta al espacio disponible pero mantiene su proporción 3:2 */
   width: 100% !important;
   height: auto !important;
   max-width: 100% !important;
   max-height: 100% !important;
   aspect-ratio: 3 / 2 !important;
-  
   position: relative;
-  /* Sombra y borde para delimitar la hoja */
   box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 0 2px #333 !important;
   border-radius: 8px !important;
   overflow: hidden !important;
-  background-color: #ffffff !important; /* Solo el área de dibujo es blanca */
+  background-color: #ffffff !important;
   z-index: 20;
 }
 
@@ -133,7 +143,7 @@ body.layout-tablet .canvas-stack canvas {
 }
 
 /* ==========================================================================
-   MENÚ LATERAL (DRAWER) VISUAL
+   MENÚ LATERAL (DRAWER)
    ========================================================================== */
 body.layout-movil .estudio-toolbar,
 body.layout-tablet .estudio-toolbar {
