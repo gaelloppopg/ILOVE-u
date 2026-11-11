@@ -1,50 +1,102 @@
 /* =========================================================
-   SEPARACIÓN ESTRICTA DE VISTAS
+   1. ADAPTACIÓN GLOBAL DE LA PÁGINA (Permite scroll normal)
+   ========================================================= */
+html, body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Solo bloquea el scroll horizontal */
+  /* NO se usa overflow-y: hidden para permitir bajar y ver el libro */
+}
+
+/* =========================================================
+   2. ADAPTACIÓN DEL LIBRO (ÁLBUM) PARA QUE QUEPA EN PANTALLA
+   ========================================================= */
+.libro-escenario {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 10px;
+  box-sizing: border-box;
+}
+
+.libro-wrapper {
+  width: clamp(280px, 90vw, 800px) !important; 
+  height: auto !important;
+  aspect-ratio: 3 / 2 !important; 
+  position: relative;
+  margin: 0 auto;
+}
+
+.libro-portada, 
+.libro-paginas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.portada-titulo { font-size: clamp(1.5rem, 5vw, 2.5rem) !important; }
+.portada-subtitulo { font-size: clamp(0.8rem, 3vw, 1.2rem) !important; }
+
+.libro-controles {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  z-index: 10;
+}
+
+/* =========================================================
+   3. SEPARACIÓN ESTRICTA DE VISTAS (Escr/Móvil)
    ========================================================= */
 body.layout-escritorio .vista-movil { display: none !important; }
 body.layout-movil .vista-escritorio, 
 body.layout-tablet .vista-escritorio { display: none !important; }
 
 /* =========================================================
-   ESTILOS MÓVIL / TABLET
+   4. ESTUDIO MÓVIL / TABLET (Bloquea el scroll aquí)
    ========================================================= */
 body.layout-movil .estudio-overlay,
 body.layout-tablet .estudio-overlay { 
   padding: 0 !important; 
   background: #000 !important;
+  /* Aquí SÍ bloqueamos el scroll porque es un área de dibujo */
+  position: fixed; inset: 0; overflow: hidden; z-index: 9999;
 }
 
 body.layout-movil .estudio,
 body.layout-tablet .estudio { 
   width: 100vw !important; 
-  height: 100dvh !important; /* dvh arregla el problema de la barra de URL en móviles */
+  height: 100dvh !important; 
   margin: 0 !important; 
   border-radius: 0 !important; 
   display: flex !important; 
   flex-direction: column !important;
   background: #000 !important;
-  overflow: hidden; /* Evita scroll */
+  overflow: hidden; 
 }
 
-/* Lienzo */
 body.layout-movil .estudio-canvas-wrapper,
 body.layout-tablet .estudio-canvas-wrapper {
   background: #111 !important; 
   padding: 10px; 
-  flex: 1; /* Ocupa todo el espacio entre el menú y la barra */
+  flex: 1; 
   display: flex; 
   justify-content: center; 
   align-items: center;
   overflow: hidden;
-  /* Crucial para que el navegador no haga scroll al dibujar */
   touch-action: none !important; 
 }
 
 body.layout-movil .canvas-stack,
 body.layout-tablet .canvas-stack {
   box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-  max-width: 100%;
-  max-height: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  aspect-ratio: 3 / 2 !important;
+  position: relative;
 }
 
 body.layout-movil canvas,
@@ -58,7 +110,7 @@ body.layout-tablet .estudio-toolbar {
   position: fixed !important; top: 0 !important; right: -100% !important;
   width: 85vw !important; max-width: 320px !important; height: 100dvh !important;
   background: #1a1a1a !important; color: #fff !important;
-  z-index: 9999 !important; padding: 20px !important; overflow-y: auto !important;
+  z-index: 10000 !important; padding: 20px !important; overflow-y: auto !important;
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; 
   display: flex !important; flex-direction: column !important; gap: 15px !important;
   box-shadow: -5px 0 15px rgba(0,0,0,0.5);
@@ -88,7 +140,6 @@ body.layout-tablet .estudio-toolbar .tool-label {
   font-size: 0.85rem !important; color: #c9a050 !important; font-weight: 700 !important; text-transform: uppercase;
 }
 
-/* Botones del menú */
 body.layout-movil .estudio-toolbar .tool-btn,
 body.layout-tablet .estudio-toolbar .tool-btn {
   width: 100% !important; padding: 14px !important; background: #2a2a2a !important; color: #fff !important;
@@ -99,7 +150,6 @@ body.layout-tablet .estudio-toolbar .tool-btn.active {
   background: #c9a050 !important; color: #000 !important; border-color: #c9a050 !important; font-weight: bold;
 }
 
-/* Colores en menú */
 body.layout-movil .estudio-toolbar .colores-grid,
 body.layout-tablet .estudio-toolbar .colores-grid { 
   display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 12px !important; width: 100%; 
@@ -111,13 +161,11 @@ body.layout-tablet .estudio-toolbar .color-btn {
 body.layout-movil .estudio-toolbar .color-btn.active,
 body.layout-tablet .estudio-toolbar .color-btn.active { border-color: #fff !important; transform: scale(1.1); }
 
-/* Grosor */
 body.layout-movil .estudio-toolbar .grosor-control,
 body.layout-tablet .estudio-toolbar .grosor-control { display: flex !important; width: 100% !important; justify-content: space-between; align-items: center; }
 body.layout-movil .estudio-toolbar input[type="range"],
 body.layout-tablet .estudio-toolbar input[type="range"] { width: 75% !important; accent-color: #c9a050; }
 
-/* Fondo */
 body.layout-movil .estudio-toolbar .fondo-controles,
 body.layout-tablet .estudio-toolbar .fondo-controles { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px !important; width: 100%; margin-top: 5px; }
 body.layout-movil .estudio-toolbar .fondo-controles input[type="color"],
@@ -125,7 +173,6 @@ body.layout-tablet .estudio-toolbar .fondo-controles input[type="color"] { width
 body.layout-movil .estudio-toolbar .fondo-controles button,
 body.layout-tablet .estudio-toolbar .fondo-controles button { width: 100% !important; padding: 12px !important; border-radius: 10px !important; background: #2a2a2a; border: 1px solid #444; color: #fff; font-size: 0.9rem;}
 
-/* Título */
 body.layout-movil .estudio-toolbar input[type="text"],
 body.layout-tablet .estudio-toolbar input[type="text"] { 
   width: 100% !important; padding: 12px !important; background: #2a2a2a !important; 
@@ -148,19 +195,19 @@ body.layout-tablet .btn-menu-movil-flotante {
 }
 
 /* =========================================================
-   BARRA INFERIOR TIPO INSTAGRAM (Optimizada para no cortarse)
+   5. BARRA INFERIOR TIPO INSTAGRAM
    ========================================================= */
 body.layout-movil .barra-instagram,
 body.layout-tablet .barra-instagram {
   display: flex !important; 
-  position: relative; /* Ya no es absolute, es parte del flex */
+  position: relative; 
   width: 100%;
   background: #000; 
   padding: 10px 15px; 
   align-items: center; 
   justify-content: space-between;
   border-top: 1px solid #222;
-  flex-shrink: 0; /* Evita que se encoja */
+  flex-shrink: 0; 
   gap: 10px;
 }
 
@@ -197,116 +244,4 @@ body.layout-tablet .btn-accion-principal {
   background: #c9a050; color: #000; border: none; padding: 12px 18px; border-radius: 25px;
   font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;
   box-shadow: 0 4px 10px rgba(201, 160, 80, 0.3);
-}
-/* =========================================================
-   ADAPTACIÓN GLOBAL DE LA PÁGINA Y EL LIENZO
-   ========================================================= */
-
-/* Evitar scroll horizontal en toda la página */
-html, body {
-  width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden !important;
-  margin: 0;
-  padding: 0;
-}
-
-/* Asegurar que el estudio ocupe exactamente el tamaño de la pantalla */
-body.layout-movil .estudio-overlay,
-body.layout-tablet .estudio-overlay {
-  width: 100vw !important;
-  height: 100dvh !important; /* dvh evita problemas con la barra de URL del móvil */
-  overflow: hidden !important;
-}
-
-body.layout-movil .estudio,
-body.layout-tablet .estudio {
-  width: 100vw !important;
-  height: 100dvh !important;
-  overflow: hidden !important;
-}
-
-/* Forzar al contenedor del canvas a adaptar el lienzo al espacio disponible */
-body.layout-movil .estudio-canvas-wrapper,
-body.layout-tablet .estudio-canvas-wrapper {
-  flex: 1 !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: center !important;
-  overflow: hidden !important;
-  width: 100% !important;
-  padding: 5px !important; /* Un pequeño margen para que no toque los bordes */
-}
-
-/* El lienzo se adapta manteniendo su proporción (aspect-ratio 3/2) */
-body.layout-movil .canvas-stack,
-body.layout-tablet .canvas-stack {
-  width: 100% !important;
-  height: auto !important;
-  max-height: 100% !important;
-  aspect-ratio: 3 / 2 !important;
-  position: relative;
-}
-
-body.layout-movil .canvas-stack canvas,
-body.layout-tablet .canvas-stack canvas {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: contain;
-}
-
-/* Asegurar que los menús laterales no generen scroll en el body */
-body.layout-movil .estudio-toolbar,
-body.layout-tablet .estudio-toolbar {
-  max-height: 100dvh !important;
-}
-/* =========================================================
-   ADAPTACIÓN DEL LIBRO (ÁLBUM) PARA MÓVILES Y TABLETS
-   ========================================================= */
-
-/* Ajustar el contenedor del libro para que no se desborde */
-.libro-escenario {
-  width: 100vw !important;
-  height: 100dvh !important;
-  overflow: hidden !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px !important;
-}
-
-/* Ajustar el tamaño del libro según la pantalla (Se adapta al 90% del ancho máximo) */
-.libro-wrapper {
-  width: clamp(280px, 90vw, 800px) !important; /* Se encoge en celular, crece en PC */
-  height: auto !important;
-  aspect-ratio: 3 / 2 !important; /* Mantiene la proporción del libro */
-  position: relative;
-  margin: 0 auto;
-  transform: scale(1) !important; /* Evita que se salga de cuadro */
-}
-
-/* Ajustar la portada y las páginas internas para que sigan el tamaño del wrapper */
-.libro-portada, 
-.libro-paginas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* Asegurarse de que los controles (botones anterior/siguiente) se vean bien */
-.libro-controles {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  z-index: 10;
-}
-
-/* Ajustar el tamaño de las letras o elementos internos del libro si se ven muy grandes */
-.portada-titulo {
-  font-size: clamp(1.5rem, 5vw, 2.5rem) !important;
-}
-.portada-subtitulo {
-  font-size: clamp(0.8rem, 3vw, 1.2rem) !important;
 }
