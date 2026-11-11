@@ -52,7 +52,7 @@ function canvasABlob(cnv) { return new Promise((res) => cnv.toBlob(res, "image/p
 function generarUUID() { return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2); }
 
 // ============================================================
-//  INICIALIZACIÓN
+//  INICIALIZACIÓN Y DETECCIÓN
 // ============================================================
 async function initArte() {
   const { data: { user } } = await supabase.auth.getUser();
@@ -115,7 +115,6 @@ function configurarEventosDibujo(dispositivo) {
     document.getElementById("grosorValor").textContent = grosor;
   };
   
-  // Paleta de colores (sean del menú lateral o de la barra de Instagram)
   document.querySelectorAll(".color-btn").forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
@@ -156,21 +155,36 @@ function configurarEventosDibujo(dispositivo) {
   const limpiarFn = () => { trazos = []; trazoActual = null; renderizarTrazos(); };
   const guardarFn = () => guardarObra();
 
-  // Enlazar botones (ambas versiones)
   document.getElementById("btnCopiarPintura").onclick = copiarFn;
   document.getElementById("btnPegarPintura").onclick = pegarFn;
-  document.getElementById("btnCopiarPinturaMob").onclick = copiarFn;
-  document.getElementById("btnPegarPinturaMob").onclick = pegarFn;
   document.getElementById("btnLimpiarMob").onclick = limpiarFn;
   document.getElementById("btnGuardarMob").onclick = guardarFn;
+  document.getElementById("btnGuardarBarraMob").onclick = guardarFn;
 
-  // Fondo y acciones
-  const elFondoColor = dispositivo === 'escritorio' ? document.getElementById("fondoColorDesk") : document.getElementById("fondoColor");
-  elFondoColor.oninput = (e) => { fondoColor = e.target.value; fondoImagen = null; dibujarFondo(); };
+  // Fondo y acciones (Escritorio)
+  document.getElementById("fondoColorDesk").oninput = (e) => { 
+    fondoColor = e.target.value; fondoImagen = null; dibujarFondo(); 
+  };
+  document.getElementById("btnSubirFondoDesk").onclick = () => document.getElementById("inputFondo").click();
+  document.getElementById("btnQuitarFondoDesk").onclick = () => { 
+    fondoImagen = null; fondoColor = "#ffffff"; document.getElementById("fondoColorDesk").value = "#ffffff"; dibujarFondo(); 
+  };
+  document.getElementById("btnLimpiarDesk").onclick = limpiarFn;
+  document.getElementById("btnGuardarDesk").onclick = guardarFn;
 
-  const btnSubir = dispositivo === 'escritorio' ? document.getElementById("btnSubirFondoDesk") : document.getElementById("btnSubirFondo");
-  btnSubir.onclick = () => document.getElementById("inputFondo").click();
-  
+  // Fondo y acciones (Móvil)
+  const fondoColorMob = document.getElementById("fondoColorMob");
+  if (fondoColorMob) {
+    fondoColorMob.oninput = (e) => { 
+      fondoColor = e.target.value; fondoImagen = null; dibujarFondo(); 
+    };
+    document.getElementById("btnSubirFondoMob").onclick = () => document.getElementById("inputFondo").click();
+    document.getElementById("btnQuitarFondoMob").onclick = () => { 
+      fondoImagen = null; fondoColor = "#ffffff"; fondoColorMob.value = "#ffffff"; dibujarFondo(); 
+    };
+  }
+
+  // Input de archivo de fondo (Común)
   document.getElementById("inputFondo").onchange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -183,15 +197,6 @@ function configurarEventosDibujo(dispositivo) {
       reader.readAsDataURL(file);
     }
   };
-  
-  const btnQuitar = dispositivo === 'escritorio' ? document.getElementById("btnQuitarFondoDesk") : document.getElementById("btnQuitarFondo");
-  btnQuitar.onclick = () => { fondoImagen = null; fondoColor = "#ffffff"; elFondoColor.value = "#ffffff"; dibujarFondo(); };
-
-  const btnLimpiar = dispositivo === 'escritorio' ? document.getElementById("btnLimpiarDesk") : document.getElementById("btnLimpiar");
-  btnLimpiar.onclick = limpiarFn;
-  
-  const btnGuardar = dispositivo === 'escritorio' ? document.getElementById("btnGuardarDesk") : document.getElementById("btnGuardar");
-  btnGuardar.onclick = guardarFn;
 }
 
 function configurarEventosUI() {
@@ -210,7 +215,6 @@ function configurarEventosUI() {
   document.getElementById("btnEditarObra").onclick = editarObraDesdeMuseo;
   document.getElementById("btnCopiarObraMuseo").onclick = copiarObraDesdeMuseo;
 
-  // Lógica del menú lateral
   const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
   const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
   const overlay = document.getElementById('overlayMenu');
@@ -237,8 +241,8 @@ function abrirEstudio() {
   
   fondoImagen = null;
   fondoColor = "#ffffff";
-  document.getElementById("fondoColor").value = "#ffffff";
   document.getElementById("fondoColorDesk").value = "#ffffff";
+  if (document.getElementById("fondoColorMob")) document.getElementById("fondoColorMob").value = "#ffffff";
   dibujarFondo(); 
   
   document.getElementById("estudioOverlay").classList.add("activo");
@@ -328,18 +332,16 @@ function renderizarTrazos() {
   ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
 }
 
-// ============================================================
-//  GUARDAR OBRA
-// ============================================================
 async function guardarObra() {
-  const titulo = (document.getElementById("tituloObraM").value || document.getElementById("tituloObra").value).trim() || "Sin título";
+  const titulo = (document.getElementById("tituloObra").value || document.getElementById("tituloObraM").value).trim() || "Sin título";
   
   const btnDesk = document.getElementById("btnGuardarDesk");
-  const btnMob = document.getElementById("btnGuardarMob");
-  const btnMenu = document.getElementById("btnGuardar");
+  const btnMobMenu = document.getElementById("btnGuardarMob");
+  const btnMobBar = document.getElementById("btnGuardarBarraMob");
+  
   if (btnDesk) { btnDesk.textContent = "Subiendo..."; btnDesk.disabled = true; }
-  if (btnMob) { btnMob.textContent = "Subiendo..."; btnMob.disabled = true; }
-  if (btnMenu) { btnMenu.textContent = "Subiendo..."; btnMenu.disabled = true; }
+  if (btnMobMenu) { btnMobMenu.textContent = "Subiendo..."; btnMobMenu.disabled = true; }
+  if (btnMobBar) { btnMobBar.textContent = "Subiendo..."; btnMobBar.disabled = true; }
 
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = canvas.width; tempCanvas.height = canvas.height;
@@ -401,15 +403,13 @@ async function guardarObra() {
     alert("Error: " + err.message);
   } finally {
     if (btnDesk) { btnDesk.textContent = "Guardar Obra"; btnDesk.disabled = false; }
-    if (btnMob) { btnMob.textContent = "Guardar"; btnMob.disabled = false; }
-    if (btnMenu) { btnMenu.textContent = "Guardar Obra"; btnMenu.disabled = false; }
+    if (btnMobMenu) { btnMobMenu.textContent = "Guardar Obra"; btnMobMenu.disabled = false; }
+    if (btnMobBar) { btnMobBar.textContent = "Guardar"; btnMobBar.disabled = false; }
     modoEdicion = false; obraEditandoId = null; fondoEditandoId = null;
   }
 }
 
-// ============================================================
-//  EDICIÓN Y MUSEO
-// ============================================================
+// ... (El resto de funciones de museo y edición, se mantienen igual)
 async function editarObraDesdeMuseo() {
   if (!obraActualEnMuseo) return;
   document.getElementById("museoOverlay").classList.remove("activo");
@@ -425,8 +425,8 @@ async function editarObraDesdeMuseo() {
   fondoImagen = null;
   fondoColor = "#ffffff";
   fondoOpacidad = 100;
-  document.getElementById("fondoColor").value = "#ffffff";
   document.getElementById("fondoColorDesk").value = "#ffffff";
+  if (document.getElementById("fondoColorMob")) document.getElementById("fondoColorMob").value = "#ffffff";
   
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
@@ -440,14 +440,14 @@ async function editarObraDesdeMuseo() {
     } catch (err) {
       console.warn("Fondo no disponible, usando color sólido.");
       fondoColor = obra.fondo_color || "#ffffff";
-      document.getElementById("fondoColor").value = fondoColor;
       document.getElementById("fondoColorDesk").value = fondoColor;
+      if (document.getElementById("fondoColorMob")) document.getElementById("fondoColorMob").value = fondoColor;
       dibujarFondo();
     }
   } else {
     fondoColor = obra.fondo_color || "#ffffff";
-    document.getElementById("fondoColor").value = fondoColor;
     document.getElementById("fondoColorDesk").value = fondoColor;
+    if (document.getElementById("fondoColorMob")) document.getElementById("fondoColorMob").value = fondoColor;
     dibujarFondo();
   }
 
@@ -504,9 +504,6 @@ async function copiarObraDesdeMuseo() {
   }
 }
 
-// ============================================================
-//  UI DEL LIBRO Y TEMAS
-// ============================================================
 function initPanelTemas() {
   const btnAbrir = document.getElementById('btnAbrirPanelTemas');
   const btnCerrar = document.getElementById('btnCerrarPanelTemas');
