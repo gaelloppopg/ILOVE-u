@@ -94,36 +94,35 @@ async function initArte() {
 }
 
 // ============================================================
-//  EVENTOS Y HERRAMIENTAS
+//  EVENTOS Y HERRAMIENTAS (CORREGIDO PARA TÁCTIL)
 // ============================================================
 function configurarEventosDibujo() {
   if (canvas) {
-    // Eventos de Mouse
-    canvas.addEventListener("mousedown", empezarDibujo);
-    canvas.addEventListener("mousemove", dibujar);
-    canvas.addEventListener("mouseup", terminarDibujo);
-    canvas.addEventListener("mouseleave", terminarDibujo);
+    // Usamos PointerEvents, que funcionan tanto para ratón como para pantallas táctiles
+    canvas.style.touchAction = "none"; // Evita el scroll y zoom en el canvas
 
-    // Eventos Táctiles (Crucial para que funcione en celular)
-    canvas.addEventListener("touchstart", (e) => {
-      e.preventDefault(); // Evita scroll
-      const touch = e.touches[0];
-      const mouseEvent = new MouseEvent("mousedown", { clientX: touch.clientX, clientY: touch.clientY });
-      canvas.dispatchEvent(mouseEvent);
-    }, { passive: false });
+    canvas.addEventListener("pointerdown", (e) => {
+      // Captura el puntero para que si el dedo sale del canvas, siga dibujando
+      canvas.setPointerCapture(e.pointerId);
+      empezarDibujo(e);
+    });
 
-    canvas.addEventListener("touchmove", (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      const mouseEvent = new MouseEvent("mousemove", { clientX: touch.clientX, clientY: touch.clientY });
-      canvas.dispatchEvent(mouseEvent);
-    }, { passive: false });
+    canvas.addEventListener("pointermove", (e) => {
+      // Solo dibuja si el botón está presionado (o el dedo está tocando)
+      if (e.buttons > 0 || e.pointerType === 'touch') {
+        dibujar(e);
+      }
+    });
 
-    canvas.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      const mouseEvent = new MouseEvent("mouseup", {});
-      canvas.dispatchEvent(mouseEvent);
-    }, { passive: false });
+    canvas.addEventListener("pointerup", (e) => {
+      terminarDibujo();
+      canvas.releasePointerCapture(e.pointerId);
+    });
+
+    canvas.addEventListener("pointercancel", (e) => {
+      terminarDibujo();
+      canvas.releasePointerCapture(e.pointerId);
+    });
   }
   
   document.querySelectorAll(".tool-btn[data-tool]").forEach(btn => {
