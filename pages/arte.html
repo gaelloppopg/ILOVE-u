@@ -257,7 +257,6 @@
       <div class="estudio-toolbar" id="estudioToolbar">
         <button class="btn-cerrar-toolbar" id="btnCerrarMenuM">✕</button>
         
-        <!-- Título (en escritorio se maneja desde topbar) -->
         <div class="tool-group">
           <span class="tool-label">Título de la Obra</span>
           <input type="text" id="tituloObraM" placeholder="Título..." maxlength="40" />
@@ -300,7 +299,6 @@
           <button type="button" class="tool-btn" id="btnPegarPintura">Pegar Trazos</button>
         </div>
 
-        <!-- CONTROLES DE FONDO Y ACCIONES (Se ocultan en escritorio porque están en el footer) -->
         <div class="tool-group solo-movil">
           <span class="tool-label">Fondo</span>
           <div class="fondo-controles">
@@ -326,6 +324,19 @@
 
       <!-- BARRA INFERIOR TIPO INSTAGRAM (Solo Móvil) -->
       <div class="barra-instagram solo-movil">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button class="tool-btn" id="btnCopiarPinturaMob" style="padding: 5px 10px; font-size: 0.8rem;">Copiar</button>
+          <button class="tool-btn" id="btnPegarPinturaMob" style="padding: 5px 10px; font-size: 0.8rem;">Pegar</button>
+        </div>
+        <div class="paleta-rapida">
+          <button class="color-btn active" data-color="#1a1a1a" style="--c:#1a1a1a"></button>
+          <button class="color-btn" data-color="#e63946" style="--c:#e63946"></button>
+          <button class="color-btn" data-color="#f4a261" style="--c:#f4a261"></button>
+          <button class="color-btn" data-color="#2a9d8f" style="--c:#2a9d8f"></button>
+          <button class="color-btn" data-color="#457b9d" style="--c:#457b9d"></button>
+          <button class="color-btn" data-color="#9d4edd" style="--c:#9d4edd"></button>
+          <button class="color-btn" data-color="#f28ca6" style="--c:#f28ca6"></button>
+        </div>
         <button class="btn-accion-principal" id="btnGuardarBarraMob">Guardar</button>
       </div>
 
