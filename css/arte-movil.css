@@ -543,3 +543,78 @@ body:has(#libroWrapper.abierto) {
     -webkit-overflow-scrolling: auto !important;
   }
 }
+/* ==========================================================================
+   FIX DEFINITIVO: el lienzo móvil no debe arrastrar el fondo
+   ========================================================================== */
+
+/* Cuando el estudio está abierto, body bloqueado */
+body.estudio-abierto,
+html:has(body.estudio-abierto) {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+}
+
+/* El overlay del estudio a pantalla completa, sin scroll */
+.estudio-overlay.activo {
+  display: flex !important;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+  z-index: 9999 !important;
+}
+
+/* El wrapper del canvas NO permite scroll */
+body.layout-movil .estudio-canvas-wrapper,
+body.layout-tablet .estudio-canvas-wrapper {
+  overscroll-behavior: contain !important;
+  touch-action: none !important;
+  -webkit-overflow-scrolling: auto !important;
+}
+
+/* El canvas en sí bloquea gestos */
+body.layout-movil .canvas-stack,
+body.layout-movil .canvas-stack canvas,
+body.layout-tablet .canvas-stack,
+body.layout-tablet .canvas-stack canvas {
+  touch-action: none !important;
+  overscroll-behavior: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+/* El toolbar lateral puede scrollear PERO sin propagar al body */
+body.layout-movil .estudio-toolbar.activo,
+body.layout-tablet .estudio-toolbar.activo {
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Overlay del menú lateral: bloquea gestos */
+body.layout-movil #overlayMenu.activo,
+body.layout-tablet #overlayMenu.activo {
+  touch-action: none !important;
+  overscroll-behavior: none !important;
+}
+
+/* Museo / temas abiertos: sin scroll de fondo */
+.museo-overlay.activo,
+.panel-temas-drawer.activo {
+  overscroll-behavior: contain !important;
+}
+
+/* iOS: quitar el rubber-band */
+@supports (-webkit-touch-callout: none) {
+  body.estudio-abierto,
+  .estudio-overlay.activo,
+  body.layout-movil .estudio-canvas-wrapper,
+  body.layout-movil .canvas-stack,
+  body.layout-movil .canvas-stack canvas {
+    -webkit-overflow-scrolling: auto !important;
+  }
+}
