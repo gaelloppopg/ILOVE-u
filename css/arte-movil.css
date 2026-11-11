@@ -1,5 +1,6 @@
 /* ==========================================================================
    PROYECTO: ESTUDIO DE DIBUJO (VISTA ESCRITORIO + MÓVIL INMERSIVO)
+   DISEÑO VISUAL MEJORADO
    ========================================================================== */
 
 :root {
@@ -51,7 +52,7 @@ body.layout-movil .vista-escritorio,
 body.layout-tablet .vista-escritorio { display: none !important; }
 
 /* ==========================================================================
-   ESTUDIO
+   ESTUDIO (Fondo transparente para ver el patrón de la página)
    ========================================================================== */
 .estudio-overlay {
   display: none;
@@ -59,7 +60,7 @@ body.layout-tablet .vista-escritorio { display: none !important; }
   inset: 0;
   width: 100vw;
   height: 100dvh;
-  background: transparent !important; /* CAMBIO: Transparente para ver el fondo de la página */
+  background: transparent !important; /* Transparente */
   padding: 0 !important;
   z-index: 9999;
   flex-direction: column;
@@ -77,19 +78,19 @@ body.layout-tablet .estudio {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: transparent !important; /* CAMBIO: Transparente */
+  background: transparent !important;
   margin: 0 !important;
   border-radius: 0 !important;
   overflow: hidden;
 }
 
 /* ==========================================================================
-   ÁREA DEL LIENZO
+   ÁREA DEL LIENZO (Con sombra y borde para definirlo)
    ========================================================================== */
 body.layout-movil .estudio-canvas-wrapper,
 body.layout-tablet .estudio-canvas-wrapper {
-  background: transparent !important; /* CAMBIO: Transparente */
-  padding: 10px !important;
+  background: transparent !important;
+  padding: 15px !important;
   padding-bottom: 85px !important;
   flex: 1 !important;
   min-height: 0 !important;
@@ -110,7 +111,8 @@ body.layout-tablet .canvas-stack {
   max-height: 100% !important;
   aspect-ratio: 3 / 2 !important;
   position: relative;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+  /* Borde y sombra mejorada */
+  box-shadow: 0 0 0 2px #333, 0 15px 40px rgba(0,0,0,0.9) !important;
   border-radius: 12px !important;
   overflow: hidden !important;
   background-color: #ffffff !important; /* El lienzo sí es blanco */
@@ -129,17 +131,17 @@ body.layout-tablet .canvas-stack canvas {
 }
 
 /* ==========================================================================
-   MENÚ LATERAL (DRAWER) OPTIMIZADO Y VISUAL
+   MENÚ LATERAL (DRAWER) REDISEÑADO Y VISUAL
    ========================================================================== */
 body.layout-movil .estudio-toolbar,
 body.layout-tablet .estudio-toolbar {
   position: fixed !important;
   top: 0 !important;
   right: -100% !important;
-  width: 90vw !important; /* Un poco más ancho */
+  width: 90vw !important;
   max-width: 340px !important;
   height: 100dvh !important;
-  background: #111 !important; /* Fondo más oscuro elegante */
+  background: #0a0a0a !important;
   color: var(--c-texto) !important;
   z-index: 10000 !important;
   padding: 20px !important;
@@ -147,9 +149,9 @@ body.layout-tablet .estudio-toolbar {
   transition: right var(--trans-normal) !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 15px !important;
-  box-shadow: -10px 0 30px rgba(0,0,0,0.8) !important;
-  border-left: 1px solid #333;
+  gap: 12px !important;
+  box-shadow: -15px 0 40px rgba(0,0,0,0.9) !important;
+  border-left: 1px solid #222;
 }
 
 body.layout-movil .estudio-toolbar.activo,
@@ -162,32 +164,33 @@ body.layout-tablet .btn-cerrar-toolbar {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  background: #222 !important;
-  border: 1px solid #444 !important;
+  background: #1a1a1a !important;
+  border: 1px solid #333 !important;
   color: #fff !important;
   font-size: 1.2rem !important;
   font-weight: bold !important;
-  width: 40px !important;
-  height: 40px !important;
+  width: 38px !important;
+  height: 38px !important;
   border-radius: 50% !important;
   cursor: pointer !important;
   align-self: flex-end !important;
   margin-bottom: 5px !important;
   transition: 0.2s;
 }
+
 body.layout-movil .btn-cerrar-toolbar:active { transform: scale(0.9); }
 
-/* Grupos del menú */
+/* Grupos del menú visualmente separados */
 body.layout-movil .estudio-toolbar .tool-group,
 body.layout-tablet .estudio-toolbar .tool-group {
   display: flex !important;
   flex-direction: column !important;
   gap: 10px !important;
   width: 100% !important;
-  background: #1a1a1a;
+  background: #141414;
   padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  border: 1px solid #222;
 }
 
 body.layout-movil .estudio-toolbar .tool-label,
@@ -197,18 +200,18 @@ body.layout-tablet .estudio-toolbar .tool-label {
   font-weight: 800 !important;
   text-transform: uppercase !important;
   letter-spacing: 1px;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
 }
 
-/* Botones de herramientas */
+/* Botones de herramientas estilo cápsula */
 body.layout-movil .estudio-toolbar .tool-btn,
 body.layout-tablet .estudio-toolbar .tool-btn {
   width: 100% !important;
-  padding: 14px !important;
-  background: #2a2a2a !important;
+  padding: 12px !important;
+  background: #1f1f1f !important;
   color: var(--c-texto) !important;
-  border: 1px solid #444 !important;
-  border-radius: 8px !important;
+  border: 1px solid #333 !important;
+  border-radius: 10px !important;
   text-align: center !important;
   font-size: 0.95rem !important;
   cursor: pointer;
@@ -221,15 +224,15 @@ body.layout-tablet .estudio-toolbar .tool-btn.active {
   color: #000 !important;
   border-color: var(--c-acento) !important;
   font-weight: bold !important;
-  box-shadow: 0 0 10px rgba(201, 160, 80, 0.4);
+  box-shadow: 0 4px 15px rgba(201, 160, 80, 0.3);
 }
 
-/* Paleta de colores */
+/* Paleta de colores más grande y espaciada */
 body.layout-movil .estudio-toolbar .colores-grid,
 body.layout-tablet .estudio-toolbar .colores-grid {
   display: grid !important;
   grid-template-columns: repeat(4, 1fr) !important;
-  gap: 10px !important;
+  gap: 12px !important;
   width: 100% !important;
 }
 
@@ -242,10 +245,12 @@ body.layout-tablet .estudio-toolbar .color-btn {
   cursor: pointer;
   transition: 0.2s;
 }
+
 body.layout-movil .estudio-toolbar .color-btn.active,
 body.layout-tablet .estudio-toolbar .color-btn.active {
   border-color: #fff !important;
-  transform: scale(1.1);
+  transform: scale(1.15);
+  box-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
 /* Grosor */
@@ -256,6 +261,7 @@ body.layout-tablet .estudio-toolbar .grosor-control {
   justify-content: space-between !important;
   align-items: center !important;
 }
+
 body.layout-movil .estudio-toolbar input[type="range"],
 body.layout-tablet .estudio-toolbar input[type="range"] {
   width: 70% !important;
@@ -270,22 +276,24 @@ body.layout-tablet .estudio-toolbar .fondo-controles {
   gap: 10px !important;
   width: 100% !important;
 }
+
 body.layout-movil .estudio-toolbar .fondo-controles input[type="color"],
 body.layout-tablet .estudio-toolbar .fondo-controles input[type="color"] {
   width: 100% !important;
   height: 45px !important;
   border-radius: 8px !important;
-  border: 1px solid #444 !important;
+  border: 1px solid #333 !important;
   cursor: pointer !important;
-  background: #222;
+  background: #1f1f1f;
 }
+
 body.layout-movil .estudio-toolbar .fondo-controles button,
 body.layout-tablet .estudio-toolbar .fondo-controles button {
   width: 100% !important;
   padding: 12px !important;
   border-radius: 8px !important;
-  background: #2a2a2a !important;
-  border: 1px solid #444 !important;
+  background: #1f1f1f !important;
+  border: 1px solid #333 !important;
   color: var(--c-texto) !important;
   font-size: 0.9rem !important;
   cursor: pointer;
@@ -296,8 +304,8 @@ body.layout-movil .estudio-toolbar input[type="text"],
 body.layout-tablet .estudio-toolbar input[type="text"] {
   width: 100% !important;
   padding: 12px !important;
-  background: #2a2a2a !important;
-  border: 1px solid #444 !important;
+  background: #1f1f1f !important;
+  border: 1px solid #333 !important;
   color: var(--c-texto) !important;
   border-radius: 8px !important;
   font-size: 1rem !important;
@@ -311,9 +319,9 @@ body.layout-tablet #overlayMenu.activo {
   display: block !important;
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(0,0,0,0.8) !important;
+  background: rgba(0,0,0,0.85) !important;
   z-index: 9998 !important;
-  backdrop-filter: blur(4px) !important;
+  backdrop-filter: blur(5px) !important;
 }
 
 body.layout-movil .btn-menu-movil-flotante,
@@ -331,7 +339,7 @@ body.layout-tablet .btn-menu-movil-flotante {
   width: 44px !important;
   height: 44px !important;
   border-radius: 50% !important;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important;
   cursor: pointer !important;
   font-size: 1.2rem !important;
 }
@@ -347,7 +355,7 @@ body.layout-tablet .barra-instagram {
   left: 0 !important;
   right: 0 !important;
   width: 100% !important;
-  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0) 100%) !important;
+  background: linear-gradient(to top, rgba(10,10,10,0.98) 0%, rgba(10,10,10,0.8) 70%, rgba(10,10,10,0) 100%) !important;
   padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 0px)) 15px !important;
   align-items: center !important;
   justify-content: space-between !important;
@@ -371,7 +379,7 @@ body.layout-tablet .barra-instagram .acciones-izq {
 
 body.layout-movil .barra-instagram .acciones-izq .tool-btn,
 body.layout-tablet .barra-instagram .acciones-izq .tool-btn {
-  background: #1a1a1a !important;
+  background: #1f1f1f !important;
   border: 1px solid #333 !important;
   color: #fff !important;
   width: 44px !important;
@@ -383,6 +391,11 @@ body.layout-tablet .barra-instagram .acciones-izq .tool-btn {
   align-items: center !important;
   cursor: pointer !important;
   transition: transform 0.1s !important;
+}
+
+body.layout-movil .barra-instagram .acciones-izq .tool-btn:active,
+body.layout-tablet .barra-instagram .acciones-izq .tool-btn:active {
+  transform: scale(0.92) !important;
 }
 
 body.layout-movil .barra-instagram .acciones-izq .tool-btn svg,
@@ -437,4 +450,5 @@ body.layout-tablet .btn-accion-principal {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  box-shadow: 0 4px 15px rgba(201, 160, 80, 0.3) !important;
 }
