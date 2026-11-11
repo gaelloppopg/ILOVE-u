@@ -87,7 +87,6 @@ async function initArte() {
   if (canvas) {
     ctx = canvas.getContext("2d");
     canvas.style.touchAction = "none";
-    canvas.style.pointerEvents = "auto";
   }
 
   dibujarFondo();
@@ -103,73 +102,44 @@ async function initArte() {
 // ============================================================
 function configurarEventosDibujo() {
   if (canvas) {
-    // 1. Prevenir gestos de zoom/scroll en el canvas
-    canvas.style.touchAction = 'none';
-
-    // 2. Eventos táctiles simulando ratón (para que el código de dibujo sea el mismo)
+    // Eventos táctiles directos
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      e.stopPropagation();
       const touch = e.touches[0];
-      const mouseEvent = new MouseEvent('mousedown', {
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-        bubbles: true,
-        cancelable: true
-      });
-      canvas.dispatchEvent(mouseEvent);
+      empezarDibujo(touch);
     }, { passive: false });
 
     canvas.addEventListener('touchmove', (e) => {
       e.preventDefault();
-      e.stopPropagation();
       const touch = e.touches[0];
-      const mouseEvent = new MouseEvent('mousemove', {
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-        bubbles: true,
-        cancelable: true
-      });
-      canvas.dispatchEvent(mouseEvent);
+      dibujar(touch);
     }, { passive: false });
 
     canvas.addEventListener('touchend', (e) => {
       e.preventDefault();
-      e.stopPropagation();
-      const mouseEvent = new MouseEvent('mouseup', {
-        bubbles: true,
-        cancelable: true
-      });
-      canvas.dispatchEvent(mouseEvent);
+      terminarDibujo();
     }, { passive: false });
 
-    // 3. Eventos de ratón para computadora (y los simulados en móvil)
-    canvas.addEventListener('mousedown', (e) => {
-      empezarDibujo(e);
-    });
-    canvas.addEventListener('mousemove', (e) => {
-      if (dibujando) dibujar(e);
-    });
+    // Eventos de ratón
+    canvas.addEventListener('mousedown', (e) => empezarDibujo(e));
+    canvas.addEventListener('mousemove', (e) => { if (dibujando) dibujar(e); });
     canvas.addEventListener('mouseup', terminarDibujo);
     canvas.addEventListener('mouseleave', terminarDibujo);
   }
 
   // Herramientas
   const botonesHerramienta = document.querySelectorAll(".tool-btn[data-tool]");
-  if (botonesHerramienta.length > 0) {
-    botonesHerramienta.forEach(btn => {
-      btn.onclick = (e) => {
-        e.preventDefault();
-        botonesHerramienta.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        herramienta = btn.dataset.tool;
-      };
-    });
-  }
+  botonesHerramienta.forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      botonesHerramienta.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      herramienta = btn.dataset.tool;
+    };
+  });
 
   // Grosor
-  const inputsGrosor = document.querySelectorAll(".input-grosor");
-  inputsGrosor.forEach(inp => {
+  document.querySelectorAll(".input-grosor").forEach(inp => {
     inp.oninput = (e) => {
       grosor = parseInt(e.target.value);
       document.querySelectorAll(".grosor-badge").forEach(b => b.textContent = grosor);

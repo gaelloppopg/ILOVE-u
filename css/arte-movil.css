@@ -28,7 +28,7 @@ html, body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Permitir scroll vertical en la página principal */
+/* Scroll normal en la página principal */
 body {
   overflow-y: auto !important;
   position: relative;
@@ -55,7 +55,7 @@ body.layout-tablet .vista-escritorio { display: none !important; }
    ESTUDIO (SOLO SE MUESTRA CUANDO TIENE LA CLASE .activo)
    ========================================================================== */
 .estudio-overlay {
-  display: none; /* Oculto por defecto */
+  display: none;
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -85,13 +85,13 @@ body.layout-tablet .estudio {
 }
 
 /* ==========================================================================
-   ÁREA DEL LIENZO
+   ÁREA DEL LIENZO (AQUÍ ESTABA EL PROBLEMA DEL TOUCH)
    ========================================================================== */
 body.layout-movil .estudio-canvas-wrapper,
 body.layout-tablet .estudio-canvas-wrapper {
   background: #0a0a0a !important;
   padding: 10px !important;
-  padding-bottom: 85px !important;
+  padding-bottom: 85px !important; /* Espacio para la barra instagram */
   flex: 1 !important;
   min-height: 0 !important;
   display: flex !important;
@@ -99,7 +99,7 @@ body.layout-tablet .estudio-canvas-wrapper {
   align-items: center !important;
   overflow: hidden !important;
   position: relative;
-  z-index: 1;
+  z-index: 10; /* Por encima del fondo */
   touch-action: none !important;
 }
 
@@ -115,7 +115,7 @@ body.layout-tablet .canvas-stack {
   border-radius: 12px !important;
   overflow: hidden !important;
   background-color: #ffffff !important;
-  z-index: 2;
+  z-index: 20;
 }
 
 body.layout-movil .canvas-stack canvas,
@@ -126,7 +126,7 @@ body.layout-tablet .canvas-stack canvas {
   object-fit: contain !important;
   touch-action: none !important;
   cursor: crosshair !important;
-  z-index: 3;
+  z-index: 30;
 }
 
 /* ==========================================================================
@@ -321,7 +321,7 @@ body.layout-tablet .btn-menu-movil-flotante {
   position: absolute !important;
   top: 15px !important;
   right: 15px !important;
-  z-index: 100 !important;
+  z-index: 50 !important; /* Por debajo de la barra pero sobre el lienzo */
   background: rgba(51, 51, 51, 0.8) !important;
   color: #fff !important;
   border: none !important;
@@ -345,12 +345,17 @@ body.layout-tablet .barra-instagram {
   left: 0 !important;
   right: 0 !important;
   width: 100% !important;
+  
   background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 70%, rgba(0,0,0,0) 100%) !important;
+  
   padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 0px)) 15px !important;
+  
   align-items: center !important;
   justify-content: space-between !important;
-  z-index: 200 !important;
+  z-index: 100 !important; /* Por encima del lienzo (z-30) */
   gap: 10px !important;
+  
+  /* Permite que los toques pasen al canvas si no tocan un botón */
   pointer-events: none !important;
 }
 
