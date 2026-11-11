@@ -85,6 +85,12 @@ async function initArte() {
   canvas = document.querySelector(".lienzo-dibujo");
   ctx = canvas.getContext("2d");
   
+  // Aseguramos que el CSS no bloquee los toques en el lienzo
+  if (canvas) {
+    canvas.style.pointerEvents = "auto";
+    canvas.style.touchAction = "none";
+  }
+
   dibujarFondo();
   configurarEventosDibujo();
   configurarEventosUI();
@@ -94,45 +100,54 @@ async function initArte() {
 }
 
 // ============================================================
-//  EVENTOS Y HERRAMIENTAS (CORREGIDO PARA TÁCTIL)
+//  EVENTOS Y HERRAMIENTAS (BLINDADO PARA TÁCTIL Y RATÓN)
 // ============================================================
 function configurarEventosDibujo() {
   if (canvas) {
-    // Usamos PointerEvents, que funcionan tanto para ratón como para pantallas táctiles
-    canvas.style.touchAction = "none"; // Evita el scroll y zoom en el canvas
-
+    // Usamos PointerEvents: Funciona perfecto tanto para clics como para deslizar el dedo
     canvas.addEventListener("pointerdown", (e) => {
-      // Captura el puntero para que si el dedo sale del canvas, siga dibujando
-      canvas.setPointerCapture(e.pointerId);
+      e.preventDefault(); // Evita comportamientos raros del navegador
+      canvas.setPointerCapture(e.pointerId); // Captura el puntero para que no se pierda si sales del canvas
       empezarDibujo(e);
     });
 
     canvas.addEventListener("pointermove", (e) => {
-      // Solo dibuja si el botón está presionado (o el dedo está tocando)
-      if (e.buttons > 0 || e.pointerType === 'touch') {
+      // Solo dibuja si el puntero está presionado
+      if (dibujando) {
+        e.preventDefault();
         dibujar(e);
       }
     });
 
     canvas.addEventListener("pointerup", (e) => {
       terminarDibujo();
-      canvas.releasePointerCapture(e.pointerId);
+      if (canvas.hasPointerCapture(e.pointerId)) {
+        canvas.releasePointerCapture(e.pointerId);
+      }
     });
 
     canvas.addEventListener("pointercancel", (e) => {
       terminarDibujo();
-      canvas.releasePointerCapture(e.pointerId);
+      if (canvas.hasPointerCapture(e.pointerId)) {
+        canvas.releasePointerCapture(e.pointerId);
+      }
     });
+
+    // Prevenir menú contextual en móviles (mantener presionado)
+    canvas.addEventListener("contextmenu", (e) => e.preventDefault());
   }
   
+  // Botones de herramientas
   document.querySelectorAll(".tool-btn[data-tool]").forEach(btn => {
-    btn.onclick = () => {
+    btn.onclick = (e) => {
+      e.preventDefault();
       document.querySelectorAll(".tool-btn[data-tool]").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       herramienta = btn.dataset.tool;
     };
   });
 
+  // Grosor
   document.querySelectorAll(".input-grosor").forEach(inp => {
     inp.oninput = (e) => {
       grosor = parseInt(e.target.value);
@@ -140,8 +155,10 @@ function configurarEventosDibujo() {
     };
   });
   
+  // Colores
   document.querySelectorAll(".color-btn").forEach(btn => {
-    btn.onclick = () => {
+    btn.onclick = (e) => {
+      e.preventDefault();
       document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       color = btn.dataset.color;
@@ -156,6 +173,7 @@ function configurarEventosDibujo() {
     };
   });
 
+  // --- Lógica del Portapapeles ---
   const copiarFn = () => {
     portapapeles.trazos = JSON.parse(JSON.stringify(trazos)); 
     if (fondoImagen) portapapeles.fondo = fondoImagen;
@@ -186,7 +204,7 @@ function configurarEventosDibujo() {
   document.querySelectorAll(".btn-limpiar").forEach(b => b.onclick = limpiarFn);
   document.querySelectorAll(".btn-guardar").forEach(b => b.onclick = guardarFn);
 
-  // Fondo (Multiple)
+  // Controles de Fondo
   document.querySelectorAll(".fondo-color-input").forEach(inp => {
     inp.oninput = (e) => { fondoColor = e.target.value; fondoImagen = null; dibujarFondo(); };
   });
@@ -199,18 +217,21 @@ function configurarEventosDibujo() {
     dibujarFondo(); 
   });
 
-  document.getElementById("inputFondo").onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = new Image();
-        img.onload = () => { fondoImagen = img; dibujarFondo(); };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const inpFondo = document.getElementById("inputFondo");
+  if (inpFondo) {
+    inpFondo.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => { fondoImagen = img; dibujarFondo(); };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+  }
 }
 
 function configurarEventosUI() {
