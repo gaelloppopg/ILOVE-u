@@ -94,14 +94,36 @@ async function initArte() {
 }
 
 // ============================================================
-//  EVENTOS Y HERRAMIENTAS (Búsqueda por clase para evitar fallos)
+//  EVENTOS Y HERRAMIENTAS
 // ============================================================
 function configurarEventosDibujo() {
   if (canvas) {
+    // Eventos de Mouse
     canvas.addEventListener("mousedown", empezarDibujo);
     canvas.addEventListener("mousemove", dibujar);
     canvas.addEventListener("mouseup", terminarDibujo);
     canvas.addEventListener("mouseleave", terminarDibujo);
+
+    // Eventos Táctiles (Crucial para que funcione en celular)
+    canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault(); // Evita scroll
+      const touch = e.touches[0];
+      const mouseEvent = new MouseEvent("mousedown", { clientX: touch.clientX, clientY: touch.clientY });
+      canvas.dispatchEvent(mouseEvent);
+    }, { passive: false });
+
+    canvas.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const mouseEvent = new MouseEvent("mousemove", { clientX: touch.clientX, clientY: touch.clientY });
+      canvas.dispatchEvent(mouseEvent);
+    }, { passive: false });
+
+    canvas.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      const mouseEvent = new MouseEvent("mouseup", {});
+      canvas.dispatchEvent(mouseEvent);
+    }, { passive: false });
   }
   
   document.querySelectorAll(".tool-btn[data-tool]").forEach(btn => {
