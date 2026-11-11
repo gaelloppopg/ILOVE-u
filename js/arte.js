@@ -26,9 +26,9 @@ let obraEditandoId = null;
 let fondoEditandoId = null;
 let preferenciaDispositivo = 'auto';
 
-let trazos = []; 
+let trazos = [];
 let trazoActual = null;
-let portapapeles = { fondo: null, trazos: [] }; 
+let portapapeles = { fondo: null, trazos: [] };
 
 // ============================================================
 //  UTILIDADES
@@ -36,7 +36,7 @@ let portapapeles = { fondo: null, trazos: [] };
 function cargarImagen(src, isCORS = false) {
   return new Promise((res, rej) => {
     const img = new Image();
-    if (isCORS) img.crossOrigin = "anonymous"; 
+    if (isCORS) img.crossOrigin = "anonymous";
     img.onload = () => res(img);
     img.onerror = () => {
       const imgFallback = new Image();
@@ -51,27 +51,46 @@ function cargarImagen(src, isCORS = false) {
 function canvasABlob(cnv) { return new Promise((res) => cnv.toBlob(res, "image/png")); }
 function generarUUID() { return crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2); }
 
+/** Devuelve el contenedor de la vista activa según el layout del body */
+function vistaActiva() {
+  if (document.body.classList.contains('layout-escritorio')) {
+    return document.querySelector('.vista-escritorio');
+  }
+  return document.querySelector('.vista-movil');
+}
+
+/** Devuelve los canvas de la vista activa */
+function obtenerCanvasActivos() {
+  const vista = vistaActiva();
+  if (!vista) return { cFondo: null, cDibujo: null };
+  return {
+    cFondo: vista.querySelector('.lienzo-fondo'),
+    cDibujo: vista.querySelector('.lienzo-dibujo'),
+    stack: vista.querySelector('.canvas-stack')
+  };
+}
+
 // ============================================================
 //  INICIALIZACIÓN
 // ============================================================
 async function initArte() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
-  
+
   const { data: couple } = await supabase
     .from('couples')
     .select('id, preferencia_dispositivo')
     .or(`owner_id.eq.${user.id},partner_id.eq.${user.id}`)
     .maybeSingle();
   if (!couple) return;
-  
+
   coupleId = couple.id;
   preferenciaDispositivo = couple.preferencia_dispositivo || 'auto';
 
   if (preferenciaDispositivo === 'auto') {
     const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(lte|wap|fone))))/i.test(navigator.userAgent);
     const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    
+
     if (isTablet) preferenciaDispositivo = 'tablet';
     else if (isMobile) preferenciaDispositivo = 'movil';
     else preferenciaDispositivo = 'escritorio';
@@ -80,9 +99,11 @@ async function initArte() {
   document.body.classList.remove('layout-movil', 'layout-tablet', 'layout-escritorio');
   document.body.classList.add(`layout-${preferenciaDispositivo}`);
 
-  canvasFondo = document.querySelector(".lienzo-fondo");
-  canvas = document.querySelector(".lienzo-dibujo");
-  
+  // ⚠️ FIX: seleccionar canvas de la VISTA ACTIVA, no el primero del DOM
+  const { cFondo, cDibujo } = obtenerCanvasActivos();
+  canvasFondo = cFondo;
+  canvas = cDibujo;
+
   if (canvasFondo) ctxFondo = canvasFondo.getContext("2d");
   if (canvas) {
     ctx = canvas.getContext("2d");
@@ -101,73 +122,84 @@ async function initArte() {
 //  EVENTOS TÁCTILES Y DIBUJO
 // ============================================================
 function configurarEventosDibujo() {
-  if (canvas) {
-    // Eventos táctiles directos
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      empezarDibujo(touch);
-    }, { passive: false });
+  // ⚠️ FIX: enlazar a TODOS los canvas de la vista activa (por si acaso)
+  const vista = vistaActiva();
+  if (!vista) return;
+  const canvasDibujo = vista.querySelector('.lienzo-dibujo');
+  if (!canvasDibujo) return;
 
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      dibujar(touch);
-    }, { passive: false });
-
-    canvas.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      terminarDibujo();
-    }, { passive: false });
-
-    // Eventos de ratón
-    canvas.addEventListener('mousedown', (e) => empezarDibujo(e));
-    canvas.addEventListener('mousemove', (e) => { if (dibujando) dibujar(e); });
-    canvas.addEventListener('mouseup', terminarDibujo);
-    canvas.addEventListener('mouseleave', terminarDibujo);
+  // Si canvas global no está definido, lo asignamos
+  if (!canvas) {
+    canvas = canvasDibujo;
+    ctx = canvas.getContext("2d");
+    canvas.style.touchAction = "none";
   }
 
-  // Herramientas
-  const botonesHerramienta = document.querySelectorAll(".tool-btn[data-tool]");
-  botonesHerramienta.forEach(btn => {
-    btn.onclick = (e) => {
+  const manejarStart = (e) => {
+    e.preventDefault();
+    const punto = e.touches ? e.touches[0] : e;
+    empezarDibujo(punto);
+  };
+  const manejarMove = (e) => {
+    e.preventDefault();
+    const punto = e.touches ? e.touches[0] : e;
+    dibujar(punto);
+  };
+  const manejarEnd = (e) => {
+    if (e.cancelable) e.preventDefault();
+    terminarDibujo();
+  };
+
+  canvasDibujo.addEventListener('touchstart', manejarStart, { passive: false });
+  canvasDibujo.addEventListener('touchmove', manejarMove, { passive: false });
+  canvasDibujo.addEventListener('touchend', manejarEnd, { passive: false });
+  canvasDibujo.addEventListener('touchcancel', manejarEnd, { passive: false });
+  canvasDibujo.addEventListener('mousedown', manejarStart);
+  canvasDibujo.addEventListener('mousemove', (e) => { if (dibujando) manejarMove(e); });
+  canvasDibujo.addEventListener('mouseup', manejarEnd);
+  canvasDibujo.addEventListener('mouseleave', manejarEnd);
+
+  // ⚠️ FIX: usar addEventListener en TODOS los botones (no sobrescribir onclick)
+  document.querySelectorAll(".tool-btn[data-tool]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
       e.preventDefault();
-      botonesHerramienta.forEach(b => b.classList.remove("active"));
+      // Marcar como activo solo los de la misma vista
+      document.querySelectorAll(".tool-btn[data-tool]").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       herramienta = btn.dataset.tool;
-    };
+    });
   });
 
   // Grosor
   document.querySelectorAll(".input-grosor").forEach(inp => {
-    inp.oninput = (e) => {
+    inp.addEventListener("input", (e) => {
       grosor = parseInt(e.target.value);
       document.querySelectorAll(".grosor-badge").forEach(b => b.textContent = grosor);
-    };
+    });
   });
-  
+
   // Colores
-  const botonesColor = document.querySelectorAll(".color-btn");
-  botonesColor.forEach(btn => {
-    btn.onclick = (e) => {
+  document.querySelectorAll(".color-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
       e.preventDefault();
-      botonesColor.forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      color = btn.dataset.color;
+      color = btn.dataset.color || color;
       document.querySelectorAll(".colorPicker").forEach(cp => cp.value = color);
-    };
+    });
   });
 
   document.querySelectorAll(".colorPicker").forEach(cp => {
-    cp.oninput = (e) => {
+    cp.addEventListener("input", (e) => {
       color = e.target.value;
-      botonesColor.forEach(b => b.classList.remove("active"));
-    };
+      document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
+    });
   });
 
   // Portapapeles
-  const copiarFn = () => {
-    portapapeles.trazos = JSON.parse(JSON.stringify(trazos)); 
+  const copiarFn = (e) => {
+    if (e) e.preventDefault();
+    portapapeles.trazos = JSON.parse(JSON.stringify(trazos));
     if (fondoImagen) portapapeles.fondo = fondoImagen;
     else {
       const tempFondo = document.createElement("canvas");
@@ -179,7 +211,8 @@ function configurarEventosDibujo() {
     alert("Trazos y fondo copiados.");
   };
 
-  const pegarFn = () => {
+  const pegarFn = (e) => {
+    if (e) e.preventDefault();
     if (portapapeles.trazos && portapapeles.trazos.length > 0) {
       portapapeles.trazos.forEach(trazo => trazos.push(JSON.parse(JSON.stringify(trazo))));
       renderizarTrazos();
@@ -188,33 +221,44 @@ function configurarEventosDibujo() {
     alert("Trazos pegados.");
   };
 
-  const limpiarFn = () => { trazos = []; trazoActual = null; renderizarTrazos(); };
-  const guardarFn = () => guardarObra();
+  const limpiarFn = (e) => {
+    if (e) e.preventDefault();
+    trazos = []; trazoActual = null; renderizarTrazos();
+  };
+  const guardarFn = (e) => {
+    if (e) e.preventDefault();
+    guardarObra();
+  };
 
-  document.querySelectorAll(".btn-copiar").forEach(b => b.onclick = copiarFn);
-  document.querySelectorAll(".btn-pegar").forEach(b => b.onclick = pegarFn);
-  document.querySelectorAll(".btn-limpiar").forEach(b => b.onclick = limpiarFn);
-  document.querySelectorAll(".btn-guardar").forEach(b => b.onclick = guardarFn);
+  document.querySelectorAll(".btn-copiar").forEach(b => b.addEventListener("click", copiarFn));
+  document.querySelectorAll(".btn-pegar").forEach(b => b.addEventListener("click", pegarFn));
+  document.querySelectorAll(".btn-limpiar").forEach(b => b.addEventListener("click", limpiarFn));
+  document.querySelectorAll(".btn-guardar").forEach(b => b.addEventListener("click", guardarFn));
 
   // Fondo
   document.querySelectorAll(".fondo-color-input").forEach(inp => {
-    inp.oninput = (e) => { fondoColor = e.target.value; fondoImagen = null; dibujarFondo(); };
-  });
-  
-  document.querySelectorAll(".btn-subir-fondo").forEach(b => b.onclick = () => {
-    const el = document.getElementById("inputFondo");
-    if (el) el.click();
-  });
-  
-  document.querySelectorAll(".btn-quitar-fondo").forEach(b => b.onclick = () => { 
-    fondoImagen = null; fondoColor = "#ffffff"; 
-    document.querySelectorAll(".fondo-color-input").forEach(inp => inp.value = "#ffffff");
-    dibujarFondo(); 
+    inp.addEventListener("input", (e) => {
+      fondoColor = e.target.value; fondoImagen = null; dibujarFondo();
+    });
   });
 
+  document.querySelectorAll(".btn-subir-fondo").forEach(b => b.addEventListener("click", (e) => {
+    e.preventDefault();
+    const el = document.getElementById("inputFondo");
+    if (el) el.click();
+  }));
+
+  document.querySelectorAll(".btn-quitar-fondo").forEach(b => b.addEventListener("click", (e) => {
+    e.preventDefault();
+    fondoImagen = null; fondoColor = "#ffffff";
+    document.querySelectorAll(".fondo-color-input").forEach(inp => inp.value = "#ffffff");
+    dibujarFondo();
+  }));
+
   const inpFondo = document.getElementById("inputFondo");
-  if (inpFondo) {
-    inpFondo.onchange = (e) => {
+  if (inpFondo && !inpFondo.dataset.bound) {
+    inpFondo.dataset.bound = "1";
+    inpFondo.addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
@@ -225,35 +269,37 @@ function configurarEventosDibujo() {
         };
         reader.readAsDataURL(file);
       }
-    };
+    });
   }
 }
 
 function configurarEventosUI() {
-  document.querySelectorAll("#btnNuevaObra").forEach(b => b.onclick = abrirEstudio);
-  document.querySelectorAll("#cerrarEstudio").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#btnNuevaObra").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); abrirEstudio(); }));
+  document.querySelectorAll("#cerrarEstudio").forEach(b => b.addEventListener("click", (e) => {
+    e.preventDefault();
     const el = document.getElementById("estudioOverlay");
     if (el) el.classList.remove("activo");
-  });
-  
-  document.querySelectorAll("#btnCerrarLibro").forEach(b => b.onclick = cerrarLibro);
-  document.querySelectorAll("#libroPortada").forEach(b => b.onclick = abrirLibro);
-  document.querySelectorAll("#btnPrev").forEach(b => b.onclick = paginaAnterior);
-  document.querySelectorAll("#btnNext").forEach(b => b.onclick = paginaSiguiente);
+  }));
 
-  document.querySelectorAll("#btnCerrarMuseo").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#btnCerrarLibro").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); cerrarLibro(); }));
+  document.querySelectorAll("#libroPortada").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); abrirLibro(); }));
+  document.querySelectorAll("#btnPrev").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); paginaAnterior(); }));
+  document.querySelectorAll("#btnNext").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); paginaSiguiente(); }));
+
+  document.querySelectorAll("#btnCerrarMuseo").forEach(b => b.addEventListener("click", (e) => {
+    e.preventDefault();
     const el = document.getElementById("museoOverlay");
     if (el) el.classList.remove("activo");
-  });
-  
-  document.querySelectorAll("#museoOverlay").forEach(m => m.onclick = (e) => { 
-    if (e.target.id === 'museoOverlay') m.classList.remove("activo"); 
-  });
+  }));
 
-  document.querySelectorAll("#btnBorrarObra").forEach(b => b.onclick = borrarObraDesdeMuseo);
-  document.querySelectorAll("#btnEditarObra").forEach(b => b.onclick = editarObraDesdeMuseo);
-  document.querySelectorAll("#btnCopiarObraMuseo").forEach(b => b.onclick = copiarObraDesdeMuseo);
-  document.querySelectorAll("#btnDescargarObra").forEach(b => b.onclick = descargarObraComoPNG);
+  document.querySelectorAll("#museoOverlay").forEach(m => m.addEventListener("click", (e) => {
+    if (e.target.id === 'museoOverlay') m.classList.remove("activo");
+  }));
+
+  document.querySelectorAll("#btnBorrarObra").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); borrarObraDesdeMuseo(); }));
+  document.querySelectorAll("#btnEditarObra").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); editarObraDesdeMuseo(); }));
+  document.querySelectorAll("#btnCopiarObraMuseo").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); copiarObraDesdeMuseo(); }));
+  document.querySelectorAll("#btnDescargarObra").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); descargarObraComoPNG(); }));
 
   const btnAbrirMenu = document.getElementById('btnAbrirMenuM');
   const btnCerrarMenu = document.getElementById('btnCerrarMenuM');
@@ -261,9 +307,28 @@ function configurarEventosUI() {
   const toolbar = document.getElementById('estudioToolbar');
 
   if (btnAbrirMenu && overlay && toolbar) {
-    btnAbrirMenu.addEventListener('click', () => { toolbar.classList.add('activo'); overlay.classList.add('activo'); });
-    if(btnCerrarMenu) btnCerrarMenu.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
-    overlay.addEventListener('click', () => { toolbar.classList.remove('activo'); overlay.classList.remove('activo'); });
+    btnAbrirMenu.addEventListener('click', (e) => {
+      e.preventDefault();
+      toolbar.classList.add('activo');
+      overlay.classList.add('activo');
+    });
+    if (btnCerrarMenu) btnCerrarMenu.addEventListener('click', (e) => {
+      e.preventDefault();
+      toolbar.classList.remove('activo');
+      overlay.classList.remove('activo');
+    });
+    overlay.addEventListener('click', () => {
+      toolbar.classList.remove('activo');
+      overlay.classList.remove('activo');
+    });
+  }
+
+  // ⚠️ Sincronizar títulos entre escritorio y móvil
+  const tE = document.getElementById('tituloObra');
+  const tM = document.getElementById('tituloObraM');
+  if (tE && tM) {
+    tE.addEventListener('input', () => { tM.value = tE.value; });
+    tM.addEventListener('input', () => { tE.value = tM.value; });
   }
 }
 
@@ -274,25 +339,25 @@ function abrirEstudio() {
   modoEdicion = false;
   obraEditandoId = null;
   fondoEditandoId = generarUUID();
-  
+
   trazos = []; trazoActual = null;
-  if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
   renderizarTrazos();
-  
+
   fondoImagen = null;
   fondoColor = "#ffffff";
-  
+
   document.querySelectorAll(".fondo-color-input").forEach(inp => inp.value = "#ffffff");
   document.querySelectorAll("#tituloObra, #tituloObraM").forEach(inp => inp.value = "");
-  
-  dibujarFondo(); 
-  
+
+  dibujarFondo();
+
   const overlay = document.getElementById("estudioOverlay");
   if (overlay) overlay.classList.add("activo");
 }
 
 function dibujarFondo() {
-  if(!ctxFondo) return;
+  if (!ctxFondo || !canvasFondo) return;
   ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
   if (fondoImagen) {
     ctxFondo.save();
@@ -305,17 +370,35 @@ function dibujarFondo() {
   }
 }
 
+/**
+ * ⚠️ FIX CRÍTICO: getPos ahora calcula bien las coordenadas
+ * teniendo en cuenta el escalado y object-fit del canvas.
+ */
 function getPos(e) {
+  if (!canvas) return { x: 0, y: 0 };
   const rect = canvas.getBoundingClientRect();
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
-  return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+  const clientX = (e.clientX !== undefined) ? e.clientX : e.pageX;
+  const clientY = (e.clientY !== undefined) ? e.clientY : e.pageY;
+  return {
+    x: (clientX - rect.left) * scaleX,
+    y: (clientY - rect.top) * scaleY
+  };
 }
 
 function empezarDibujo(e) {
+  if (!canvas || !ctx) return;
   dibujando = true;
   const pos = getPos(e);
-  trazoActual = { tipo: herramienta, color: color, grosor: grosor, opacidad: herramienta === "lapiz" ? 0.6 : 1, sombra: herramienta === "neon" ? 25 : 0, puntos: [pos] };
+  trazoActual = {
+    tipo: herramienta,
+    color: color,
+    grosor: grosor,
+    opacidad: herramienta === "lapiz" ? 0.6 : 1,
+    sombra: herramienta === "neon" ? 25 : 0,
+    puntos: [pos]
+  };
   trazos.push(trazoActual);
   renderizarTrazos();
 }
@@ -327,7 +410,10 @@ function dibujar(e) {
     for (let i = 0; i < 5; i++) {
       const angulo = Math.random() * Math.PI * 2;
       const distancia = Math.random() * grosor * 2;
-      trazoActual.puntos.push({ x: pos.x + Math.cos(angulo) * distancia, y: pos.y + Math.sin(angulo) * distancia });
+      trazoActual.puntos.push({
+        x: pos.x + Math.cos(angulo) * distancia,
+        y: pos.y + Math.sin(angulo) * distancia
+      });
     }
   } else {
     trazoActual.puntos.push(pos);
@@ -341,7 +427,7 @@ function terminarDibujo() {
 }
 
 function renderizarTrazos() {
-  if(!ctx) return;
+  if (!ctx || !canvas) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   trazos.forEach((trazo) => {
     ctx.beginPath();
@@ -364,25 +450,36 @@ function renderizarTrazos() {
       });
     } else {
       if (trazo.puntos.length === 1) {
-        ctx.beginPath(); ctx.arc(trazo.puntos[0].x, trazo.puntos[0].y, ctx.lineWidth / 2, 0, Math.PI * 2); ctx.fillStyle = trazo.color; ctx.fill();
+        ctx.beginPath();
+        ctx.arc(trazo.puntos[0].x, trazo.puntos[0].y, ctx.lineWidth / 2, 0, Math.PI * 2);
+        ctx.fillStyle = trazo.color;
+        ctx.fill();
       } else {
-        ctx.beginPath(); ctx.moveTo(trazo.puntos[0].x, trazo.puntos[0].y);
+        ctx.beginPath();
+        ctx.moveTo(trazo.puntos[0].x, trazo.puntos[0].y);
         for (let i = 1; i < trazo.puntos.length; i++) ctx.lineTo(trazo.puntos[i].x, trazo.puntos[i].y);
         ctx.stroke();
       }
     }
   });
-  ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+  ctx.globalCompositeOperation = "source-over";
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
 }
 
 // ============================================================
 //  GUARDADO Y MUSEO
 // ============================================================
 async function guardarObra() {
+  if (!canvas || !canvasFondo) {
+    alert("Error: no se encontró el lienzo.");
+    return;
+  }
+
   const t1 = document.getElementById("tituloObra");
   const t2 = document.getElementById("tituloObraM");
   const titulo = ((t1 ? t1.value : "") || (t2 ? t2.value : "")).trim() || "Sin título";
-  
+
   document.querySelectorAll(".btn-guardar").forEach(b => { b.textContent = "Guardando..."; b.disabled = true; });
 
   const tempCanvas = document.createElement("canvas");
@@ -436,16 +533,18 @@ async function guardarObra() {
     }
 
     const elOverlay = document.getElementById("estudioOverlay");
-    if(elOverlay) elOverlay.classList.remove("activo");
+    if (elOverlay) elOverlay.classList.remove("activo");
     cerrarLibro();
     await cargarObras();
-    
+
     if (window.lanzarConfeti) window.lanzarConfeti(1000);
-    
+
   } catch (err) {
     alert("Error: " + err.message);
   } finally {
     document.querySelectorAll(".btn-guardar").forEach(b => { b.textContent = "Guardar Obra"; b.disabled = false; });
+    // Restaurar el texto del botón principal de la barra Instagram
+    document.querySelectorAll(".btn-accion-principal.btn-guardar").forEach(b => { b.textContent = "Guardar"; });
     modoEdicion = false; obraEditandoId = null; fondoEditandoId = null;
   }
 }
@@ -453,23 +552,29 @@ async function guardarObra() {
 async function editarObraDesdeMuseo() {
   if (!obraActualEnMuseo) return;
   const mo = document.getElementById("museoOverlay");
-  if(mo) mo.classList.remove("activo");
+  if (mo) mo.classList.remove("activo");
+
+  // ⚠️ Asegurarnos de tener el canvas de la vista activa
+  const { cFondo, cDibujo } = obtenerCanvasActivos();
+  canvasFondo = cFondo; canvas = cDibujo;
+  if (canvasFondo) ctxFondo = canvasFondo.getContext("2d");
+  if (canvas) ctx = canvas.getContext("2d");
 
   modoEdicion = true;
   obraEditandoId = obraActualEnMuseo.id;
   fondoEditandoId = obraActualEnMuseo.fondo_id || generarUUID();
 
   const eo = document.getElementById("estudioOverlay");
-  if(eo) eo.classList.add("activo");
+  if (eo) eo.classList.add("activo");
   document.querySelectorAll("#tituloObra, #tituloObraM").forEach(inp => inp.value = obraActualEnMuseo.titulo || "");
 
   fondoImagen = null;
   fondoColor = "#ffffff";
   document.querySelectorAll(".fondo-color-input").forEach(inp => inp.value = "#ffffff");
-  
-  if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if(ctxFondo) ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
-  
+
+  if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (ctxFondo && canvasFondo) ctxFondo.clearRect(0, 0, canvasFondo.width, canvasFondo.height);
+
   const obra = obraActualEnMuseo;
 
   if (obra.capa_fondo_url) {
@@ -492,11 +597,11 @@ async function editarObraDesdeMuseo() {
     trazos = JSON.parse(JSON.stringify(obra.capa_trazos));
     renderizarTrazos();
   } else {
-    trazos = []; 
+    trazos = [];
     renderizarTrazos();
     try {
       const imgFull = await cargarImagen(obra.imagen_url, true);
-      ctx.drawImage(imgFull, 0, 0, canvas.width, canvas.height);
+      if (ctx && canvas) ctx.drawImage(imgFull, 0, 0, canvas.width, canvas.height);
     } catch (err) {
       console.error("No se pudo cargar la obra antigua:", err);
     }
@@ -505,14 +610,14 @@ async function editarObraDesdeMuseo() {
 
 async function copiarObraDesdeMuseo() {
   if (!obraActualEnMuseo) return;
-  const btn = document.getElementById("btnCopiarObraMuseo");
-  const textoOriginal = btn.textContent;
-  btn.textContent = "Copiando...";
+  const botones = document.querySelectorAll("#btnCopiarObraMuseo");
+  const textosOriginales = Array.from(botones).map(b => b.textContent);
+  botones.forEach(b => b.textContent = "Copiando...");
 
   try {
     const obra = obraActualEnMuseo;
     if (obra.capa_fondo_url) {
-      portapapeles.fondo = await cargarImagen(obra.capa_fondo_url, true); 
+      portapapeles.fondo = await cargarImagen(obra.capa_fondo_url, true);
     } else {
       const canvasFondoTemp = document.createElement("canvas");
       canvasFondoTemp.width = 900; canvasFondoTemp.height = 600;
@@ -527,17 +632,19 @@ async function copiarObraDesdeMuseo() {
     } else {
       portapapeles.trazos = [];
     }
-    
-    btn.textContent = "¡Copiado!";
+
+    botones.forEach(b => b.textContent = "¡Copiado!");
     const mo = document.getElementById("museoOverlay");
-    if(mo) mo.classList.remove("activo");
-    abrirEstudio(); 
-    
-    setTimeout(() => { btn.textContent = textoOriginal; }, 500);
+    if (mo) mo.classList.remove("activo");
+    abrirEstudio();
+
+    setTimeout(() => {
+      botones.forEach((b, i) => b.textContent = textosOriginales[i]);
+    }, 500);
   } catch (err) {
     console.error("Error al copiar obra:", err);
     alert("No se pudo copiar la obra.");
-    btn.textContent = textoOriginal;
+    botones.forEach((b, i) => b.textContent = textosOriginales[i]);
   }
 }
 
@@ -554,22 +661,27 @@ function initPanelTemas() {
   const previewColor = document.getElementById('previewColorActual');
   if (!btnAbrir) return;
 
-  btnAbrir.onclick = () => { drawer.classList.add('activo'); overlay.classList.add('activo'); };
+  btnAbrir.addEventListener('click', (e) => {
+    e.preventDefault();
+    drawer.classList.add('activo');
+    overlay.classList.add('activo');
+  });
   const cerrarPanel = () => { drawer.classList.remove('activo'); overlay.classList.remove('activo'); };
-  if(btnCerrar) btnCerrar.onclick = cerrarPanel;
-  if(overlay) overlay.onclick = cerrarPanel;
+  if (btnCerrar) btnCerrar.addEventListener('click', (e) => { e.preventDefault(); cerrarPanel(); });
+  if (overlay) overlay.addEventListener('click', cerrarPanel);
 
   items.forEach(item => {
-    item.onclick = () => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
       items.forEach(i => i.classList.remove('activo'));
       item.classList.add('activo');
       const tema = item.dataset.setTema;
       body.setAttribute('data-tema', tema);
       const previewStyle = item.querySelector('.tema-card-preview').style.background;
-      if(previewColor) previewColor.style.background = previewStyle;
+      if (previewColor) previewColor.style.background = previewStyle;
       localStorage.setItem('tema_pagina', tema);
       cerrarPanel();
-    };
+    });
   });
 
   const temaGuardado = localStorage.getItem('tema_pagina');
@@ -579,7 +691,7 @@ function initPanelTemas() {
     if (itemActivo) {
       items.forEach(i => i.classList.remove('activo'));
       itemActivo.classList.add('activo');
-      if(previewColor) previewColor.style.background = itemActivo.querySelector('.tema-card-preview').style.background;
+      if (previewColor) previewColor.style.background = itemActivo.querySelector('.tema-card-preview').style.background;
     }
   }
 }
@@ -611,7 +723,7 @@ async function cargarObras() {
 
 function generarLibro() {
   const contenedor = document.getElementById("libroPaginas");
-  if(!contenedor) return;
+  if (!contenedor) return;
   contenedor.innerHTML = "";
   paginas = [];
 
@@ -640,7 +752,7 @@ function generarLibro() {
     const caraFrente = document.createElement("div");
     caraFrente.className = "hoja-cara";
     caraFrente.innerHTML = `${paginas[i].map(obra => crearEstampaHTML(obra)).join("")}`;
-    
+
     const caraTrasera = document.createElement("div");
     caraTrasera.className = "hoja-cara trasera";
     if (i + 1 < paginas.length) {
@@ -658,7 +770,7 @@ function generarLibro() {
 
 function crearEstampaHTML(obra) {
   return `
-    <div class="estampa-obra" onclick="event.stopPropagation(); abrirMuseo('${obra.id}')">
+    <div class="estampa-obra" onclick="event.stopPropagation(); window.abrirMuseo('${obra.id}')">
       <img src="${obra.imagen_url}" alt="${obra.titulo}" loading="lazy" />
       <h4>${obra.titulo || "Sin título"}</h4>
     </div>
@@ -669,11 +781,11 @@ function abrirLibro() {
   const lw = document.getElementById("libroWrapper");
   const lc = document.getElementById("libroControles");
   const bc = document.getElementById("btnCerrarLibro");
-  
-  if(lw) lw.classList.add("abierto");
-  if(lc) lc.classList.add("activo");
-  if(bc) bc.style.display = "flex";
-  
+
+  if (lw) lw.classList.add("abierto");
+  if (lc) lc.classList.add("activo");
+  if (bc) bc.style.display = "flex";
+
   paginaActual = 1;
   actualizarPaginas();
 }
@@ -682,11 +794,11 @@ function cerrarLibro() {
   const lw = document.getElementById("libroWrapper");
   const lc = document.getElementById("libroControles");
   const bc = document.getElementById("btnCerrarLibro");
-  
-  if(lw) { lw.classList.remove("abierto"); lw.style.transform = ""; }
-  if(lc) lc.classList.remove("activo");
-  if(bc) bc.style.display = "none";
-  
+
+  if (lw) { lw.classList.remove("abierto"); lw.style.transform = ""; }
+  if (lc) lc.classList.remove("activo");
+  if (bc) bc.style.display = "none";
+
   paginaActual = 0;
   const hojas = document.querySelectorAll(".hoja");
   hojas.forEach(hoja => hoja.classList.remove("volteada"));
@@ -699,9 +811,9 @@ function paginaSiguiente() { if (paginaActual < paginas.length) { paginaActual++
 
 function animarPagina() {
   const wrapper = document.getElementById("libroWrapper");
-  if(wrapper) wrapper.classList.add("girando");
+  if (wrapper) wrapper.classList.add("girando");
   actualizarPaginas();
-  setTimeout(() => { if(wrapper) wrapper.classList.remove("girando"); }, 1200);
+  setTimeout(() => { if (wrapper) wrapper.classList.remove("girando"); }, 1200);
 }
 
 function actualizarPaginas() {
@@ -725,8 +837,8 @@ function actualizarControles() {
   const btnPrev = document.getElementById("btnPrev");
   const btnNext = document.getElementById("btnNext");
   const indicador = document.getElementById("indicadorPaginas");
-  if(btnPrev) btnPrev.disabled = paginaActual <= 1;
-  if(btnNext) btnNext.disabled = paginaActual >= paginas.length;
+  if (btnPrev) btnPrev.disabled = paginaActual <= 1;
+  if (btnNext) btnNext.disabled = paginaActual >= paginas.length;
   if (indicador) {
     if (paginaActual === 0) indicador.textContent = "Libro Cerrado";
     else {
@@ -742,14 +854,14 @@ window.abrirMuseo = function(id) {
   if (!obra) return;
   obraActualEnMuseo = obra;
   const mt = document.getElementById("museoTitulo");
-  if(mt) mt.textContent = obra.titulo || "Sin título";
+  if (mt) mt.textContent = obra.titulo || "Sin título";
   const mf = document.getElementById("museoFecha");
-  if(mf) mf.textContent = new Date(obra.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  if (mf) mf.textContent = new Date(obra.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
   const mi = document.getElementById("museoImagen");
-  if(mi) mi.src = obra.imagen_url;
+  if (mi) mi.src = obra.imagen_url;
   const mo = document.getElementById("museoOverlay");
-  if(mo) mo.classList.add("activo");
-}
+  if (mo) mo.classList.add("activo");
+};
 
 async function descargarObraComoPNG() {
   if (!obraActualEnMuseo || !obraActualEnMuseo.imagen_url) return;
@@ -774,12 +886,12 @@ async function borrarObraDesdeMuseo() {
     const pushPath = (u) => { if (u && u.includes('/media/')) paths.push(u.split('/media/')[1]); };
     pushPath(obra.imagen_url);
     pushPath(obra.capa_fondo_url);
-    
+
     if (paths.length) await supabase.storage.from('media').remove(paths);
 
     await supabase.from('arte_obras').delete().eq('id', obra.id);
     const mo = document.getElementById("museoOverlay");
-    if(mo) mo.classList.remove("activo");
+    if (mo) mo.classList.remove("activo");
     cerrarLibro();
     await cargarObras();
   } catch (err) { alert("Error al eliminar: " + err.message); }
