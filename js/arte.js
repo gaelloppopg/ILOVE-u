@@ -635,7 +635,7 @@ function crearEstampaHTML(obra) {
 
 function abrirLibro() {
   document.getElementById("libroWrapper").classList.add("abierto");
-  document.getElementById("libroControles").classList.add("activo"); // <- CLAVE
+  document.getElementById("libroControles").classList.add("activo");
   document.getElementById("btnCerrarLibro").style.display = "flex";
   paginaActual = 1;
   actualizarPaginas();
@@ -645,7 +645,7 @@ function cerrarLibro() {
   const wrapper = document.getElementById("libroWrapper");
   wrapper.classList.remove("abierto");
   wrapper.style.transform = ""; 
-  document.getElementById("libroControles").classList.remove("activo"); // <- CLAVE
+  document.getElementById("libroControles").classList.remove("activo");
   document.getElementById("btnCerrarLibro").style.display = "none";
   paginaActual = 0;
   const hojas = document.querySelectorAll(".hoja");
