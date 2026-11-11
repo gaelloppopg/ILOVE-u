@@ -198,3 +198,65 @@ body.layout-tablet .btn-accion-principal {
   font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;
   box-shadow: 0 4px 10px rgba(201, 160, 80, 0.3);
 }
+/* =========================================================
+   ADAPTACIÓN GLOBAL DE LA PÁGINA Y EL LIENZO
+   ========================================================= */
+
+/* Evitar scroll horizontal en toda la página */
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Asegurar que el estudio ocupe exactamente el tamaño de la pantalla */
+body.layout-movil .estudio-overlay,
+body.layout-tablet .estudio-overlay {
+  width: 100vw !important;
+  height: 100dvh !important; /* dvh evita problemas con la barra de URL del móvil */
+  overflow: hidden !important;
+}
+
+body.layout-movil .estudio,
+body.layout-tablet .estudio {
+  width: 100vw !important;
+  height: 100dvh !important;
+  overflow: hidden !important;
+}
+
+/* Forzar al contenedor del canvas a adaptar el lienzo al espacio disponible */
+body.layout-movil .estudio-canvas-wrapper,
+body.layout-tablet .estudio-canvas-wrapper {
+  flex: 1 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  padding: 5px !important; /* Un pequeño margen para que no toque los bordes */
+}
+
+/* El lienzo se adapta manteniendo su proporción (aspect-ratio 3/2) */
+body.layout-movil .canvas-stack,
+body.layout-tablet .canvas-stack {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 100% !important;
+  aspect-ratio: 3 / 2 !important;
+  position: relative;
+}
+
+body.layout-movil .canvas-stack canvas,
+body.layout-tablet .canvas-stack canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+}
+
+/* Asegurar que los menús laterales no generen scroll en el body */
+body.layout-movil .estudio-toolbar,
+body.layout-tablet .estudio-toolbar {
+  max-height: 100dvh !important;
+}
