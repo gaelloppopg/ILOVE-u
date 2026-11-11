@@ -462,3 +462,84 @@ body.layout-movil .btn-accion-principal:active,
 body.layout-tablet .btn-accion-principal:active {
   transform: scale(0.96) !important;
 }
+/* ==========================================================================
+   BLOQUEO DE SCROLL (FIX: el fondo no debe moverse al dibujar)
+   ========================================================================== */
+
+/* Cuando el body tiene la clase estudio-abierto, no permitir scroll */
+body.estudio-abierto {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+}
+
+html:has(body.estudio-abierto) {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/* Evitar scroll chaining en el wrapper del canvas */
+body.layout-movil .estudio-canvas-wrapper,
+body.layout-tablet .estudio-canvas-wrapper,
+body.layout-escritorio .estudio-canvas-wrapper {
+  overscroll-behavior: contain !important;
+  touch-action: none !important;
+}
+
+/* Asegurar que el overlay del estudio cubre todo y no deja scroll detrás */
+.estudio-overlay.activo {
+  display: flex !important;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+  z-index: 9999 !important;
+}
+
+/* El toolbar lateral del menú móvil: no debe generar scroll del body */
+body.layout-movil .estudio-toolbar,
+body.layout-tablet .estudio-toolbar {
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Museo: bloquear scroll también cuando esté abierto */
+.museo-overlay.activo {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none !important;
+}
+
+/* Panel de temas: bloquear scroll cuando esté abierto */
+.panel-temas-drawer.activo {
+  overscroll-behavior: contain !important;
+}
+
+/* En el libro, no permitir overscroll cuando está abierto */
+body:has(#libroWrapper.abierto) {
+  overscroll-behavior: none !important;
+}
+
+/* El canvas nunca debe permitir gestos de scroll/zoom */
+.canvas-stack,
+.canvas-stack canvas {
+  touch-action: none !important;
+  overscroll-behavior: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+/* En iOS, evitar el "rubber band" al llegar al borde */
+@supports (-webkit-touch-callout: none) {
+  body.estudio-abierto,
+  .estudio-overlay.activo,
+  .estudio-canvas-wrapper,
+  .canvas-stack,
+  .canvas-stack canvas {
+    -webkit-overflow-scrolling: auto !important;
+  }
+}

@@ -71,6 +71,64 @@ function obtenerCanvasActivos() {
 }
 
 // ============================================================
+//  BLOQUEO DE SCROLL (FIX PRINCIPAL)
+// ============================================================
+let _scrollY = 0;
+
+/**
+ * Bloquea el scroll del body. Se usa al abrir estudio, museo o libro.
+ * Usa position:fixed para forzar bloqueo en iOS Safari.
+ */
+function bloquearScrollBody() {
+  if (document.body.dataset.scrollBloqueado === "1") return;
+  _scrollY = window.scrollY || window.pageYOffset || 0;
+  document.body.dataset.scrollBloqueado = "1";
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${_scrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+  document.body.style.overflow = "hidden";
+  document.documentElement.style.overflow = "hidden";
+  document.documentElement.style.overscrollBehavior = "none";
+}
+
+/** Restaura el scroll del body */
+function desbloquearScrollBody() {
+  if (document.body.dataset.scrollBloqueado !== "1") return;
+  document.body.dataset.scrollBloqueado = "0";
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  document.body.style.overflow = "";
+  document.documentElement.style.overflow = "";
+  document.documentElement.style.overscrollBehavior = "";
+  window.scrollTo(0, _scrollY);
+}
+
+/**
+ * Revisa si algún overlay crítico sigue abierto y,
+ * si no queda ninguno, restaura el scroll.
+ */
+function actualizarBloqueoScroll() {
+  const estudio = document.getElementById("estudioOverlay");
+  const museo = document.getElementById("museoOverlay");
+  const panel = document.getElementById("panelTemasDrawer");
+
+  const estudioAbierto = estudio && estudio.classList.contains("activo");
+  const museoAbierto = museo && museo.classList.contains("activo");
+  const panelAbierto = panel && panel.classList.contains("activo");
+
+  if (estudioAbierto || museoAbierto || panelAbierto) {
+    bloquearScrollBody();
+  } else {
+    desbloquearScrollBody();
+  }
+}
+
+// ============================================================
 //  INICIALIZACIÓN
 // ============================================================
 async function initArte() {
@@ -99,7 +157,6 @@ async function initArte() {
   document.body.classList.remove('layout-movil', 'layout-tablet', 'layout-escritorio');
   document.body.classList.add(`layout-${preferenciaDispositivo}`);
 
-  // ⚠️ FIX: seleccionar canvas de la VISTA ACTIVA, no el primero del DOM
   const { cFondo, cDibujo } = obtenerCanvasActivos();
   canvasFondo = cFondo;
   canvas = cDibujo;
@@ -122,13 +179,11 @@ async function initArte() {
 //  EVENTOS TÁCTILES Y DIBUJO
 // ============================================================
 function configurarEventosDibujo() {
-  // ⚠️ FIX: enlazar a TODOS los canvas de la vista activa (por si acaso)
   const vista = vistaActiva();
   if (!vista) return;
   const canvasDibujo = vista.querySelector('.lienzo-dibujo');
   if (!canvasDibujo) return;
 
-  // Si canvas global no está definido, lo asignamos
   if (!canvas) {
     canvas = canvasDibujo;
     ctx = canvas.getContext("2d");
@@ -136,12 +191,14 @@ function configurarEventosDibujo() {
   }
 
   const manejarStart = (e) => {
-    e.preventDefault();
+    // ⚠️ NO llamamos preventDefault aquí para no bloquear clicks
+    // pero sí evitamos que el touch haga scroll
+    if (e.cancelable) e.preventDefault();
     const punto = e.touches ? e.touches[0] : e;
     empezarDibujo(punto);
   };
   const manejarMove = (e) => {
-    e.preventDefault();
+    if (e.cancelable) e.preventDefault();
     const punto = e.touches ? e.touches[0] : e;
     dibujar(punto);
   };
@@ -159,11 +216,10 @@ function configurarEventosDibujo() {
   canvasDibujo.addEventListener('mouseup', manejarEnd);
   canvasDibujo.addEventListener('mouseleave', manejarEnd);
 
-  // ⚠️ FIX: usar addEventListener en TODOS los botones (no sobrescribir onclick)
+  // Herramientas
   document.querySelectorAll(".tool-btn[data-tool]").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
-      // Marcar como activo solo los de la misma vista
       document.querySelectorAll(".tool-btn[data-tool]").forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
       herramienta = btn.dataset.tool;
@@ -277,8 +333,7 @@ function configurarEventosUI() {
   document.querySelectorAll("#btnNuevaObra").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); abrirEstudio(); }));
   document.querySelectorAll("#cerrarEstudio").forEach(b => b.addEventListener("click", (e) => {
     e.preventDefault();
-    const el = document.getElementById("estudioOverlay");
-    if (el) el.classList.remove("activo");
+    cerrarEstudio();
   }));
 
   document.querySelectorAll("#btnCerrarLibro").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); cerrarLibro(); }));
@@ -288,12 +343,11 @@ function configurarEventosUI() {
 
   document.querySelectorAll("#btnCerrarMuseo").forEach(b => b.addEventListener("click", (e) => {
     e.preventDefault();
-    const el = document.getElementById("museoOverlay");
-    if (el) el.classList.remove("activo");
+    cerrarMuseo();
   }));
 
   document.querySelectorAll("#museoOverlay").forEach(m => m.addEventListener("click", (e) => {
-    if (e.target.id === 'museoOverlay') m.classList.remove("activo");
+    if (e.target.id === 'museoOverlay') cerrarMuseo();
   }));
 
   document.querySelectorAll("#btnBorrarObra").forEach(b => b.addEventListener("click", (e) => { e.preventDefault(); borrarObraDesdeMuseo(); }));
@@ -323,7 +377,7 @@ function configurarEventosUI() {
     });
   }
 
-  // ⚠️ Sincronizar títulos entre escritorio y móvil
+  // Sincronizar títulos
   const tE = document.getElementById('tituloObra');
   const tM = document.getElementById('tituloObraM');
   if (tE && tM) {
@@ -354,6 +408,23 @@ function abrirEstudio() {
 
   const overlay = document.getElementById("estudioOverlay");
   if (overlay) overlay.classList.add("activo");
+
+  document.body.classList.add("estudio-abierto");
+  bloquearScrollBody(); // ⚠️ FIX
+}
+
+function cerrarEstudio() {
+  const el = document.getElementById("estudioOverlay");
+  if (el) el.classList.remove("activo");
+  document.body.classList.remove("estudio-abierto");
+
+  // Cerrar menú lateral móvil si estaba abierto
+  const toolbar = document.getElementById('estudioToolbar');
+  const overlayMenu = document.getElementById('overlayMenu');
+  if (toolbar) toolbar.classList.remove('activo');
+  if (overlayMenu) overlayMenu.classList.remove('activo');
+
+  actualizarBloqueoScroll(); // ⚠️ FIX
 }
 
 function dibujarFondo() {
@@ -370,10 +441,6 @@ function dibujarFondo() {
   }
 }
 
-/**
- * ⚠️ FIX CRÍTICO: getPos ahora calcula bien las coordenadas
- * teniendo en cuenta el escalado y object-fit del canvas.
- */
 function getPos(e) {
   if (!canvas) return { x: 0, y: 0 };
   const rect = canvas.getBoundingClientRect();
@@ -532,8 +599,7 @@ async function guardarObra() {
       if (idx !== -1) obras[idx] = obraGuardada;
     }
 
-    const elOverlay = document.getElementById("estudioOverlay");
-    if (elOverlay) elOverlay.classList.remove("activo");
+    cerrarEstudio();
     cerrarLibro();
     await cargarObras();
 
@@ -543,7 +609,6 @@ async function guardarObra() {
     alert("Error: " + err.message);
   } finally {
     document.querySelectorAll(".btn-guardar").forEach(b => { b.textContent = "Guardar Obra"; b.disabled = false; });
-    // Restaurar el texto del botón principal de la barra Instagram
     document.querySelectorAll(".btn-accion-principal.btn-guardar").forEach(b => { b.textContent = "Guardar"; });
     modoEdicion = false; obraEditandoId = null; fondoEditandoId = null;
   }
@@ -551,10 +616,8 @@ async function guardarObra() {
 
 async function editarObraDesdeMuseo() {
   if (!obraActualEnMuseo) return;
-  const mo = document.getElementById("museoOverlay");
-  if (mo) mo.classList.remove("activo");
+  cerrarMuseo();
 
-  // ⚠️ Asegurarnos de tener el canvas de la vista activa
   const { cFondo, cDibujo } = obtenerCanvasActivos();
   canvasFondo = cFondo; canvas = cDibujo;
   if (canvasFondo) ctxFondo = canvasFondo.getContext("2d");
@@ -606,6 +669,9 @@ async function editarObraDesdeMuseo() {
       console.error("No se pudo cargar la obra antigua:", err);
     }
   }
+
+  document.body.classList.add("estudio-abierto");
+  bloquearScrollBody(); // ⚠️ FIX
 }
 
 async function copiarObraDesdeMuseo() {
@@ -634,8 +700,7 @@ async function copiarObraDesdeMuseo() {
     }
 
     botones.forEach(b => b.textContent = "¡Copiado!");
-    const mo = document.getElementById("museoOverlay");
-    if (mo) mo.classList.remove("activo");
+    cerrarMuseo();
     abrirEstudio();
 
     setTimeout(() => {
@@ -665,8 +730,13 @@ function initPanelTemas() {
     e.preventDefault();
     drawer.classList.add('activo');
     overlay.classList.add('activo');
+    bloquearScrollBody(); // ⚠️ FIX
   });
-  const cerrarPanel = () => { drawer.classList.remove('activo'); overlay.classList.remove('activo'); };
+  const cerrarPanel = () => {
+    drawer.classList.remove('activo');
+    overlay.classList.remove('activo');
+    actualizarBloqueoScroll(); // ⚠️ FIX
+  };
   if (btnCerrar) btnCerrar.addEventListener('click', (e) => { e.preventDefault(); cerrarPanel(); });
   if (overlay) overlay.addEventListener('click', cerrarPanel);
 
@@ -788,6 +858,7 @@ function abrirLibro() {
 
   paginaActual = 1;
   actualizarPaginas();
+  bloquearScrollBody(); // ⚠️ FIX
 }
 
 function cerrarLibro() {
@@ -804,6 +875,7 @@ function cerrarLibro() {
   hojas.forEach(hoja => hoja.classList.remove("volteada"));
   actualizarZIndex();
   actualizarControles();
+  actualizarBloqueoScroll(); // ⚠️ FIX
 }
 
 function paginaAnterior() { if (paginaActual > 1) { paginaActual--; animarPagina(); } }
@@ -861,7 +933,14 @@ window.abrirMuseo = function(id) {
   if (mi) mi.src = obra.imagen_url;
   const mo = document.getElementById("museoOverlay");
   if (mo) mo.classList.add("activo");
+  bloquearScrollBody(); // ⚠️ FIX
 };
+
+function cerrarMuseo() {
+  const mo = document.getElementById("museoOverlay");
+  if (mo) mo.classList.remove("activo");
+  actualizarBloqueoScroll(); // ⚠️ FIX
+}
 
 async function descargarObraComoPNG() {
   if (!obraActualEnMuseo || !obraActualEnMuseo.imagen_url) return;
@@ -890,8 +969,7 @@ async function borrarObraDesdeMuseo() {
     if (paths.length) await supabase.storage.from('media').remove(paths);
 
     await supabase.from('arte_obras').delete().eq('id', obra.id);
-    const mo = document.getElementById("museoOverlay");
-    if (mo) mo.classList.remove("activo");
+    cerrarMuseo();
     cerrarLibro();
     await cargarObras();
   } catch (err) { alert("Error al eliminar: " + err.message); }
