@@ -1,14 +1,13 @@
 /* =========================================================
-   ESTILOS EXCLUSIVOS PARA MÓVILES Y TABLETS (Layout Instagram)
+   SEPARACIÓN ESTRICTA DE VISTAS
    ========================================================= */
+body.layout-escritorio .vista-movil { display: none !important; }
+body.layout-movil .vista-escritorio, 
+body.layout-tablet .vista-escritorio { display: none !important; }
 
-/* Ocultar barras superiores e inferiores clásicas */
-body.layout-movil .estudio-topbar,
-body.layout-tablet .estudio-topbar { display: none !important; }
-body.layout-movil .estudio-footer,
-body.layout-tablet .estudio-footer { display: none !important; }
-
-/* Hacer que el estudio ocupe toda la pantalla */
+/* =========================================================
+   ESTILOS MÓVIL / TABLET
+   ========================================================= */
 body.layout-movil .estudio-overlay,
 body.layout-tablet .estudio-overlay { padding: 0 !important; }
 
@@ -20,24 +19,29 @@ body.layout-tablet .estudio {
   background: #000 !important;
 }
 
-/* Lienzo centrado */
 body.layout-movil .estudio-canvas-wrapper,
 body.layout-tablet .estudio-canvas-wrapper {
-  background: #111 !important;
-  padding: 10px;
-  padding-bottom: 80px; /* Espacio para la barra de Instagram */
+  background: #111 !important; 
+  padding: 15px; 
+  padding-bottom: 80px; /* Espacio para la barra inferior */
+  display: flex; justify-content: center; align-items: center;
 }
 
-/* EL MENÚ LATERAL (DRAWER) - Oculto por defecto, se abre con el botón */
+body.layout-movil .canvas-stack,
+body.layout-tablet .canvas-stack {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+}
+
+/* MENÚ LATERAL (DRAWER) */
 body.layout-movil .estudio-toolbar,
 body.layout-tablet .estudio-toolbar { 
   position: fixed !important; top: 0 !important; right: -100% !important;
   width: 85vw !important; max-width: 320px !important; height: 100vh !important;
   background: #1a1a1a !important; color: #fff !important;
   z-index: 9999 !important; padding: 20px !important; overflow-y: auto !important;
-  transition: right 0.3s ease !important; 
-  display: flex !important; flex-direction: column !important; gap: 20px !important;
-  align-items: stretch !important;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; 
+  display: flex !important; flex-direction: column !important; gap: 15px !important;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.5);
 }
 
 body.layout-movil .estudio-toolbar.activo,
@@ -45,116 +49,130 @@ body.layout-tablet .estudio-toolbar.activo { right: 0 !important; }
 
 body.layout-movil .btn-cerrar-toolbar,
 body.layout-tablet .btn-cerrar-toolbar {
-  display: block !important; background: transparent; border: none; color: #fff;
-  font-size: 1.5rem; text-align: right; cursor: pointer; margin-bottom: 0;
-  align-self: flex-end;
+  display: flex !important; justify-content: center; align-items: center;
+  background: #333; border: none; color: #fff; font-size: 1.2rem; font-weight: bold;
+  width: 35px; height: 35px; border-radius: 50%; cursor: pointer; 
+  align-self: flex-end; margin-bottom: 10px;
 }
 
-/* Agrupar herramientas en el menú lateral */
 body.layout-movil .estudio-toolbar .tool-group,
 body.layout-tablet .estudio-toolbar .tool-group { 
   display: flex !important; flex-direction: column !important; gap: 10px !important; 
   width: 100% !important; border-bottom: 1px solid #333; padding-bottom: 15px;
 }
 body.layout-movil .estudio-toolbar .tool-group:last-child,
-body.layout-tablet .estudio-toolbar .tool-group:last-child { border-bottom: none; }
+body.layout-tablet .estudio-toolbar .tool-group:last-child { border-bottom: none; padding-bottom: 0; }
 
 body.layout-movil .estudio-toolbar .tool-label,
 body.layout-tablet .estudio-toolbar .tool-label { 
-  font-size: 0.9rem !important; color: #c9a050 !important; margin-bottom: 5px; font-weight: 700;
+  font-size: 0.85rem !important; color: #c9a050 !important; font-weight: 700 !important; text-transform: uppercase;
 }
 
-/* Botones de herramientas en el menú */
+/* Botones de herramientas */
 body.layout-movil .estudio-toolbar .tool-btn,
 body.layout-tablet .estudio-toolbar .tool-btn {
-  width: 100% !important; padding: 12px !important; background: #333 !important; color: #fff !important;
-  border: 1px solid #444 !important; border-radius: 8px !important; text-align: left !important; font-size: 1rem !important;
+  width: 100% !important; padding: 14px !important; background: #2a2a2a !important; color: #fff !important;
+  border: 1px solid #444 !important; border-radius: 10px !important; text-align: center !important; font-size: 1rem !important;
 }
 body.layout-movil .estudio-toolbar .tool-btn.active,
 body.layout-tablet .estudio-toolbar .tool-btn.active { 
-  background: #c9a050 !important; color: #000 !important; border-color: #c9a050 !important; 
+  background: #c9a050 !important; color: #000 !important; border-color: #c9a050 !important; font-weight: bold;
 }
 
-/* Colores en cuadrícula */
+/* Colores en cuadrícula en el menú */
 body.layout-movil .estudio-toolbar .colores-grid,
 body.layout-tablet .estudio-toolbar .colores-grid { 
-  display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 10px !important; width: 100%; 
+  display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 12px !important; width: 100%; 
 }
 body.layout-movil .estudio-toolbar .color-btn,
 body.layout-tablet .estudio-toolbar .color-btn { 
-  width: 100% !important; height: 40px !important; border-radius: 50% !important; border: 2px solid #555 !important; 
+  width: 100% !important; aspect-ratio: 1 !important; border-radius: 50% !important; border: 2px solid transparent !important; 
 }
+body.layout-movil .estudio-toolbar .color-btn.active,
+body.layout-tablet .estudio-toolbar .color-btn.active { border-color: #fff !important; transform: scale(1.1); }
 
 /* Grosor */
 body.layout-movil .estudio-toolbar .grosor-control,
-body.layout-tablet .estudio-toolbar .grosor-control { display: flex !important; width: 100% !important; justify-content: space-between; }
+body.layout-tablet .estudio-toolbar .grosor-control { display: flex !important; width: 100% !important; justify-content: space-between; align-items: center; }
 body.layout-movil .estudio-toolbar input[type="range"],
-body.layout-tablet .estudio-toolbar input[type="range"] { width: 80% !important; }
+body.layout-tablet .estudio-toolbar input[type="range"] { width: 75% !important; accent-color: #c9a050; }
 
-/* Controles del Fondo y Acciones (Limpiar, Guardar) dentro del menú */
+/* Controles del Fondo */
 body.layout-movil .estudio-toolbar .fondo-controles,
-body.layout-tablet .estudio-toolbar .fondo-controles { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px !important; width: 100%; }
+body.layout-tablet .estudio-toolbar .fondo-controles { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px !important; width: 100%; margin-top: 5px; }
 body.layout-movil .estudio-toolbar .fondo-controles input[type="color"],
-body.layout-tablet .estudio-toolbar .fondo-controles input[type="color"] { width: 100% !important; height: 40px !important; border-radius: 8px !important; }
+body.layout-tablet .estudio-toolbar .fondo-controles input[type="color"] { width: 100% !important; height: 45px !important; border-radius: 10px !important; border: none; cursor: pointer; }
 body.layout-movil .estudio-toolbar .fondo-controles button,
-body.layout-tablet .estudio-toolbar .fondo-controles button { width: 100% !important; padding: 10px !important; border-radius: 8px !important; background: #333; border: 1px solid #444; color: #fff;}
-body.layout-movil .estudio-toolbar .acciones-movil,
-body.layout-tablet .estudio-toolbar .acciones-movil { display: flex !important; flex-direction: column !important; gap: 10px !important; width: 100%; margin-top: 10px; }
+body.layout-tablet .estudio-toolbar .fondo-controles button { width: 100% !important; padding: 12px !important; border-radius: 10px !important; background: #2a2a2a; border: 1px solid #444; color: #fff; font-size: 0.9rem;}
 
-body.layout-movil .btn-accion,
-body.layout-tablet .btn-accion { width: 100% !important; padding: 15px !important; border-radius: 8px !important; font-size: 1rem !important; }
-
-/* Título en el menú móvil */
+/* Título en el menú */
 body.layout-movil .estudio-toolbar input[type="text"],
 body.layout-tablet .estudio-toolbar input[type="text"] { 
-  width: 100% !important; padding: 12px !important; background: #333 !important; 
-  border: 1px solid #555 !important; color: #fff !important; border-radius: 8px !important; font-size: 1rem !important; 
+  width: 100% !important; padding: 12px !important; background: #2a2a2a !important; 
+  border: 1px solid #444 !important; color: #fff !important; border-radius: 10px !important; font-size: 1rem !important; 
 }
 
-/* Fondo oscuro detrás del menú lateral */
+/* Overlay oscuro detrás del menú */
 body.layout-movil #overlayMenu.activo,
 body.layout-tablet #overlayMenu.activo { 
-  display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9998; backdrop-filter: blur(3px); 
+  display: block !important; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9998; backdrop-filter: blur(2px); 
 }
 
-/* =========================================================
-   BARRA INFERIOR TIPO INSTAGRAM
-   ========================================================= */
-body.layout-movil .barra-instagram,
-body.layout-tablet .barra-instagram {
-  display: flex !important;
-  position: absolute; bottom: 0; left: 0; width: 100%;
-  background: #1a1a1a; padding: 10px 15px;
-  align-items: center; justify-content: space-between;
-  z-index: 100; border-top: 1px solid #333;
-}
-
-/* Botón flotante para abrir herramientas (arriba a la derecha) */
+/* Botón flotante para abrir menú */
 body.layout-movil .btn-menu-movil-flotante,
 body.layout-tablet .btn-menu-movil-flotante {
   display: flex; align-items: center; justify-content: center;
   position: absolute; top: 15px; right: 15px; z-index: 100;
-  background: #333; color: #fff; border: none;
-  width: 40px; height: 40px; border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.5); cursor: pointer;
+  background: rgba(51, 51, 51, 0.8); color: #fff; border: none;
+  width: 44px; height: 44px; border-radius: 50%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5); cursor: pointer; backdrop-filter: blur(5px);
+  font-size: 1.2rem;
 }
 
-/* Paleta de colores rápida en la barra inferior */
+/* =========================================================
+   BARRA INFERIOR TIPO INSTAGRAM (Diseño exacto)
+   ========================================================= */
+body.layout-movil .barra-instagram,
+body.layout-tablet .barra-instagram {
+  display: flex !important; position: absolute; bottom: 0; left: 0; width: 100%;
+  background: #000; padding: 12px 15px; align-items: center; justify-content: space-between;
+  z-index: 100; border-top: 1px solid #222;
+}
+
+/* Grupo de botones izquierdos (Copiar, Pegar, Limpiar) */
+body.layout-movil .barra-instagram .acciones-izq,
+body.layout-tablet .barra-instagram .acciones-izq {
+  display: flex; gap: 8px; align-items: center;
+}
+
+body.layout-movil .barra-instagram .acciones-izq .tool-btn,
+body.layout-tablet .barra-instagram .acciones-izq .tool-btn {
+  background: #1a1a1a; border: none; color: #fff; padding: 8px; border-radius: 8px; font-size: 0.8rem;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer;
+}
+body.layout-movil .barra-instagram .acciones-izq .tool-btn svg,
+body.layout-tablet .barra-instagram .acciones-izq .tool-btn svg { width: 20px; height: 20px; }
+
+/* Paleta rápida central (Deslizable) */
 body.layout-movil .paleta-rapida,
 body.layout-tablet .paleta-rapida {
-  display: flex; gap: 10px; overflow-x: auto; align-items: center;
-  flex: 1; margin: 0 15px;
+  display: flex; gap: 10px; overflow-x: auto; align-items: center; 
+  flex: 1; margin: 0 15px; scrollbar-width: none; /* Firefox */
 }
+body.layout-movil .paleta-rapida::-webkit-scrollbar,
+body.layout-tablet .paleta-rapida::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+
 body.layout-movil .paleta-rapida .color-btn,
 body.layout-tablet .paleta-rapida .color-btn {
-  width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; flex-shrink: 0;
+  width: 32px; height: 32px; border-radius: 50%; border: 2px solid transparent; flex-shrink: 0; cursor: pointer;
 }
 body.layout-movil .paleta-rapida .color-btn.active,
-body.layout-tablet .paleta-rapida .color-btn.active { border-color: #fff; transform: scale(1.1); }
+body.layout-tablet .paleta-rapida .color-btn.active { border-color: #fff; transform: scale(1.15); }
 
-/* Botón de acción principal (Guardar) */
+/* Botón principal Guardar (Derecha) */
 body.layout-movil .btn-accion-principal,
 body.layout-tablet .btn-accion-principal {
-  background: #c9a050; color: #000; border: none; padding: 10px 20px; border-radius: 20px;
+  background: #c9a050; color: #000; border: none; padding: 12px 24px; border-radius: 25px;
   font-weight: bold; font-size: 1rem; cursor: pointer; flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(201, 160, 80, 0.3);
 }

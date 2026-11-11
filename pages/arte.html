@@ -232,7 +232,7 @@
     <div class="estudio" id="estudio">
       
       <!-- ==========================================
-           VISTA ESCRITORIO (Diseño original intacto)
+           VISTA ESCRITORIO
            ========================================== -->
       <div class="vista-escritorio" style="display: flex; flex-direction: column; width: 100%; height: 100%;">
         <div class="estudio-topbar">
@@ -268,9 +268,7 @@
               <button type="button" class="color-btn" data-color="#2a9d8f" style="--c:#2a9d8f"></button>
               <button type="button" class="color-btn" data-color="#457b9d" style="--c:#457b9d"></button>
               <button type="button" class="color-btn" data-color="#9d4edd" style="--c:#9d4edd"></button>
-              <button type="button" class="color-btn" data-color="#f28ca6" style="--c:#f28ca6"></button>
             </div>
-            <div class="color-custom"><input type="color" class="colorPicker" value="#1a1a1a" /></div>
           </div>
           <div class="tool-group herramientas-extras">
             <span class="tool-label">Portapapeles</span>
@@ -303,14 +301,15 @@
       </div>
 
       <!-- ==========================================
-           VISTA MÓVIL (Menú lateral y barra Instagram)
+           VISTA MÓVIL (Estilo Instagram)
            ========================================== -->
       <div class="vista-movil" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
-        <button class="btn-menu-movil-flotante" id="btnAbrirMenuM">≡</button>
+        <button class="btn-menu-movil-flotante" id="btnAbrirMenuM">☰</button>
         <div id="overlayMenu"></div>
 
+        <!-- MENÚ LATERAL -->
         <div class="estudio-toolbar" id="estudioToolbar">
-          <button class="btn-cerrar-toolbar" id="btnCerrarMenuM">X</button>
+          <button class="btn-cerrar-toolbar" id="btnCerrarMenuM">✕</button>
           
           <div class="tool-group">
             <span class="tool-label">Título de la Obra</span>
@@ -343,9 +342,8 @@
               <button type="button" class="color-btn" data-color="#2a9d8f" style="--c:#2a9d8f"></button>
               <button type="button" class="color-btn" data-color="#457b9d" style="--c:#457b9d"></button>
               <button type="button" class="color-btn" data-color="#9d4edd" style="--c:#9d4edd"></button>
-              <button type="button" class="color-btn" data-color="#f28ca6" style="--c:#f28ca6"></button>
             </div>
-            <div class="color-custom"><input type="color" class="colorPicker" value="#1a1a1a" /></div>
+            <div class="color-custom" style="margin-top: 10px;"><input type="color" class="colorPicker" value="#1a1a1a" style="width: 100%; height: 40px; border-radius: 8px; border: none;" /></div>
           </div>
 
           <div class="tool-group">
@@ -365,10 +363,11 @@
 
           <div class="tool-group acciones-movil">
             <button type="button" class="btn-accion secundario btn-limpiar">Limpiar Lienzo</button>
-            <button type="button" class="btn-accion primario btn-guardar">Guardar Obra</button>
+            <button type="button" class="btn-accion primario btn-guardar" style="margin-top: 5px;">Guardar Obra</button>
           </div>
         </div>
 
+        <!-- CANVAS MÓVIL -->
         <div class="estudio-canvas-wrapper">
           <div class="canvas-stack" id="canvasStack">
             <canvas class="lienzo-fondo" width="900" height="600"></canvas>
@@ -376,16 +375,26 @@
           </div>
         </div>
 
+        <!-- BARRA INFERIOR TIPO INSTAGRAM -->
         <div class="barra-instagram">
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <button class="tool-btn btn-copiar" style="padding: 5px 10px; font-size: 0.8rem;">Copiar</button>
-            <button class="tool-btn btn-pegar" style="padding: 5px 10px; font-size: 0.8rem;">Pegar</button>
+          <div class="acciones-izq">
+            <button class="tool-btn btn-copiar" title="Copiar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+            <button class="tool-btn btn-pegar" title="Pegar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            </button>
+            <button class="tool-btn btn-limpiar" title="Limpiar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
           </div>
           <div class="paleta-rapida">
             <button type="button" class="color-btn active" data-color="#1a1a1a" style="--c:#1a1a1a"></button>
             <button type="button" class="color-btn" data-color="#e63946" style="--c:#e63946"></button>
             <button type="button" class="color-btn" data-color="#f4a261" style="--c:#f4a261"></button>
             <button type="button" class="color-btn" data-color="#2a9d8f" style="--c:#2a9d8f"></button>
+            <button type="button" class="color-btn" data-color="#457b9d" style="--c:#457b9d"></button>
+            <button type="button" class="color-btn" data-color="#9d4edd" style="--c:#9d4edd"></button>
           </div>
           <button class="btn-accion-principal btn-guardar">Guardar</button>
         </div>
